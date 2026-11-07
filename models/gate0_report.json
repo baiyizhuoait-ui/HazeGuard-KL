@@ -1,0 +1,79 @@
+{
+  "generated_at": "2026-11-07T17:50:45",
+  "n_nodes": 26,
+  "n_receptors": 3,
+  "date_range": [
+    "2022-08-04 08:00:00",
+    "2026-10-31 20:00:00"
+  ],
+  "split_rows": {
+    "train": 676884,
+    "val": 145054,
+    "test": 144739
+  },
+  "level_distribution_receptor_all": {
+    "0": 0.1791,
+    "1": 0.4973,
+    "2": 0.2015,
+    "3": 0.1221
+  },
+  "level_distribution_receptor_train": {
+    "0": 0.1854,
+    "1": 0.5029,
+    "2": 0.2005,
+    "3": 0.1113
+  },
+  "level_distribution_receptor_test": {
+    "0": 0.1178,
+    "1": 0.4718,
+    "2": 0.2218,
+    "3": 0.1885
+  },
+  "level_distribution_receptor_val": {
+    "0": 0.2114,
+    "1": 0.4966,
+    "2": 0.1861,
+    "3": 0.1059
+  },
+  "checks": {
+    "G0-1_total_rows": {
+      "pass": true,
+      "value": {
+        "total_rows": 966677,
+        "min_rows_per_node": 36952
+      },
+      "rule": "总行数 ≥ 100,000 且每节点 ≥ 12,000"
+    },
+    "G0-2_level3_share": {
+      "pass": true,
+      "value": {
+        "receptor_level3": 0.1221,
+        "panel_level3": 0.0337
+      },
+      "rule": "受体节点 Level 3 占比 ≥ 1.0%"
+    },
+    "G0-3_max_gap": {
+      "pass": true,
+      "value": {
+        "max_gap_receptor_h": 5,
+        "max_gap_panel_h": 37
+      },
+      "rule": "受体节点最长连续缺失 ≤ 24 小时（源区节点的缺口不影响标签，仅披露）"
+    },
+    "G0-4_distribution_drift": {
+      "pass": true,
+      "value": {
+        "train_level3": 0.1113,
+        "test_level3": 0.1885,
+        "ratio": 1.69
+      },
+      "rule": "受体节点 train 与 test 的 Level 3 占比差异 ≤ 3 倍"
+    }
+  },
+  "all_passed": true,
+  "notes": [
+    "测试集覆盖 2026 年 8–10 月的强跨境烟霾过程（KL 单月 Level 3 占比达 47%–51%，PM2.5 p95 = 151.8 µg/m³），因此 High-Risk Recall 具有真实事件支撑。",
+    "空气质量为 CAMS 0.4° 模式产品，非地面实测；报告须声明。",
+    "同格点候选点位已归并为单一节点，见 docs/node_discovery.json。"
+  ]
+}

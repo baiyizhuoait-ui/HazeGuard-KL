@@ -1,0 +1,478 @@
+{
+  "duplicates_removed": 0,
+  "grid_rows_added": 0,
+  "interpolated_cells": 656,
+  "out_of_bounds": {
+    "pm2_5": 0,
+    "pm10": 0,
+    "no2": 0,
+    "so2": 0,
+    "o3": 0,
+    "co": 0,
+    "temperature_2m": 0,
+    "relative_humidity_2m": 0,
+    "precipitation": 0
+  },
+  "max_gap_h": {
+    "KL_City": 2,
+    "Port_Klang": 0,
+    "Sepang": 5,
+    "Seremban": 1,
+    "Malacca": 1,
+    "Johor_Bahru": 2,
+    "Kuantan": 0,
+    "Temerloh": 1,
+    "Kota_Bharu": 0,
+    "Kuala_Terengganu": 0,
+    "Penang": 0,
+    "Alor_Setar": 0,
+    "Ipoh": 1,
+    "Banda_Aceh": 1,
+    "Medan": 1,
+    "Dumai": 3,
+    "Pekanbaru": 1,
+    "Padang": 0,
+    "Jambi": 9,
+    "Palembang": 8,
+    "Bengkulu": 0,
+    "Pontianak": 1,
+    "Palangkaraya": 37,
+    "Banjarmasin": 2,
+    "Kuching": 0,
+    "Bintulu": 0
+  },
+  "rows_total": 966992,
+  "rows_with_missing": 277,
+  "rows_fetched": 969072,
+  "per_node": {
+    "KL_City": 37192,
+    "Port_Klang": 37192,
+    "Sepang": 37192,
+    "Seremban": 37192,
+    "Malacca": 37192,
+    "Johor_Bahru": 37192,
+    "Kuantan": 37192,
+    "Temerloh": 37192,
+    "Kota_Bharu": 37192,
+    "Kuala_Terengganu": 37192,
+    "Penang": 37192,
+    "Alor_Setar": 37192,
+    "Ipoh": 37192,
+    "Banda_Aceh": 37192,
+    "Medan": 37192,
+    "Dumai": 37192,
+    "Pekanbaru": 37192,
+    "Padang": 37192,
+    "Jambi": 37192,
+    "Palembang": 37192,
+    "Bengkulu": 37192,
+    "Pontianak": 37192,
+    "Palangkaraya": 37192,
+    "Banjarmasin": 37192,
+    "Kuching": 37192,
+    "Bintulu": 37192
+  },
+  "leading_block_trimmed": 2080,
+  "rows_interpolated": 486,
+  "baseline_low_support_cells": 0,
+  "baseline_total_cells": 7488,
+  "baseline_min_support": 85,
+  "qc_counts": {
+    "pm25_gt_pm10": 303,
+    "censored": 4,
+    "calm_wind": 48641,
+    "interpolated": 486,
+    "missing": 277
+  },
+  "rows_dropped_no_target": 226,
+  "rows_dropped_no_anchor": 89,
+  "generated_at": "2026-11-07T17:50:46",
+  "n_nodes": 26,
+  "rows_final": 966677,
+  "columns": [
+    "station_id",
+    "timestamp",
+    "lat",
+    "lon",
+    "region",
+    "role",
+    "split",
+    "pm2_5",
+    "pm10",
+    "no2",
+    "so2",
+    "o3",
+    "co",
+    "temperature_2m",
+    "relative_humidity_2m",
+    "wind_speed_ms",
+    "precipitation",
+    "wind_speed_kmh",
+    "wind_direction_10m",
+    "is_missing",
+    "qc_pm25_gt_pm10",
+    "qc_censored",
+    "qc_calm_wind",
+    "qc_interpolated",
+    "month",
+    "hour",
+    "dayofweek",
+    "b_proto_pm25",
+    "b_proto_temp",
+    "b_proto_n",
+    "b_proto_src",
+    "pm2_5_anomaly",
+    "temp_anomaly",
+    "target_pm25_3h",
+    "target_level_3h"
+  ],
+  "fetch": [
+    {
+      "station_id": "KL_City",
+      "cached": true,
+      "aq_rows": 37272,
+      "wx_rows": 37272
+    },
+    {
+      "station_id": "Port_Klang",
+      "cached": true,
+      "aq_rows": 37272,
+      "wx_rows": 37272
+    },
+    {
+      "station_id": "Sepang",
+      "cached": true,
+      "aq_rows": 37272,
+      "wx_rows": 37272
+    },
+    {
+      "station_id": "Seremban",
+      "cached": true,
+      "aq_rows": 37272,
+      "wx_rows": 37272
+    },
+    {
+      "station_id": "Malacca",
+      "cached": true,
+      "aq_rows": 37272,
+      "wx_rows": 37272
+    },
+    {
+      "station_id": "Johor_Bahru",
+      "cached": true,
+      "aq_rows": 37272,
+      "wx_rows": 37272
+    },
+    {
+      "station_id": "Kuantan",
+      "cached": true,
+      "aq_rows": 37272,
+      "wx_rows": 37272
+    },
+    {
+      "station_id": "Temerloh",
+      "cached": true,
+      "aq_rows": 37272,
+      "wx_rows": 37272
+    },
+    {
+      "station_id": "Kota_Bharu",
+      "cached": true,
+      "aq_rows": 37272,
+      "wx_rows": 37272
+    },
+    {
+      "station_id": "Kuala_Terengganu",
+      "cached": true,
+      "aq_rows": 37272,
+      "wx_rows": 37272
+    },
+    {
+      "station_id": "Penang",
+      "cached": true,
+      "aq_rows": 37272,
+      "wx_rows": 37272
+    },
+    {
+      "station_id": "Alor_Setar",
+      "cached": true,
+      "aq_rows": 37272,
+      "wx_rows": 37272
+    },
+    {
+      "station_id": "Ipoh",
+      "cached": true,
+      "aq_rows": 37272,
+      "wx_rows": 37272
+    },
+    {
+      "station_id": "Banda_Aceh",
+      "cached": true,
+      "aq_rows": 37272,
+      "wx_rows": 37272
+    },
+    {
+      "station_id": "Medan",
+      "cached": true,
+      "aq_rows": 37272,
+      "wx_rows": 37272
+    },
+    {
+      "station_id": "Dumai",
+      "cached": true,
+      "aq_rows": 37272,
+      "wx_rows": 37272
+    },
+    {
+      "station_id": "Pekanbaru",
+      "cached": true,
+      "aq_rows": 37272,
+      "wx_rows": 37272
+    },
+    {
+      "station_id": "Padang",
+      "cached": true,
+      "aq_rows": 37272,
+      "wx_rows": 37272
+    },
+    {
+      "station_id": "Jambi",
+      "cached": true,
+      "aq_rows": 37272,
+      "wx_rows": 37272
+    },
+    {
+      "station_id": "Palembang",
+      "cached": true,
+      "aq_rows": 37272,
+      "wx_rows": 37272
+    },
+    {
+      "station_id": "Bengkulu",
+      "cached": true,
+      "aq_rows": 37272,
+      "wx_rows": 37272
+    },
+    {
+      "station_id": "Pontianak",
+      "cached": true,
+      "aq_rows": 37272,
+      "wx_rows": 37272
+    },
+    {
+      "station_id": "Palangkaraya",
+      "cached": true,
+      "aq_rows": 37272,
+      "wx_rows": 37272
+    },
+    {
+      "station_id": "Banjarmasin",
+      "cached": true,
+      "aq_rows": 37272,
+      "wx_rows": 37272
+    },
+    {
+      "station_id": "Kuching",
+      "cached": true,
+      "aq_rows": 37272,
+      "wx_rows": 37272
+    },
+    {
+      "station_id": "Bintulu",
+      "cached": true,
+      "aq_rows": 37272,
+      "wx_rows": 37272
+    }
+  ],
+  "node_completeness": {
+    "Alor_Setar": {
+      "rows": 37189,
+      "missing_rate": 0.0,
+      "interpolated_rate": 0.0,
+      "pm25_min": 0.1,
+      "pm25_max": 84.5
+    },
+    "Banda_Aceh": {
+      "rows": 37189,
+      "missing_rate": 0.0,
+      "interpolated_rate": 2.7e-05,
+      "pm25_min": 0.4,
+      "pm25_max": 71.7
+    },
+    "Banjarmasin": {
+      "rows": 37189,
+      "missing_rate": 0.0,
+      "interpolated_rate": 5.4e-05,
+      "pm25_min": 0.5,
+      "pm25_max": 899.7
+    },
+    "Bengkulu": {
+      "rows": 37189,
+      "missing_rate": 0.0,
+      "interpolated_rate": 0.0,
+      "pm25_min": 0.5,
+      "pm25_max": 53.6
+    },
+    "Bintulu": {
+      "rows": 37189,
+      "missing_rate": 0.0,
+      "interpolated_rate": 0.0,
+      "pm25_min": 0.0,
+      "pm25_max": 183.9
+    },
+    "Dumai": {
+      "rows": 37189,
+      "missing_rate": 0.0,
+      "interpolated_rate": 0.000215,
+      "pm25_min": 0.3,
+      "pm25_max": 888.5
+    },
+    "Ipoh": {
+      "rows": 37189,
+      "missing_rate": 0.0,
+      "interpolated_rate": 5.4e-05,
+      "pm25_min": 0.1,
+      "pm25_max": 158.8
+    },
+    "Jambi": {
+      "rows": 37189,
+      "missing_rate": 0.000457,
+      "interpolated_rate": 0.000914,
+      "pm25_min": 0.1,
+      "pm25_max": 480.6
+    },
+    "Johor_Bahru": {
+      "rows": 37189,
+      "missing_rate": 0.0,
+      "interpolated_rate": 0.000108,
+      "pm25_min": 0.5,
+      "pm25_max": 176.0
+    },
+    "KL_City": {
+      "rows": 37189,
+      "missing_rate": 0.0,
+      "interpolated_rate": 0.000511,
+      "pm25_min": 0.6,
+      "pm25_max": 224.0
+    },
+    "Kota_Bharu": {
+      "rows": 37189,
+      "missing_rate": 0.0,
+      "interpolated_rate": 0.0,
+      "pm25_min": 0.0,
+      "pm25_max": 77.1
+    },
+    "Kuala_Terengganu": {
+      "rows": 37189,
+      "missing_rate": 0.0,
+      "interpolated_rate": 0.0,
+      "pm25_min": 0.1,
+      "pm25_max": 94.5
+    },
+    "Kuantan": {
+      "rows": 37189,
+      "missing_rate": 0.0,
+      "interpolated_rate": 0.0,
+      "pm25_min": 0.1,
+      "pm25_max": 102.2
+    },
+    "Kuching": {
+      "rows": 37189,
+      "missing_rate": 0.0,
+      "interpolated_rate": 0.0,
+      "pm25_min": 0.5,
+      "pm25_max": 357.6
+    },
+    "Malacca": {
+      "rows": 37189,
+      "missing_rate": 0.0,
+      "interpolated_rate": 5.4e-05,
+      "pm25_min": 0.0,
+      "pm25_max": 173.2
+    },
+    "Medan": {
+      "rows": 37189,
+      "missing_rate": 0.0,
+      "interpolated_rate": 2.7e-05,
+      "pm25_min": 0.6,
+      "pm25_max": 165.8
+    },
+    "Padang": {
+      "rows": 37189,
+      "missing_rate": 0.0,
+      "interpolated_rate": 0.0,
+      "pm25_min": 0.4,
+      "pm25_max": 178.8
+    },
+    "Palangkaraya": {
+      "rows": 36952,
+      "missing_rate": 0.001867,
+      "interpolated_rate": 0.006495,
+      "pm25_min": 0.0,
+      "pm25_max": 899.7
+    },
+    "Palembang": {
+      "rows": 37189,
+      "missing_rate": 0.00043,
+      "interpolated_rate": 0.000672,
+      "pm25_min": 0.4,
+      "pm25_max": 305.5
+    },
+    "Pekanbaru": {
+      "rows": 37189,
+      "missing_rate": 0.0,
+      "interpolated_rate": 5.4e-05,
+      "pm25_min": 0.4,
+      "pm25_max": 359.5
+    },
+    "Penang": {
+      "rows": 37189,
+      "missing_rate": 0.0,
+      "interpolated_rate": 0.0,
+      "pm25_min": 0.4,
+      "pm25_max": 99.4
+    },
+    "Pontianak": {
+      "rows": 37189,
+      "missing_rate": 0.0,
+      "interpolated_rate": 8.1e-05,
+      "pm25_min": 0.4,
+      "pm25_max": 430.3
+    },
+    "Port_Klang": {
+      "rows": 37189,
+      "missing_rate": 0.0,
+      "interpolated_rate": 0.0,
+      "pm25_min": 0.5,
+      "pm25_max": 170.0
+    },
+    "Sepang": {
+      "rows": 37189,
+      "missing_rate": 5.4e-05,
+      "interpolated_rate": 0.000296,
+      "pm25_min": 0.5,
+      "pm25_max": 188.1
+    },
+    "Seremban": {
+      "rows": 37189,
+      "missing_rate": 0.0,
+      "interpolated_rate": 2.7e-05,
+      "pm25_min": 0.1,
+      "pm25_max": 195.6
+    },
+    "Temerloh": {
+      "rows": 37189,
+      "missing_rate": 0.0,
+      "interpolated_rate": 2.7e-05,
+      "pm25_min": 0.0,
+      "pm25_max": 160.2
+    }
+  },
+  "qc_notes": [
+    "qc_pm25_gt_pm10 只标记不修正：PM2.5 是 PM10 的子集，违反者为模式内部不一致。",
+    "qc_censored 标记贴近 900 µg/m³ 输出上限的截断值，不可当作真实极值使用。",
+    "qc_calm_wind 标记静风时刻，此时风向为数值噪声，上风向权重应置零。",
+    "qc_interpolated 标记经 ≤3h 线性插值补齐的单元格。",
+    "is_missing 标记仍有变量缺失、未插值的行。"
+  ]
+}

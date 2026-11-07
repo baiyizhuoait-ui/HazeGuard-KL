@@ -1,0 +1,116 @@
+{
+  "model": "DecisionTreeClassifier (baseline)",
+  "stage": "01-baseline",
+  "metrics": {
+    "Macro_F1": 0.662,
+    "Balanced_Accuracy": 0.6443,
+    "High_Risk_Recall": 0.5707,
+    "MAOE": 0.322,
+    "Severe_Jumping_Error_Rate": 0.0218,
+    "Avg_Asymmetric_Cost": 0.8905,
+    "n_samples": 16728,
+    "n_high_risk": 6865
+  },
+  "metrics_train": {
+    "Macro_F1": 0.7017,
+    "Balanced_Accuracy": 0.6869,
+    "High_Risk_Recall": 0.5807,
+    "MAOE": 0.271,
+    "Severe_Jumping_Error_Rate": 0.0121,
+    "Avg_Asymmetric_Cost": 0.6678,
+    "n_samples": 78100,
+    "n_high_risk": 24346
+  },
+  "metrics_val": {
+    "Macro_F1": 0.6867,
+    "Balanced_Accuracy": 0.6738,
+    "High_Risk_Recall": 0.5497,
+    "MAOE": 0.2833,
+    "Severe_Jumping_Error_Rate": 0.0122,
+    "Avg_Asymmetric_Cost": 0.6882,
+    "n_samples": 16737,
+    "n_high_risk": 4888
+  },
+  "per_node_test": {
+    "KL_City": {
+      "Macro_F1": 0.6007,
+      "Balanced_Accuracy": 0.586,
+      "High_Risk_Recall": 0.6037,
+      "MAOE": 0.3481,
+      "Severe_Jumping_Error_Rate": 0.0305,
+      "Avg_Asymmetric_Cost": 1.0791,
+      "n_samples": 5576,
+      "n_high_risk": 3278
+    },
+    "Port_Klang": {
+      "Macro_F1": 0.6741,
+      "Balanced_Accuracy": 0.6516,
+      "High_Risk_Recall": 0.5222,
+      "MAOE": 0.2724,
+      "Severe_Jumping_Error_Rate": 0.0117,
+      "Avg_Asymmetric_Cost": 0.6264,
+      "n_samples": 5576,
+      "n_high_risk": 1105
+    },
+    "Sepang": {
+      "Macro_F1": 0.6152,
+      "Balanced_Accuracy": 0.5964,
+      "High_Risk_Recall": 0.5488,
+      "MAOE": 0.3454,
+      "Severe_Jumping_Error_Rate": 0.0231,
+      "Avg_Asymmetric_Cost": 0.9659,
+      "n_samples": 5576,
+      "n_high_risk": 2482
+    }
+  },
+  "best_params": {
+    "criterion": "gini",
+    "max_depth": 9,
+    "min_samples_leaf": 20
+  },
+  "cv_macro_f1": 0.6315,
+  "overfit_gap_train_minus_val": 0.015,
+  "features": [
+    "pm2_5",
+    "pm10",
+    "no2",
+    "so2",
+    "o3",
+    "co",
+    "temperature_2m",
+    "relative_humidity_2m",
+    "wind_speed_ms",
+    "wind_direction_10m",
+    "precipitation",
+    "pm2_5_anomaly",
+    "temp_anomaly",
+    "hour",
+    "month",
+    "dayofweek",
+    "wd_sin",
+    "wd_cos"
+  ],
+  "n_features": 18,
+  "n_train": 78100,
+  "n_val": 16737,
+  "n_test": 16728,
+  "class_distribution_train": {
+    "0": 14478,
+    "1": 39276,
+    "2": 15656,
+    "3": 8690
+  },
+  "class_distribution_test": {
+    "0": 1970,
+    "1": 7893,
+    "2": 3711,
+    "3": 3154
+  },
+  "tree_structure": {
+    "n_leaves": 384,
+    "depth": 9
+  },
+  "train_universe": "receptor nodes only (KL_City, Port_Klang, Sepang)",
+  "elapsed_sec": 9.1,
+  "owner": "组长（数据与基线）"
+}
