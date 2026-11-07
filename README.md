@@ -163,7 +163,7 @@ AIT201 Applied Machine Learning · 2026/09 · 小组项目
 ## 快速开始
 
 ```bash
-git clone https://github.com/baiyizhuoait-ui/HazeGuard-KL.git
+git clone https://github.com/baiyizhuoait/HazeGuard-KL.git
 cd HazeGuard-KL
 
 conda create -n hzkl python=3.11 -y
