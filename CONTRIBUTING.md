@@ -34,26 +34,50 @@
 
 ## 2. 分支怎么用
 
-只有一条长期分支 `main`，加上每人一条短期分支。
+只有一条长期分支 `main`，加上每人一条短期分支。**分支已经建好了，直接切就行，不用自己想名字。**
 
-| 分支 | 谁用 | 规则 |
+| 分支 | 谁 | 模块 |
 |---|---|---|
-| `main` | 全体 | 任何时刻 checkout 下来都能跑通；只有过了第 5 节检查才合并 |
-| `feat/02-eda` 这类 | 各自 | 从最新 `main` 切出，做完合并后删掉 |
+| `main` | 全体 | 集成分支，任何时刻拉下来都能跑通 |
+| `feat/02-eda` | 成员 A | EDA 与时空传导特征 |
+| `feat/03-fig` | 成员 E | 模糊信息粒化与特征选择 |
+| `feat/04-nominal-rf` | 成员 B | 名义 RF 与回归分级 |
+| `feat/05-ordinal-rf` | 成员 C | 有序 RF 与分位数 RF |
+| `feat/06-cost-shap` | 成员 D | 代价敏感优化与可解释性 |
+| `feat/07-streamlit` | 成员 F | 交互系统与报告 |
 
-命名：`feat/<模块号>-<简短英文>`，例如 `feat/03-fig`、`feat/06-gpso`。
-修 bug 用 `fix/<简短描述>`。
+自己的活干完了就删掉自己的分支，别留着。
+
+### 开工
 
 ```bash
 git checkout main
 git pull
-git checkout -b feat/02-eda
-# ...干活...
-git push -u origin feat/02-eda
+git checkout feat/02-eda        # 换成自己那条
 ```
 
-**不要在 `main` 上直接 commit。** 也不要把一条分支留超过一周不合并——
-拖越久，合的时候冲突越多。
+### 收工
+
+```bash
+git add -A
+git commit -m "feat(02): EDA 五张图 + 时空传导特征
+
+- 日内双峰与季风期对比：西南季风期 PM2.5 中位数比东北季风高 1.8 倍
+- 上风向权重用 sigma=15km，静风时段按 qc_calm_wind 置零
+- 新增 42 列，未改名未删列"
+
+git push
+```
+
+然后到 GitHub 上开 Pull Request 合并到 `main`，按第 5 节清单自查一遍。
+
+### 什么时候该合并
+
+**做完就合，不要攒。** 一条分支留超过一周，`main` 已经往前走了，
+合的时候冲突会成倍增加，而且你会发现自己基于一个过时的上游在干活。
+
+只有 04 和 05 是真并行（两条都只读 `features_final.parquet`，写不同的文件），
+它们可以同时开着；其余都是串行，前一条不合，后一条没法真正开始。
 
 ### 实际先后顺序
 
@@ -66,6 +90,17 @@ git push -u origin feat/02-eda
 
 03 想提前开工是可以的：先写 `src/03_fuzzy_granulation.py`，用 01 的清洗表单独跑 FIG 特征，
 等 02 合并后再做合并和消融。但不要写着"并行"结果去读一个还不存在的文件。
+
+### 保护 main
+
+仓库设置里勾上 `Settings → Branches → Add branch protection rule`，
+对 `main` 打开：
+
+- Require a pull request before merging
+- Do not allow bypassing the above settings
+
+这样没人能直接把代码推到 `main` 上，§5 的检查清单就不会被绕过。
+（管理员可以临时关掉，但别养成习惯。）
 
 ---
 
