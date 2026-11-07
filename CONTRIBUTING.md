@@ -19,10 +19,10 @@
 |---|---|---|---|
 | **1号**（组长） | 数据工程、气候基线解耦与基线模型 | `src/config.py`、`src/01_data_pipeline.py`、`src/01_baseline_dt.py`、`src/01_verify_data.py`、`src/utils_metrics.py`、`tools/discover_nodes.py` | `data/haze_panel_clean.parquet`、`data/manifest.json`、`data/data_dictionary.json`、`models/baseline_dt.joblib`、`models/metrics_stage1.json`、`models/gate0_report.json`、`models/cleaning_report.json`、`figures/fig_baseline_dt_*.png` |
 | **2号** | EDA 与时空季风传导特征 | `src/02_eda_analysis.py`、`src/02_spatiotemporal_features.py` | `data/feat_spatiotemporal.parquet`、`figures/fig_eda_diurnal_seasonal.png`、`figures/fig_eda_correlation_matrix.png`、`figures/fig_eda_class_imbalance.png`、`figures/fig_eda_wind_rose_pollution.png`、`figures/fig_eda_spatial_crosscorr.png` |
-| **3号** | 模糊信息粒化与特征选择 | `src/03_fuzzy_granulation.py`、`src/03_feature_selection.py` | `data/features_final.parquet`、`models/selected_features.json`、`figures/fig_feature_ablation.png`、`figures/fig_fcm_prototypes.png` |
-| **4号** | 多分类 RF、回归转分级与复杂度控制 | `src/04_standard_and_reg_rf.py`、`src/04_complexity_experiments.py` | `models/rf_nominal_balanced.joblib`、`models/rf_regressor.joblib`、`models/metrics_stage4.json`、`figures/fig_rf_complexity_curve.png`、`figures/fig_window_sensitivity.png` |
-| **5号** | 有序 RF 与分位数区间预测 | `src/05_ordinal_rf.py`、`src/05_quantile_rf.py` | `models/ordinal_rf.joblib`、`models/quantile_rf.joblib`、`models/ordinal_probs_val_test.npz`、`models/metrics_stage5.json`、`figures/fig_ordinal_error_distribution.png`、`figures/fig_quantile_fan_chart.png` |
-| **6号** | 代价敏感优化、SHAP 与泛化评估 | `src/06_cost_sensitive_gpso.py`、`src/06_shap_explainability.py`、`src/06_generalization_study.py` | `models/gpso_optimal_thresholds.json`、`models/all_models_benchmark.csv`、`models/loso_results.csv`、`models/seasonal_metrics.csv`、`figures/fig_shap_beeswarm.png`、`figures/fig_shap_dependence.png`、`figures/fig_shap_waterfall_haze_event.png`、`figures/fig_confusion_matrices_comparison.png` |
+| **3号** | 多尺度趋势粒化与特征选择 | `src/03_granulation_features.py`、`src/03_feature_selection.py` | `data/features_final.parquet`、`models/selected_features.json`、`figures/fig_feature_ablation.png`、`figures/fig_granulation_bands.png` |
+| **4号** | 名义 RF、类权重与提升法 | `src/04_rf_and_boosting.py`、`src/04_complexity_experiments.py` | `models/rf_nominal.joblib`、`models/rf_balanced.joblib`、`models/boosting.joblib`、`models/metrics_stage4.json`、`figures/fig_rf_complexity_curve.png`、`figures/fig_window_sensitivity.png`、`figures/fig_boosting_vs_rf.png` |
+| **5号** | 回归分级与有序随机森林（两种保序范式） | `src/05_reg_to_cls.py`、`src/05_ordinal_rf.py` | `models/rf_regressor.joblib`、`models/ordinal_rf.joblib`、`models/ordinal_probs_val_test.npz`、`models/metrics_stage5.json`、`figures/fig_ordinal_error_distribution.png`、`figures/fig_interval_band.png` |
+| **6号** | 代价敏感阈值、可解释性与泛化评估 | `src/06_cost_thresholds.py`、`src/06_interpretability.py`、`src/06_generalization_study.py` | `models/cost_thresholds.json`、`models/all_models_benchmark.csv`、`models/loso_results.csv`、`models/seasonal_metrics.csv`、`figures/fig_perm_importance.png`、`figures/fig_pdp_wind_humidity.png`、`figures/fig_roc_high_risk.png`、`figures/fig_confusion_matrices_comparison.png` |
 | **7号** | 交互系统与示范报告总成 | `app.py`、`src/07_compile_report.py` | `reports/HazeGuard_KL_Demonstration_Report.md`、`requirements.txt`（定稿）、`README.md`（定稿） |
 
 每个人还要交两样东西，不写就算没做完：
@@ -50,10 +50,10 @@
 |---|---|---|
 | `main` | 全体 | 集成分支，任何时刻拉下来都能跑通 |
 | `feat/02-eda` | 2号 | EDA 与时空传导特征 |
-| `feat/03-fig` | 3号 | 模糊信息粒化与特征选择 |
+| `feat/03-granulation` | 3号 | 趋势粒化与特征选择 |
 | `feat/04-nominal-rf` | 4号 | 名义 RF 与回归分级 |
-| `feat/05-ordinal-rf` | 5号 | 有序 RF 与分位数 RF |
-| `feat/06-cost-shap` | 6号 | 代价敏感优化与可解释性 |
+| `feat/05-ordinal-rf` | 5号 | 回归分级与有序 RF |
+| `feat/06-cost-explain` | 6号 | 代价敏感阈值与可解释性 |
 | `feat/07-streamlit` | 7号 | 交互系统与报告 |
 
 自己的活干完了就删掉自己的分支，别留着。
@@ -135,7 +135,7 @@ git push
 ```
 src/NN_<english_slug>.py          例：03_fuzzy_granulation.py
 models/metrics_stage<N>.json      例：metrics_stage4.json
-models/<model_key>.joblib         model_key: rf_nominal / rf_regressor / ordinal_rf / quantile_rf
+models/<model_key>.joblib         model_key: rf_nominal / rf_balanced / rf_regressor / ordinal_rf / boosting
 models/<name>.npz                 概率矩阵，键名统一 val_probs / test_probs / val_y / test_y
 figures/fig_<topic>.png           topic 用小写下划线
 reports/sec<章节号>_<主题>.md
@@ -221,8 +221,8 @@ n_high_risk
 ```
 feat(03): FIG 粒化与 Top-25 特征选择
 
-- FCM c=8, m=2.0，原型只在 train 上拟合，未触碰 val/test
-- 解粒化重构误差 fig_recon_error_6h/12h 纳入候选特征
+- 窗口粒化特征只在 train 上拟合归一化参数，未触碰 val/test
+- 窗口斜率与区间宽度纳入候选特征
 - 消融：Raw → +Lag → +Spatial → +FIG，val Macro-F1 0.662 → 0.701 → 0.734 → 0.762
 
 影响：features_final.parquet 新增 12 列，未改名未删列

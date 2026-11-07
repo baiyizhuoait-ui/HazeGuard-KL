@@ -53,8 +53,8 @@ Klang Valley. Specifically, it aims to:
    model is forced to learn *deviation from normal* rather than *which month it is*.
 3. **O3** — Compare six model families under a single evaluation contract: a decision-tree
    floor, nominal random forests with and without class reweighting, a
-   regression-then-threshold formulation, an ordinal decomposition, a quantile interval
-   model, and a cost-sensitive ordinal model tuned by a group-exchange particle swarm.
+   regression-then-threshold formulation, a boosting baseline, an ordinal decomposition,
+   and a cost-sensitive ordinal model whose decision thresholds are tuned by grid search.
 4. **O4** — Quantify what happens when the model meets an unseen station (leave-one-node-out)
    and an unseen year (temporal extrapolation), rather than reporting a single
    in-distribution score.
@@ -253,7 +253,7 @@ validation / 15 % test:
 | Split | Approx. window | n rows | Permitted use |
 |---|---|---|---|
 | train | 2022-08 → 2025-06 | 676,884 | baseline fitting, model fitting, CV, hyperparameter search |
-| val | 2025-06 → 2026-03 | 145,054 | model selection, GPSO threshold search, early stopping |
+| val | 2025-06 → 2026-03 | 145,054 | model selection, threshold grid search, early stopping |
 | test | 2026-03 → 2026-10 | 144,828 | **final reporting only — evaluated once** |
 
 The split is defined on timestamps (span percentiles), not row counts, so that missing
