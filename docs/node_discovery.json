@@ -1,0 +1,301 @@
+{
+  "probe_window": [
+    "2025-07-01",
+    "2025-07-31"
+  ],
+  "cells": [
+    {
+      "representative": "KL_City",
+      "members": [
+        "KL_City",
+        "Batu_Muda",
+        "Petaling_Jaya",
+        "Shah_Alam"
+      ],
+      "mean_pm25": 42.52,
+      "lat": 3.107,
+      "lon": 101.726,
+      "region": "KL",
+      "role": "受体"
+    },
+    {
+      "representative": "Port_Klang",
+      "members": [
+        "Port_Klang"
+      ],
+      "mean_pm25": 24.63,
+      "lat": 3.0,
+      "lon": 101.392,
+      "region": "KL",
+      "role": "受体"
+    },
+    {
+      "representative": "Sepang",
+      "members": [
+        "Sepang",
+        "Putrajaya",
+        "Banting"
+      ],
+      "mean_pm25": 31.86,
+      "lat": 2.828,
+      "lon": 101.703,
+      "region": "KL",
+      "role": "受体"
+    },
+    {
+      "representative": "Seremban",
+      "members": [
+        "Seremban"
+      ],
+      "mean_pm25": 22.1,
+      "lat": 2.729,
+      "lon": 101.938,
+      "region": "Peninsula",
+      "role": "候选中转"
+    },
+    {
+      "representative": "Malacca",
+      "members": [
+        "Malacca",
+        "Muar"
+      ],
+      "mean_pm25": 15.39,
+      "lat": 2.189,
+      "lon": 102.25,
+      "region": "Peninsula",
+      "role": "候选中转"
+    },
+    {
+      "representative": "Johor_Bahru",
+      "members": [
+        "Johor_Bahru"
+      ],
+      "mean_pm25": 24.69,
+      "lat": 1.492,
+      "lon": 103.741,
+      "region": "Peninsula",
+      "role": "受体/源"
+    },
+    {
+      "representative": "Kuantan",
+      "members": [
+        "Kuantan"
+      ],
+      "mean_pm25": 17.6,
+      "lat": 3.807,
+      "lon": 103.326,
+      "region": "Peninsula",
+      "role": "受体/源"
+    },
+    {
+      "representative": "Temerloh",
+      "members": [
+        "Temerloh"
+      ],
+      "mean_pm25": 22.51,
+      "lat": 3.45,
+      "lon": 102.417,
+      "region": "Peninsula",
+      "role": "候选中转"
+    },
+    {
+      "representative": "Kota_Bharu",
+      "members": [
+        "Kota_Bharu"
+      ],
+      "mean_pm25": 15.97,
+      "lat": 6.125,
+      "lon": 102.238,
+      "region": "Peninsula",
+      "role": "受体/源"
+    },
+    {
+      "representative": "Kuala_Terengganu",
+      "members": [
+        "Kuala_Terengganu"
+      ],
+      "mean_pm25": 17.8,
+      "lat": 5.33,
+      "lon": 103.14,
+      "region": "Peninsula",
+      "role": "源"
+    },
+    {
+      "representative": "Penang",
+      "members": [
+        "Penang"
+      ],
+      "mean_pm25": 24.2,
+      "lat": 5.414,
+      "lon": 100.329,
+      "region": "Peninsula",
+      "role": "受体/源"
+    },
+    {
+      "representative": "Alor_Setar",
+      "members": [
+        "Alor_Setar"
+      ],
+      "mean_pm25": 21.2,
+      "lat": 6.118,
+      "lon": 100.368,
+      "region": "Peninsula",
+      "role": "源"
+    },
+    {
+      "representative": "Ipoh",
+      "members": [
+        "Ipoh",
+        "Cameron_Highland"
+      ],
+      "mean_pm25": 23.09,
+      "lat": 4.597,
+      "lon": 101.09,
+      "region": "Peninsula",
+      "role": "源"
+    },
+    {
+      "representative": "Banda_Aceh",
+      "members": [
+        "Banda_Aceh"
+      ],
+      "mean_pm25": 6.52,
+      "lat": 5.548,
+      "lon": 95.324,
+      "region": "Sumatra",
+      "role": "源"
+    },
+    {
+      "representative": "Medan",
+      "members": [
+        "Medan"
+      ],
+      "mean_pm25": 36.12,
+      "lat": 3.595,
+      "lon": 98.672,
+      "region": "Sumatra",
+      "role": "源"
+    },
+    {
+      "representative": "Dumai",
+      "members": [
+        "Dumai"
+      ],
+      "mean_pm25": 19.66,
+      "lat": 1.666,
+      "lon": 101.45,
+      "region": "Sumatra",
+      "role": "源"
+    },
+    {
+      "representative": "Pekanbaru",
+      "members": [
+        "Pekanbaru"
+      ],
+      "mean_pm25": 22.12,
+      "lat": 0.507,
+      "lon": 101.447,
+      "region": "Sumatra",
+      "role": "源"
+    },
+    {
+      "representative": "Padang",
+      "members": [
+        "Padang"
+      ],
+      "mean_pm25": 18.25,
+      "lat": -0.949,
+      "lon": 100.354,
+      "region": "Sumatra",
+      "role": "源"
+    },
+    {
+      "representative": "Jambi",
+      "members": [
+        "Jambi"
+      ],
+      "mean_pm25": 18.3,
+      "lat": -1.61,
+      "lon": 103.613,
+      "region": "Sumatra",
+      "role": "源"
+    },
+    {
+      "representative": "Palembang",
+      "members": [
+        "Palembang"
+      ],
+      "mean_pm25": 14.42,
+      "lat": -2.976,
+      "lon": 104.775,
+      "region": "Sumatra",
+      "role": "源"
+    },
+    {
+      "representative": "Bengkulu",
+      "members": [
+        "Bengkulu"
+      ],
+      "mean_pm25": 10.03,
+      "lat": -3.8,
+      "lon": 102.265,
+      "region": "Sumatra",
+      "role": "源"
+    },
+    {
+      "representative": "Pontianak",
+      "members": [
+        "Pontianak"
+      ],
+      "mean_pm25": 18.01,
+      "lat": -0.026,
+      "lon": 109.342,
+      "region": "Borneo",
+      "role": "源"
+    },
+    {
+      "representative": "Palangkaraya",
+      "members": [
+        "Palangkaraya"
+      ],
+      "mean_pm25": 10.78,
+      "lat": -2.209,
+      "lon": 113.917,
+      "region": "Borneo",
+      "role": "源"
+    },
+    {
+      "representative": "Banjarmasin",
+      "members": [
+        "Banjarmasin"
+      ],
+      "mean_pm25": 12.89,
+      "lat": -3.319,
+      "lon": 114.59,
+      "region": "Borneo",
+      "role": "源"
+    },
+    {
+      "representative": "Kuching",
+      "members": [
+        "Kuching"
+      ],
+      "mean_pm25": 20.89,
+      "lat": 1.553,
+      "lon": 110.359,
+      "region": "Borneo",
+      "role": "源"
+    },
+    {
+      "representative": "Bintulu",
+      "members": [
+        "Bintulu"
+      ],
+      "mean_pm25": 13.68,
+      "lat": 3.171,
+      "lon": 113.041,
+      "region": "Borneo",
+      "role": "源"
+    }
+  ]
+}

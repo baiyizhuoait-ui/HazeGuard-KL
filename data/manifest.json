@@ -1,0 +1,164 @@
+{
+  "dataset": "haze_panel_clean",
+  "generated_at": "2026-11-07T17:50:48",
+  "git_commit": "447913f",
+  "path": "data/haze_panel_clean.parquet",
+  "sha256": "97b5db123352861b6cd41224daf1ce278c90d6d528031b9bdc2744317a5ead93",
+  "bytes": 25057369,
+  "rows": 966677,
+  "columns": [
+    "station_id",
+    "timestamp",
+    "lat",
+    "lon",
+    "region",
+    "role",
+    "split",
+    "pm2_5",
+    "pm10",
+    "no2",
+    "so2",
+    "o3",
+    "co",
+    "temperature_2m",
+    "relative_humidity_2m",
+    "wind_speed_ms",
+    "precipitation",
+    "wind_speed_kmh",
+    "wind_direction_10m",
+    "is_missing",
+    "qc_pm25_gt_pm10",
+    "qc_censored",
+    "qc_calm_wind",
+    "qc_interpolated",
+    "month",
+    "hour",
+    "dayofweek",
+    "b_proto_pm25",
+    "b_proto_temp",
+    "b_proto_n",
+    "b_proto_src",
+    "pm2_5_anomaly",
+    "temp_anomaly",
+    "target_pm25_3h",
+    "target_level_3h"
+  ],
+  "n_nodes": 26,
+  "nodes_by_role": {
+    "corridor": [
+      "Alor_Setar",
+      "Ipoh",
+      "Johor_Bahru",
+      "Kota_Bharu",
+      "Kuala_Terengganu",
+      "Kuantan",
+      "Malacca",
+      "Penang",
+      "Seremban",
+      "Temerloh"
+    ],
+    "receptor": [
+      "KL_City",
+      "Port_Klang",
+      "Sepang"
+    ],
+    "source": [
+      "Banda_Aceh",
+      "Banjarmasin",
+      "Bengkulu",
+      "Bintulu",
+      "Dumai",
+      "Jambi",
+      "Kuching",
+      "Medan",
+      "Padang",
+      "Palangkaraya",
+      "Palembang",
+      "Pekanbaru",
+      "Pontianak"
+    ]
+  },
+  "date_range": [
+    "2022-08-04 08:00:00",
+    "2026-10-31 20:00:00"
+  ],
+  "split_rows": {
+    "train": 676884,
+    "val": 145054,
+    "test": 144739
+  },
+  "qc_counts": {
+    "qc_pm25_gt_pm10": 303,
+    "qc_censored": 4,
+    "qc_calm_wind": 48621,
+    "qc_interpolated": 356
+  },
+  "time_axis_holes": {
+    "Palangkaraya": {
+      "n_holes": 44,
+      "max_step_h": 19.0
+    }
+  },
+  "verification": {
+    "passed": 11,
+    "total": 11,
+    "all_passed": true,
+    "results": [
+      {
+        "check": "schema：必需列齐全",
+        "pass": true,
+        "detail": "35 列全部存在"
+      },
+      {
+        "check": "schema：无意外新增列",
+        "pass": true,
+        "detail": "无"
+      },
+      {
+        "check": "主键 (station_id, timestamp) 唯一",
+        "pass": true,
+        "detail": "重复 0 行"
+      },
+      {
+        "check": "时间轴单调且步长为整小时",
+        "pass": true,
+        "detail": "26 节点全部为 1h 整数倍步长"
+      },
+      {
+        "check": "切分严格时序且不重叠",
+        "pass": true,
+        "detail": "全部 26 节点 train<val<test"
+      },
+      {
+        "check": "四级标签与阈值一致",
+        "pass": true,
+        "detail": "966,677 行全部匹配 [15,35,55]"
+      },
+      {
+        "check": "target_pm25_3h = 3 小时后的 pm2_5",
+        "pass": true,
+        "detail": "抽检 78 行"
+      },
+      {
+        "check": "基线未泄露（可用 train 重算复现）",
+        "pass": true,
+        "detail": "966,677 行全部可复现"
+      },
+      {
+        "check": "受体 Level 3 占比 ≥ 1%",
+        "pass": true,
+        "detail": "12.21%"
+      },
+      {
+        "check": "质量标记列齐全",
+        "pass": true,
+        "detail": "{'qc_pm25_gt_pm10': 303, 'qc_censored': 4, 'qc_calm_wind': 48621, 'qc_interpolated': 356}"
+      },
+      {
+        "check": "关键列无 NaN",
+        "pass": true,
+        "detail": "{'pm2_5': 0, 'target_pm25_3h': 0, 'target_level_3h': 0, 'b_proto_pm25': 0}"
+      }
+    ]
+  }
+}

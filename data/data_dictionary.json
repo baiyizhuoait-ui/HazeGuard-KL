@@ -1,0 +1,102 @@
+{
+  "dataset": "HazeGuard-KL haze panel",
+  "generated_at": "2026-11-07T17:50:46",
+  "unit_notes": {
+    "pm2_5/pm10/no2/so2/o3/co": "µg/m³（Open-Meteo 原样，CO 非 ppm）",
+    "wind_speed_ms": "m/s，由 km/h ÷ 3.6 换算，建模请用此列",
+    "wind_speed_kmh": "km/h，原始值，仅供复核",
+    "temperature_2m": "°C",
+    "relative_humidity_2m": "%",
+    "precipitation": "mm",
+    "wind_direction_10m": "度，0=北，顺时针"
+  },
+  "key_columns": {
+    "station_id": "CAMS 空间单元 ID（非行政站点，同格点已归并）",
+    "split": "train/val/test，按每节点时间跨度 70/15/15 顺序切分，无 shuffle",
+    "b_proto_pm25": "气候态基线，仅用 train 段按 (station,month,hour) 统计",
+    "pm2_5_anomaly": "pm2_5 - b_proto_pm25，去季节与日周期背景",
+    "target_pm25_3h": "t+3h 的 PM2.5 浓度，groupby(station).shift(-3) 构造",
+    "target_level_3h": "四级有序标签，阈值 [15,35,55]",
+    "is_missing": "1=该行至少一个变量超过 3h 缺口未能插值"
+  },
+  "data_source_note": "空气质量来自 CAMS 全球大气成分产品（0.4°≈45 km，模式再分析/预报，非地面实测）；气象来自 ERA5（约 9 km）。引用需注明 Open-Meteo 与 CAMS/ECMWF。",
+  "gate0_summary": {
+    "generated_at": "2026-11-07T17:50:45",
+    "n_nodes": 26,
+    "n_receptors": 3,
+    "date_range": [
+      "2022-08-04 08:00:00",
+      "2026-10-31 20:00:00"
+    ],
+    "split_rows": {
+      "train": 676884,
+      "val": 145054,
+      "test": 144739
+    },
+    "level_distribution_receptor_all": {
+      "0": 0.1791,
+      "1": 0.4973,
+      "2": 0.2015,
+      "3": 0.1221
+    },
+    "level_distribution_receptor_train": {
+      "0": 0.1854,
+      "1": 0.5029,
+      "2": 0.2005,
+      "3": 0.1113
+    },
+    "level_distribution_receptor_test": {
+      "0": 0.1178,
+      "1": 0.4718,
+      "2": 0.2218,
+      "3": 0.1885
+    },
+    "level_distribution_receptor_val": {
+      "0": 0.2114,
+      "1": 0.4966,
+      "2": 0.1861,
+      "3": 0.1059
+    },
+    "checks": {
+      "G0-1_total_rows": {
+        "pass": true,
+        "value": {
+          "total_rows": 966677,
+          "min_rows_per_node": 36952
+        },
+        "rule": "总行数 ≥ 100,000 且每节点 ≥ 12,000"
+      },
+      "G0-2_level3_share": {
+        "pass": true,
+        "value": {
+          "receptor_level3": 0.1221,
+          "panel_level3": 0.0337
+        },
+        "rule": "受体节点 Level 3 占比 ≥ 1.0%"
+      },
+      "G0-3_max_gap": {
+        "pass": true,
+        "value": {
+          "max_gap_receptor_h": 5,
+          "max_gap_panel_h": 37
+        },
+        "rule": "受体节点最长连续缺失 ≤ 24 小时（源区节点的缺口不影响标签，仅披露）"
+      },
+      "G0-4_distribution_drift": {
+        "pass": true,
+        "value": {
+          "train_level3": 0.1113,
+          "test_level3": 0.1885,
+          "ratio": 1.69
+        },
+        "rule": "受体节点 train 与 test 的 Level 3 占比差异 ≤ 3 倍"
+      }
+    },
+    "all_passed": true,
+    "notes": [
+      "测试集覆盖 2026 年 8–10 月的强跨境烟霾过程（KL 单月 Level 3 占比达 47%–51%，PM2.5 p95 = 151.8 µg/m³），因此 High-Risk Recall 具有真实事件支撑。",
+      "空气质量为 CAMS 0.4° 模式产品，非地面实测；报告须声明。",
+      "同格点候选点位已归并为单一节点，见 docs/node_discovery.json。"
+    ]
+  }
+}
