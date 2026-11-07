@@ -1,6 +1,8 @@
 {
+  "module": "01 数据工程与基线",
+  "owner": "1号（组长）",
   "model": "DecisionTreeClassifier (baseline)",
-  "stage": "01-baseline",
+  "stage": "test",
   "metrics": {
     "Macro_F1": 0.662,
     "Balanced_Accuracy": 0.6443,
@@ -111,6 +113,5 @@
     "depth": 9
   },
   "train_universe": "receptor nodes only (KL_City, Port_Klang, Sepang)",
-  "elapsed_sec": 9.1,
-  "owner": "组长（数据与基线）"
+  "elapsed_sec": 9.6
 }

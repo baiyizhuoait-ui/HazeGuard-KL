@@ -16,7 +16,7 @@
 产出
 ----
 models/baseline_dt.joblib
-models/metrics_baseline.json
+models/metrics_stage1.json
 figures/fig_baseline_dt_confusion.png
 figures/fig_baseline_dt_importance.png
 
@@ -146,7 +146,8 @@ def main() -> None:
     joblib.dump({"model": best, "features": list(X.columns)}, model_path, compress=3)
 
     payload = {
-        "agent": "数据负责人",
+        "module": "01 数据工程与基线",
+        "owner": "1号（组长）",
         "model": "DecisionTreeClassifier (baseline)",
         "stage": "test",
         "metrics": {k: m_te[k] for k in (
@@ -173,13 +174,13 @@ def main() -> None:
         "train_universe": "receptor nodes only (KL_City, Port_Klang, Sepang)",
         "elapsed_sec": round(time.time() - t_start, 1),
     }
-    UM.save_metrics(payload, os.path.join(C.MODEL_DIR, "metrics_baseline.json"))
+    UM.save_metrics(payload, os.path.join(C.MODEL_DIR, "metrics_stage1.json"))
 
     _plot_confusion(y_te, y_te_pred)
     _plot_importance(best, X.columns)
 
     print(f"\n✓ {model_path}")
-    print(f"✓ {C.MODEL_DIR}/metrics_baseline.json")
+    print(f"✓ {C.MODEL_DIR}/metrics_stage1.json")
     print(f"✓ {C.FIGURE_DIR}/fig_baseline_dt_confusion.png")
     print(f"✓ {C.FIGURE_DIR}/fig_baseline_dt_importance.png")
     print(f"  叶子 {best.get_n_leaves()} 个，深度 {best.get_depth()}，耗时 {time.time() - t_start:.0f}s")

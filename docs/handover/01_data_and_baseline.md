@@ -45,7 +45,7 @@ assert m["sha256"] == hashlib.sha256(open("data/haze_panel_clean.parquet","rb").
 | 文件 | 内容 |
 |---|---|
 | `models/baseline_dt.joblib` | dict，键 `model`（模型对象）/ `features`（特征名列表） |
-| `models/metrics_baseline.json` | 六指标 + 超参 + 分节点结果 + 类别分布 |
+| `models/metrics_stage1.json` | 六指标 + 超参 + 分节点结果 + 类别分布 |
 | `models/gate0_report.json` | 四项数据可行性闸门 |
 | `models/cleaning_report.json` | 清洗计数、QC 计数、逐节点完整性 |
 

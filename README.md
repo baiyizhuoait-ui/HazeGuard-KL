@@ -195,7 +195,7 @@ python src/01_baseline_dt.py       # M1 基线（约 10 秒）
 │   └── data_dictionary.json      字段口径
 ├── models/
 │   ├── baseline_dt.joblib
-│   ├── metrics_baseline.json     六指标 + 超参 + 分节点结果
+│   ├── metrics_stage1.json     六指标 + 超参 + 分节点结果
 │   ├── gate0_report.json         数据可行性四项闸门
 │   └── cleaning_report.json      清洗计数（可追溯）
 ├── figures/                      混淆矩阵、特征重要性

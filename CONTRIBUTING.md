@@ -12,23 +12,33 @@
 
 **一个文件只有一个负责人。** 别人只能读，不能改。发现问题就在群里说，或者提 Issue。
 
-| 模块 | 负责人 | 负责的代码 | 负责的产物 |
+下面这张表**锁死**了，不再改。1 号到 7 号与模块号一一对应，产物文件名与课程要求逐字一致——
+下游是按文件名读的，写错一个字母就读不到，而且不会报错。
+
+| 号 | 职责 | 代码文件 | 交付产物 |
 |---|---|---|---|
-| 01 数据工程与基线 | **1号（组长）** | `src/config.py`、`src/01_*.py`、`src/utils_metrics.py` | `data/haze_panel_clean.parquet`、`models/baseline_dt.joblib`、`models/metrics_baseline.json` |
-| 02 EDA 与时空特征 | 2号 | `src/02_*.py` | `data/feat_spatiotemporal.parquet`、`figures/fig_eda_*.png` |
-| 03 粒化与特征选择 | 3号 | `src/03_*.py` | `data/features_final.parquet`、`models/selected_features.json` |
-| 04 名义 RF 与回归分级 | 4号 | `src/04_*.py` | `models/rf_*.joblib`、`models/metrics_stage4.json` |
-| 05 有序 RF 与分位数 RF | 5号 | `src/05_*.py` | `models/ordinal_rf.joblib`、`models/ordinal_probs.npz` |
-| 06 代价优化与可解释性 | 6号 | `src/06_*.py` | `models/benchmark.csv`、`figures/fig_shap_*.png` |
-| 07 交互系统与报告 | 7号 | `app.py`、`src/07_compile_report.py` | `reports/final_report.md`、`README` 的截图 |
+| **1号**（组长） | 数据工程、气候基线解耦与基线模型 | `src/config.py`、`src/01_data_pipeline.py`、`src/01_baseline_dt.py`、`src/01_verify_data.py`、`src/utils_metrics.py`、`tools/discover_nodes.py` | `data/haze_panel_clean.parquet`、`data/manifest.json`、`data/data_dictionary.json`、`models/baseline_dt.joblib`、`models/metrics_stage1.json`、`models/gate0_report.json`、`models/cleaning_report.json`、`figures/fig_baseline_dt_*.png` |
+| **2号** | EDA 与时空季风传导特征 | `src/02_eda_analysis.py`、`src/02_spatiotemporal_features.py` | `data/feat_spatiotemporal.parquet`、`figures/fig_eda_diurnal_seasonal.png`、`figures/fig_eda_correlation_matrix.png`、`figures/fig_eda_class_imbalance.png`、`figures/fig_eda_wind_rose_pollution.png`、`figures/fig_eda_spatial_crosscorr.png` |
+| **3号** | 模糊信息粒化与特征选择 | `src/03_fuzzy_granulation.py`、`src/03_feature_selection.py` | `data/features_final.parquet`、`models/selected_features.json`、`figures/fig_feature_ablation.png`、`figures/fig_fcm_prototypes.png` |
+| **4号** | 多分类 RF、回归转分级与复杂度控制 | `src/04_standard_and_reg_rf.py`、`src/04_complexity_experiments.py` | `models/rf_nominal_balanced.joblib`、`models/rf_regressor.joblib`、`models/metrics_stage4.json`、`figures/fig_rf_complexity_curve.png`、`figures/fig_window_sensitivity.png` |
+| **5号** | 有序 RF 与分位数区间预测 | `src/05_ordinal_rf.py`、`src/05_quantile_rf.py` | `models/ordinal_rf.joblib`、`models/quantile_rf.joblib`、`models/ordinal_probs_val_test.npz`、`models/metrics_stage5.json`、`figures/fig_ordinal_error_distribution.png`、`figures/fig_quantile_fan_chart.png` |
+| **6号** | 代价敏感优化、SHAP 与泛化评估 | `src/06_cost_sensitive_gpso.py`、`src/06_shap_explainability.py`、`src/06_generalization_study.py` | `models/gpso_optimal_thresholds.json`、`models/all_models_benchmark.csv`、`models/loso_results.csv`、`models/seasonal_metrics.csv`、`figures/fig_shap_beeswarm.png`、`figures/fig_shap_dependence.png`、`figures/fig_shap_waterfall_haze_event.png`、`figures/fig_confusion_matrices_comparison.png` |
+| **7号** | 交互系统与示范报告总成 | `app.py`、`src/07_compile_report.py` | `reports/HazeGuard_KL_Demonstration_Report.md`、`requirements.txt`（定稿）、`README.md`（定稿） |
 
-公共文件（`README.md`、`CONTRIBUTING.md`、`requirements.txt`、`.gitignore`）只有组长能改。
+每个人还要交两样东西，不写就算没做完：
 
-### 关于 `utils_metrics.py`
+- `reports/sec<章节号>_<主题>.md` —— 自己那几节的英文学术正文
+- `docs/handover/NN_<主题>.md` —— 交接文档（见第 7 节）
 
-这是全组**唯一**的指标实现。任何人发现自己需要它没有的功能，**找组长加**，
-不要在自己脚本里另写一个 `evaluate_predictions`。两份口径一旦分家，
-最后合成报告时数字一定打架，而且很难查是哪一份错了。
+### 几个特例，说清楚免得推诿
+
+- **`utils_metrics.py` 只有 1 号能改。** 这是全组唯一的指标实现。谁发现自己需要它没有的功能，
+  找 1 号加，**不要自己另写一个 `evaluate_predictions`**。两份口径一旦分家，
+  最后合报告时数字一定打架，而且查不出是哪份错了。
+- **`README.md` 和 `requirements.txt` 分两段管。** 前期由 1 号维护（项目说明、依赖）；
+  最后一棒 7 号负责定稿（补运行说明、截图、最终依赖）。7 号动手前先在群里说一声。
+- **`CONTRIBUTING.md`、`.gitignore`、`src/config.py` 永远只有 1 号能改。**
+  改契约（列名、粒度、路径）必须先在这里登记，再改代码。
 
 ---
 
