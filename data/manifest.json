@@ -1,7 +1,7 @@
 {
   "dataset": "haze_panel_clean",
-  "generated_at": "2026-11-07T17:50:48",
-  "git_commit": "447913f",
+  "generated_at": "2026-11-07T17:58:11",
+  "git_commit": "b2b91c0",
   "path": "data/haze_panel_clean.parquet",
   "sha256": "97b5db123352861b6cd41224daf1ce278c90d6d528031b9bdc2744317a5ead93",
   "bytes": 25057369,
