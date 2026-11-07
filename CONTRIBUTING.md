@@ -1,6 +1,6 @@
 # 协作规范
 
-七个人做同一个仓库，最容易出的问题不是算法写错，而是**别人不知道你在改什么**、
+七个人（1 号带头，2~7 号各管一个模块）做同一个仓库，最容易出的问题不是算法写错，而是**别人不知道你在改什么**、
 **两个人同时改同一个文件**、**下游读到的列名和上游写的对不上**。
 这份文档就是为了把这些事提前定死。
 
@@ -14,13 +14,13 @@
 
 | 模块 | 负责人 | 负责的代码 | 负责的产物 |
 |---|---|---|---|
-| 01 数据工程与基线 | **组长** | `src/config.py`、`src/01_*.py`、`src/utils_metrics.py` | `data/haze_panel_clean.parquet`、`models/baseline_dt.joblib`、`models/metrics_baseline.json` |
-| 02 EDA 与时空特征 | 成员 A | `src/02_*.py` | `data/feat_spatiotemporal.parquet`、`figures/fig_eda_*.png` |
-| 03 粒化与特征选择 | 成员 E | `src/03_*.py` | `data/features_final.parquet`、`models/selected_features.json` |
-| 04 名义 RF 与回归分级 | 成员 B | `src/04_*.py` | `models/rf_*.joblib`、`models/metrics_stage4.json` |
-| 05 有序 RF 与分位数 RF | 成员 C | `src/05_*.py` | `models/ordinal_rf.joblib`、`models/ordinal_probs.npz` |
-| 06 代价优化与可解释性 | 成员 D | `src/06_*.py` | `models/benchmark.csv`、`figures/fig_shap_*.png` |
-| 07 交互系统与报告 | 成员 F | `app.py`、`src/07_compile_report.py` | `reports/final_report.md`、`README` 的截图 |
+| 01 数据工程与基线 | **1号（组长）** | `src/config.py`、`src/01_*.py`、`src/utils_metrics.py` | `data/haze_panel_clean.parquet`、`models/baseline_dt.joblib`、`models/metrics_baseline.json` |
+| 02 EDA 与时空特征 | 2号 | `src/02_*.py` | `data/feat_spatiotemporal.parquet`、`figures/fig_eda_*.png` |
+| 03 粒化与特征选择 | 3号 | `src/03_*.py` | `data/features_final.parquet`、`models/selected_features.json` |
+| 04 名义 RF 与回归分级 | 4号 | `src/04_*.py` | `models/rf_*.joblib`、`models/metrics_stage4.json` |
+| 05 有序 RF 与分位数 RF | 5号 | `src/05_*.py` | `models/ordinal_rf.joblib`、`models/ordinal_probs.npz` |
+| 06 代价优化与可解释性 | 6号 | `src/06_*.py` | `models/benchmark.csv`、`figures/fig_shap_*.png` |
+| 07 交互系统与报告 | 7号 | `app.py`、`src/07_compile_report.py` | `reports/final_report.md`、`README` 的截图 |
 
 公共文件（`README.md`、`CONTRIBUTING.md`、`requirements.txt`、`.gitignore`）只有组长能改。
 
@@ -39,12 +39,12 @@
 | 分支 | 谁 | 模块 |
 |---|---|---|
 | `main` | 全体 | 集成分支，任何时刻拉下来都能跑通 |
-| `feat/02-eda` | 成员 A | EDA 与时空传导特征 |
-| `feat/03-fig` | 成员 E | 模糊信息粒化与特征选择 |
-| `feat/04-nominal-rf` | 成员 B | 名义 RF 与回归分级 |
-| `feat/05-ordinal-rf` | 成员 C | 有序 RF 与分位数 RF |
-| `feat/06-cost-shap` | 成员 D | 代价敏感优化与可解释性 |
-| `feat/07-streamlit` | 成员 F | 交互系统与报告 |
+| `feat/02-eda` | 2号 | EDA 与时空传导特征 |
+| `feat/03-fig` | 3号 | 模糊信息粒化与特征选择 |
+| `feat/04-nominal-rf` | 4号 | 名义 RF 与回归分级 |
+| `feat/05-ordinal-rf` | 5号 | 有序 RF 与分位数 RF |
+| `feat/06-cost-shap` | 6号 | 代价敏感优化与可解释性 |
+| `feat/07-streamlit` | 7号 | 交互系统与报告 |
 
 自己的活干完了就删掉自己的分支，别留着。
 

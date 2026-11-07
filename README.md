@@ -110,13 +110,13 @@ AIT201 Applied Machine Learning · 2026/09 · 小组项目
 
 | 编号 | 模型 | 范式 | 为什么要有它 | 负责人 |
 |---|---|---|---|---|
-| M1 | Decision Tree | 多分类 | 地板线。证明后面的复杂度不是白加的 | 组长 |
-| M2A | Nominal RF | 多分类 | 完全不管顺序的对照 | 成员 B |
-| M2B | Balanced RF | 多分类 | `class_weight='balanced_subsample'`，看权重能救多少 | 成员 B |
-| M3 | Reg-to-Cls RF | 回归→阈值切档 | 先学浓度再切档，检验"分级损失信息"这个说法 | 成员 B |
-| M4 | Ordinal RF | 有序分解 | 把四分类拆成 3 个累积二分类，尊重等级次序 | 成员 C |
-| M5 | Quantile RF | 分位数回归 | 给 90% 区间，别只会给一个点 | 成员 C |
-| M6 | Cost-Sensitive Ordinal RF | 有序 + 代价敏感 | 用非对称代价矩阵把"漏报高危"的代价显式建模 | 成员 D |
+| M1 | Decision Tree | 多分类 | 地板线。证明后面的复杂度不是白加的 | 1号 |
+| M2A | Nominal RF | 多分类 | 完全不管顺序的对照 | 4号 |
+| M2B | Balanced RF | 多分类 | `class_weight='balanced_subsample'`，看权重能救多少 | 4号 |
+| M3 | Reg-to-Cls RF | 回归→阈值切档 | 先学浓度再切档，检验"分级损失信息"这个说法 | 4号 |
+| M4 | Ordinal RF | 有序分解 | 把四分类拆成 3 个累积二分类，尊重等级次序 | 5号 |
+| M5 | Quantile RF | 分位数回归 | 给 90% 区间，别只会给一个点 | 5号 |
+| M6 | Cost-Sensitive Ordinal RF | 有序 + 代价敏感 | 用非对称代价矩阵把"漏报高危"的代价显式建模 | 6号 |
 
 **统一评估的六项指标**（全部由 `src/utils_metrics.py` 产出，谁都不许自己另写一套）：
 
@@ -148,15 +148,15 @@ AIT201 Applied Machine Learning · 2026/09 · 小组项目
 
 | 模块 | 负责人 | 状态 | 主要产物 |
 |---|---|---|---|
-| 01 数据工程与基线 | 组长 | ✅ 完成 | `haze_panel_clean.parquet`、M1 基线 |
-| 02 EDA 与时空传导特征 | 成员 A | ⬜ 待开工 | `feat_spatiotemporal.parquet`、5 张 EDA 图 |
-| 03 模糊信息粒化与特征选择 | 成员 E | ⬜ 待 02 | `features_final.parquet`、`selected_features.json` |
-| 04 名义 RF / 回归分级 | 成员 B | ⬜ 待 03 | M2A/M2B/M3 |
-| 05 有序 RF / 分位数 RF | 成员 C | ⬜ 待 03 | M4/M5 |
-| 06 代价敏感优化与可解释性 | 成员 D | ⬜ 待 05 | M6、SHAP、泛化实验 |
-| 07 交互系统与报告 | 成员 F | ⬜ 待 06 | `app.py`、完整报告 |
+| 01 数据工程与基线 | 1号（组长） | ✅ 完成 | `haze_panel_clean.parquet`、M1 基线 |
+| 02 EDA 与时空传导特征 | 2号 | ⬜ 待开工 | `feat_spatiotemporal.parquet`、5 张 EDA 图 |
+| 03 模糊信息粒化与特征选择 | 3号 | ⬜ 待 02 | `features_final.parquet`、`selected_features.json` |
+| 04 名义 RF / 回归分级 | 4号 | ⬜ 待 03 | M2A/M2B/M3 |
+| 05 有序 RF / 分位数 RF | 5号 | ⬜ 待 03 | M4/M5 |
+| 06 代价敏感优化与可解释性 | 6号 | ⬜ 待 05 | M6、SHAP、泛化实验 |
+| 07 交互系统与报告 | 7号 | ⬜ 待 06 | `app.py`、完整报告 |
 
-> 分工表里的"成员 B~F"是仓库里的代号，提交前替换成真实姓名。
+> 分工表里的"4号~F"是仓库里的代号，提交前替换成真实姓名。
 
 ---
 
