@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.vscode/
+.DS_Store
+
+# 原始 API 缓存（可由 01_data_pipeline.py 重新生成）
+data/raw/
+
+# 中间产物
+*.tmp
+*.log
