@@ -141,6 +141,23 @@ def main() -> None:
     print("      分节点 Macro-F1：" +
           "  ".join(f"{k}={v['Macro_F1']:.3f}" for k, v in per_node.items()))
 
+    # ---- M0 纯持续性基线 ----------------------------------------------
+    # 这不是凑数：报告里说"后面加复杂度的对手是持续性本身"，那就必须把它算出来。
+    # 预测规则极简：t+3h 的等级 = 当前 t 时刻的等级，不做任何学习。
+    print("[4b] 纯持续性基线 M0（t+3h 直接沿用 t 时刻等级）")
+    m0_te_pred = _level_from_pm25(d.loc[split == "test", "pm2_5"].to_numpy())
+    m0_va_pred = _level_from_pm25(d.loc[split == "val", "pm2_5"].to_numpy())
+    m0_te = UM.evaluate_predictions(y_te, m0_te_pred)
+    m0_va = UM.evaluate_predictions(y_va, m0_va_pred)
+    UM.print_metrics(m0_te, "M0 Persistence · test")
+
+    # 关键对照：M1 相对 M0 到底赢在哪、输在哪
+    print("\n      对照（test）      M0 持续性   M1 决策树   差值")
+    for k in ("Macro_F1", "Balanced_Accuracy", "High_Risk_Recall",
+              "MAOE", "Severe_Jumping_Error_Rate", "Avg_Asymmetric_Cost"):
+        a, b_ = m0_te[k], m_te[k]
+        print(f"      {k:24s} {a:8.4f}   {b_:8.4f}   {b_ - a:+.4f}")
+
     print("[5/5] 保存模型与指标")
     model_path = os.path.join(C.MODEL_DIR, "baseline_dt.joblib")
     joblib.dump({"model": best, "features": list(X.columns)}, model_path, compress=3)
@@ -154,6 +171,8 @@ def main() -> None:
             "Macro_F1", "Balanced_Accuracy", "High_Risk_Recall",
             "MAOE", "Severe_Jumping_Error_Rate", "Avg_Asymmetric_Cost",
             "n_samples", "n_high_risk")},
+        "metrics_persistence_M0_test": m0_te,
+        "metrics_persistence_M0_val": m0_va,
         "metrics_train": m_tr,
         "metrics_val": m_va,
         "per_node_test": per_node,
@@ -172,6 +191,10 @@ def main() -> None:
             "depth": int(best.get_depth()),
         },
         "train_universe": "receptor nodes only (KL_City, Port_Klang, Sepang)",
+        "train_universe_note": "主实验统一只在 3 个受体节点上训练与验证；"
+                               "23 个走廊/源区节点只作特征输入与泛化实验对照",
+        "metric_version": "High_Risk_Recall = P(ŷ∈{2,3} | y∈{2,3})，"
+                          "诊断项 diag_* 不参与横向排序",
         "elapsed_sec": round(time.time() - t_start, 1),
     }
     UM.save_metrics(payload, os.path.join(C.MODEL_DIR, "metrics_stage1.json"))
@@ -184,6 +207,13 @@ def main() -> None:
     print(f"✓ {C.FIGURE_DIR}/fig_baseline_dt_confusion.png")
     print(f"✓ {C.FIGURE_DIR}/fig_baseline_dt_importance.png")
     print(f"  叶子 {best.get_n_leaves()} 个，深度 {best.get_depth()}，耗时 {time.time() - t_start:.0f}s")
+
+
+def _level_from_pm25(arr) -> np.ndarray:
+    """按 config 阈值把浓度离散成四级。用于构造持续性基线。"""
+    a = np.asarray(arr, dtype=float)
+    lo, mid, hi = C.LEVEL_THRESHOLDS
+    return np.select([a < lo, a < mid, a < hi], [0, 1, 2], default=3).astype(int)
 
 
 def _plot_confusion(y_true, y_pred) -> None:

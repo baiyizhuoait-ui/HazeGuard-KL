@@ -9,7 +9,9 @@
 --------------------------------------
 1. Macro_F1                 四等级 F1 的算术平均
 2. Balanced_Accuracy        各类召回率的平均
-3. High_Risk_Recall         真实 Level 2/3 被正确识别的比例（核心防漏报）
+3. High_Risk_Recall         真实 Level 2/3 中，预测落在 {2,3} 的比例（核心防漏报）
+                            口径是「高危有没有被预警」，不是「等级有没有报对」。
+                            真实 L2 报成 L3 属于过度预警，不算漏报。
 4. MAOE                     平均绝对序差 (1/N)Σ|y-ŷ|
 5. Severe_Jumping_Error_Rate 跨两级误判比例 (1/N)Σ1(|y-ŷ|≥2)
 6. Avg_Asymmetric_Cost      平均非对称代价 (1/N)ΣC[y][ŷ]
@@ -86,10 +88,18 @@ def evaluate_predictions(
     # 2) Balanced Accuracy
     bal_acc = float(balanced_accuracy_score(yt, yp))
 
-    # 3) High-Risk Recall（召回率，不是精确率）
+    # 3) High-Risk Recall —— 口径是"高危有没有被预警"，不是"等级有没有报对"
+    #    真实属于高危（默认 L2/L3）的样本中，预测落在高危集合内的比例。
+    #    注意：把真实 L2 报成 L3 属于"过度预警"，不是漏报，两种口径差别很大
+    #    （基线 DT 上 union=0.7693、exact=0.5707），报告里必须写清用的是哪一种。
     hr_mask = np.isin(yt, high_risk_levels)
     n_hr = int(hr_mask.sum())
-    hr_recall = float((yp[hr_mask] == yt[hr_mask]).mean()) if n_hr > 0 else float("nan")
+    hr_recall = float(np.isin(yp[hr_mask], high_risk_levels).mean()) if n_hr > 0 else float("nan")
+
+    # 辅助诊断（不进六项主指标）：严格逐类召回，用于混淆矩阵讨论
+    hr_exact = float((yp[hr_mask] == yt[hr_mask]).mean()) if n_hr > 0 else float("nan")
+    l3_mask = yt == max(high_risk_levels)
+    l3_recall = float((yp[l3_mask] == yt[l3_mask]).mean()) if l3_mask.sum() > 0 else float("nan")
 
     # 4) MAOE
     abs_err = np.abs(yt - yp)
@@ -110,6 +120,9 @@ def evaluate_predictions(
         "Avg_Asymmetric_Cost": round(avg_cost, 4),
         "n_samples": int(len(yt)),
         "n_high_risk": n_hr,
+        # 诊断项：不参与六项主指标的横向排序，只在分析里用
+        "diag_High_Risk_Exact_Recall": round(hr_exact, 4) if n_hr > 0 else None,
+        "diag_Level3_Recall": round(l3_recall, 4) if l3_mask.sum() > 0 else None,
     }
 
 
@@ -127,6 +140,9 @@ def print_metrics(metrics: Dict[str, float], title: str = "") -> None:
     for k in order:
         v = metrics.get(k)
         print(f"  {k:26s} {v if v is not None else 'n/a'}")
+    for k in ("diag_High_Risk_Exact_Recall", "diag_Level3_Recall"):
+        if k in metrics:
+            print(f"  {k:26s} {metrics[k]}   (诊断项)")
     print(f"  {'n_samples':26s} {metrics.get('n_samples')}"
           f"   (高危 {metrics.get('n_high_risk')})")
 

@@ -186,7 +186,7 @@ Applied per node, in order:
 7. **Target construction and row removal**: rows without a valid `t+3h` target are dropped.
    *Rows dropped: 226.*
 
-Net: 969,072 → **966,766 rows** (99.76 % retention).
+Net: 969,072 → **966,677 rows** (99.75 % retention).
 
 ## 2.1.5 Target Construction
 
@@ -207,8 +207,8 @@ distribution and misread their inter-annual variability as distribution drift.
 
 | Gate | Criterion | Result | Verdict |
 |---|---|---|---|
-| G0-1 | ≥ 100,000 rows, ≥ 12,000 per node | 966,766 rows; min 37,041 | pass |
-| G0-2 | Receptor Level 3 share ≥ 1 % | 12.21 % (panel: 3.38 %) | pass |
+| G0-1 | ≥ 100,000 rows, ≥ 12,000 per node | 966,677 rows; min 36,952 | pass |
+| G0-2 | Receptor Level 3 share ≥ 1 % | 12.21 % (panel: 3.37 %) | pass |
 | G0-3 | Longest receptor gap ≤ 24 h | 5 h (panel max 37 h, Palangkaraya) | pass |
 | G0-4 | Train/test Level 3 ratio ≤ 3× | 11.13 % vs 18.85 % (1.69×) | pass |
 
@@ -254,7 +254,7 @@ validation / 15 % test:
 |---|---|---|---|
 | train | 2022-08 → 2025-06 | 676,884 | baseline fitting, model fitting, CV, hyperparameter search |
 | val | 2025-06 → 2026-03 | 145,054 | model selection, threshold grid search, early stopping |
-| test | 2026-03 → 2026-10 | 144,828 | **final reporting only — evaluated once** |
+| test | 2026-03 → 2026-10 | 144,739 | **final reporting only — evaluated once** |
 
 The split is defined on timestamps (span percentiles), not row counts, so that missing
 rows cannot shift a boundary. No shuffling, no `KFold`, no random subsampling appears
@@ -311,22 +311,35 @@ should look like.
 
 Test split, receptor nodes, n = 16,728 (of which 6,865 high-risk):
 
-| Metric | Value |
-|---|---|
-| Macro-F1 | **0.6620** |
-| Balanced Accuracy | 0.6443 |
-| High-Risk Recall (L2 ∪ L3) | **0.5707** |
-| MAOE | 0.3220 |
-| Severe Jumping Error Rate | 0.0218 |
-| Average Asymmetric Cost | 0.8905 |
+| Metric | M0 Persistence | M1 Decision Tree | Δ (M1 − M0) |
+|---|---|---|---|
+| Macro-F1 | 0.6222 | **0.6620** | +0.0398 |
+| Balanced Accuracy | 0.6222 | **0.6443** | +0.0221 |
+| High-Risk Recall (L2 ∪ L3) | **0.7752** | 0.7693 | **−0.0059** |
+| MAOE | 0.3930 | **0.3220** | −0.0710 |
+| Severe Jumping Error Rate | 0.0375 | **0.0218** | −0.0157 |
+| Average Asymmetric Cost | 0.9986 | **0.8905** | −0.1081 |
+
+**Definition of High-Risk Recall.** We report the *union* recall,
+Pr(ŷ ∈ {2,3} | y ∈ {2,3}), which asks whether a dangerous hour received *any* high-risk
+warning. A true Level 2 predicted as Level 3 counts as a hit: it over-warns, it does not
+under-warn. The stricter per-class version, Pr(ŷ = y | y ∈ {2,3}), is 0.5707 for M1 and is
+reported as a diagnostic (`diag_High_Risk_Exact_Recall`) rather than as a headline number,
+because penalising over-warning contradicts the asymmetric cost structure this project is
+built on. The two definitions differ by 0.20 absolute, so every table states which one is used.
+
+**M0 is not a straw man.** A persistence forecast sets the t+3h level equal to the current
+level and involves no learning whatsoever. It is included because the natural competitor for
+any added complexity is not an empty model but the persistent behaviour of the pollutant
+itself.
 
 Per receptor node:
 
-| Node | Macro-F1 | High-Risk Recall | Avg. Asymmetric Cost |
+| Node | Macro-F1 | High-Risk Recall (union) | Avg. Asymmetric Cost |
 |---|---|---|---|
-| KL_City | 0.6007 | 0.6037 | 1.0791 |
-| Port_Klang | 0.6741 | 0.5222 | 0.6264 |
-| Sepang | 0.6152 | 0.5488 | 0.9659 |
+| KL_City | 0.6007 | **0.8078** | 1.0791 |
+| Port_Klang | 0.6741 | 0.6724 | 0.6264 |
+| Sepang | 0.6152 | 0.7615 | 0.9659 |
 
 ## 2.2.4.3 Interpretation
 
@@ -339,13 +352,20 @@ has learned "tomorrow's air resembles today's air, adjusted for the time of day"
 that is a strong prior precisely because PM2.5 is autocorrelated. The burden of proof for
 any added complexity is therefore not "beat a naive model" but "beat persistence".
 
-**The failure mode is systematic under-warning, not random error.** The confusion matrix
-shows 1,348 true Level 2 cases predicted as Level 1, and 758 true Level 3 cases predicted
-as Level 2. False alarms in the opposite direction are rare (9 Level 2 predicted from
-Level 0). This is the signature of a model optimised for marginal accuracy under a
-majority-ish class structure: it hedges downward. High-Risk Recall of 0.57 means **four in
-ten genuinely dangerous hours are announced as merely moderate** — the exact error a public
-warning system cannot afford.
+**Aggregate metrics improve, but the metric that matters does not.** Macro-F1 rises by
+0.04, MAOE falls by 18 %, and average asymmetric cost falls by 11 %; on every summary
+statistic the tree looks like an improvement. Yet its union recall (0.7693) is *lower* than
+that of pure persistence (0.7752). Training a model and thereby losing ground on "should we
+raise an alarm" is the single most important result of this section: it shows that
+aggregate accuracy is the wrong objective for a warning system, and it is the empirical
+justification for the ordinal decomposition (M6) and the cost-sensitive threshold search
+(M7) that follow.
+
+The confusion matrix explains the mechanism. 1,348 true Level 2 cases are predicted as
+Level 1 and 758 true Level 3 cases as Level 2, while false alarms in the opposite direction
+are rare (9 Level 2 predicted from Level 0). The tree suppresses the boundary to accommodate
+Level 1, which holds roughly half the test set. That is hedging toward the majority, not
+random error.
 
 **Cross-cell performance is uneven, and the pattern is physical.** `Port_Klang` scores
 highest on macro-F1 but lowest on high-risk recall; it is the cleanest receptor (Level 3

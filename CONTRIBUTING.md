@@ -125,6 +125,13 @@ git push
 5. **不许用 test 段做任何选择。** 调超参、挑特征、定阈值，统统在 val 上做。
    test 只在最后报一次。用了就是数据泄露，结论作废。
 6. **随机种子固定 42。** 要比较两个模型，至少跑 3 个种子，报均值 ± 标准差。
+7. **主实验统一在 3 个受体节点上训练**（`role == "receptor"`，train 78,100 行）。
+   走廊和源区那 23 个节点只作特征输入与泛化对照，不许混进训练集——
+   它们 Level 3 占比接近 0，混进去会把高危先验稀释到 3.37%，和 M1 就没法比了。
+8. **调 `TimeSeriesSplit` 之前必须先按 `timestamp` 排序。** 面板是按
+   `["station_id", "timestamp"]` 落盘的，全局 timestamp 并不单调；
+   不排序的话前几折会变成"在 KL_City 上训练、在 Port_Klang 上验证"，
+   指标虚高而且完全看不出来。
 
 ---
 
@@ -196,6 +203,18 @@ n_high_risk
 | `data/*.parquet`（单个 < 50 MB） | 超过 2 MB 的 notebook 输出 |
 
 仓库总量控制 **200 MB** 以内，当前约 26 MB。
+
+### 交作业那一步：Moodle 只收 20 MB
+
+课程 PDF 明确写了三条，7 号定稿时逐条对：
+
+1. 报告必须是 **`<学号或组号>_Report.pdf`**，而且**要把第 5–7 页的 Marking Rubric 一起装进去**；
+2. 要有 **`README.txt`**（后缀是 `.txt`，不是 `.md`，仓库里的 README.md 要另存一份纯文本）；
+3. Moodle 单次上传**不能超过 20 MB**。光 `haze_panel_clean.parquet` 就 25 MB，
+   加上后面特征表和 `.joblib` 肯定超。
+
+所以提交包应该是：报告 PDF + `README.txt` + 源码 + `models/*.json` + 说明文件，
+**大数据和大模型放 OneDrive / XMU Drive，链接写进报告封面**。
 
 ---
 

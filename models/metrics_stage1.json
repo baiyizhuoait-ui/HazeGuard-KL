@@ -6,63 +6,97 @@
   "metrics": {
     "Macro_F1": 0.662,
     "Balanced_Accuracy": 0.6443,
-    "High_Risk_Recall": 0.5707,
+    "High_Risk_Recall": 0.7693,
     "MAOE": 0.322,
     "Severe_Jumping_Error_Rate": 0.0218,
     "Avg_Asymmetric_Cost": 0.8905,
     "n_samples": 16728,
     "n_high_risk": 6865
   },
+  "metrics_persistence_M0_test": {
+    "Macro_F1": 0.6222,
+    "Balanced_Accuracy": 0.6222,
+    "High_Risk_Recall": 0.7752,
+    "MAOE": 0.393,
+    "Severe_Jumping_Error_Rate": 0.0375,
+    "Avg_Asymmetric_Cost": 0.9986,
+    "n_samples": 16728,
+    "n_high_risk": 6865,
+    "diag_High_Risk_Exact_Recall": 0.5576,
+    "diag_Level3_Recall": 0.6766
+  },
+  "metrics_persistence_M0_val": {
+    "Macro_F1": 0.6099,
+    "Balanced_Accuracy": 0.61,
+    "High_Risk_Recall": 0.7056,
+    "MAOE": 0.3814,
+    "Severe_Jumping_Error_Rate": 0.0341,
+    "Avg_Asymmetric_Cost": 0.9286,
+    "n_samples": 16737,
+    "n_high_risk": 4888,
+    "diag_High_Risk_Exact_Recall": 0.4763,
+    "diag_Level3_Recall": 0.5431
+  },
   "metrics_train": {
     "Macro_F1": 0.7017,
     "Balanced_Accuracy": 0.6869,
-    "High_Risk_Recall": 0.5807,
+    "High_Risk_Recall": 0.7768,
     "MAOE": 0.271,
     "Severe_Jumping_Error_Rate": 0.0121,
     "Avg_Asymmetric_Cost": 0.6678,
     "n_samples": 78100,
-    "n_high_risk": 24346
+    "n_high_risk": 24346,
+    "diag_High_Risk_Exact_Recall": 0.5807,
+    "diag_Level3_Recall": 0.6586
   },
   "metrics_val": {
     "Macro_F1": 0.6867,
     "Balanced_Accuracy": 0.6738,
-    "High_Risk_Recall": 0.5497,
+    "High_Risk_Recall": 0.7473,
     "MAOE": 0.2833,
     "Severe_Jumping_Error_Rate": 0.0122,
     "Avg_Asymmetric_Cost": 0.6882,
     "n_samples": 16737,
-    "n_high_risk": 4888
+    "n_high_risk": 4888,
+    "diag_High_Risk_Exact_Recall": 0.5497,
+    "diag_Level3_Recall": 0.6712
   },
   "per_node_test": {
     "KL_City": {
       "Macro_F1": 0.6007,
       "Balanced_Accuracy": 0.586,
-      "High_Risk_Recall": 0.6037,
+      "High_Risk_Recall": 0.8078,
       "MAOE": 0.3481,
       "Severe_Jumping_Error_Rate": 0.0305,
       "Avg_Asymmetric_Cost": 1.0791,
       "n_samples": 5576,
-      "n_high_risk": 3278
+      "n_high_risk": 3278,
+      "diag_High_Risk_Exact_Recall": 0.6037,
+      "diag_Level3_Recall": 0.7159
     },
     "Port_Klang": {
       "Macro_F1": 0.6741,
       "Balanced_Accuracy": 0.6516,
-      "High_Risk_Recall": 0.5222,
+      "High_Risk_Recall": 0.6724,
       "MAOE": 0.2724,
       "Severe_Jumping_Error_Rate": 0.0117,
       "Avg_Asymmetric_Cost": 0.6264,
       "n_samples": 5576,
-      "n_high_risk": 1105
+      "n_high_risk": 1105,
+      "diag_High_Risk_Exact_Recall": 0.5222,
+      "diag_Level3_Recall": 0.6293
     },
     "Sepang": {
       "Macro_F1": 0.6152,
       "Balanced_Accuracy": 0.5964,
-      "High_Risk_Recall": 0.5488,
+      "High_Risk_Recall": 0.7615,
       "MAOE": 0.3454,
       "Severe_Jumping_Error_Rate": 0.0231,
       "Avg_Asymmetric_Cost": 0.9659,
       "n_samples": 5576,
-      "n_high_risk": 2482
+      "n_high_risk": 2482,
+      "diag_High_Risk_Exact_Recall": 0.5488,
+      "diag_Level3_Recall": 0.6626
     }
   },
   "best_params": {
@@ -113,5 +147,7 @@
     "depth": 9
   },
   "train_universe": "receptor nodes only (KL_City, Port_Klang, Sepang)",
-  "elapsed_sec": 9.6
+  "train_universe_note": "主实验统一只在 3 个受体节点上训练与验证；23 个走廊/源区节点只作特征输入与泛化实验对照",
+  "metric_version": "High_Risk_Recall = P(ŷ∈{2,3} | y∈{2,3})，诊断项 diag_* 不参与横向排序",
+  "elapsed_sec": 10.4
 }
