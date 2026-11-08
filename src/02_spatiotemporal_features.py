@@ -11,6 +11,7 @@ import hashlib
 import json
 from datetime import datetime, timezone
 from pathlib import Path
+import re
 import subprocess
 
 import numpy as np
@@ -34,8 +35,19 @@ def digest(path):
 
 
 def git_revision():
-    return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT,
-                                   text=True).strip()
+    """Support source archives without Git, without discovering a parent repository."""
+    if (ROOT / ".git").exists():
+        try:
+            return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT,
+                                           text=True, stderr=subprocess.DEVNULL).strip()
+        except (OSError, subprocess.CalledProcessError):
+            pass
+    provenance = ROOT / "SOURCE_COMMIT.txt"
+    if provenance.exists():
+        revision = provenance.read_text(encoding="utf-8").strip()
+        if re.fullmatch(r"[0-9a-fA-F]{40}|[0-9a-fA-F]{64}", revision):
+            return revision.lower()
+    return None
 
 
 def default_input():
@@ -261,8 +273,9 @@ def main():
     ap.add_argument("--sigma-km", type=float, default=15.0)
     ap.add_argument("--wind-speed-unit", choices=["km/h", "m/s"])
     args = ap.parse_args()
-    if args.input.resolve() == args.output.resolve():
-        ap.error("input is read-only; output must be a different path")
+    paths = [args.input.resolve(), args.output.resolve(), args.audit.resolve()]
+    if len(set(paths)) != len(paths):
+        ap.error("input is read-only; input, output and audit must be different paths")
     before = digest(args.input)
     df = pd.read_parquet(args.input)
     out = build_features(df, args.sigma_km, args.wind_speed_unit)
@@ -277,18 +290,42 @@ def main():
     unit = ("wind_speed_ms (m/s), cross-checked against km/h when present" if "wind_speed_ms" in df
             else f"km/h converted once, or explicit raw unit {args.wind_speed_unit}")
     gate_path = ROOT / "models/gate0_report.json"
+    family_counts = {
+        "lag": len(LAG_COLUMNS) * len(LAGS),
+        "rolling": len(WINDOWS) * 3,
+        "change_and_slope": 2,
+        "cyclical": 6,
+        "wind_vector": 2,
+        "spatial_and_availability": 7,
+        "audit_only": 6,
+    }
+    assert sum(family_counts.values()) == len(extra)
+    timestamp = local_time(out.timestamp)
+    gaps = (out.assign(_time=timestamp).sort_values(["station_id", "_time"])
+            .groupby("station_id", observed=True)._time.diff().dropna())
     audit = {
         "generated_at": datetime.now(timezone.utc).isoformat(), "git_commit": git_revision(),
         "source_sha256": digest(Path(__file__)),
         "input_sha256": before, "output_sha256": digest(args.output),
         "rows": len(out), "input_columns": len(df.columns), "output_columns": len(out.columns),
         "output_bytes": args.output.stat().st_size, "new_columns": extra,
+        "new_column_count": len(extra), "new_predictor_count": len(extra) - family_counts["audit_only"],
+        "feature_family_counts": family_counts,
+        "integrity": {"node_count": int(out.station_id.nunique()),
+                      "duplicate_primary_keys": int(out.duplicated(["station_id", "timestamp"]).sum()),
+                      "original_columns_values_dtypes_and_row_order_preserved": True,
+                      "timestamp_min": timestamp.min().isoformat(),
+                      "timestamp_max": timestamp.max().isoformat(),
+                      "non_hourly_consecutive_intervals": int(gaps.ne(pd.Timedelta(hours=1)).sum()),
+                      "split_counts": {str(k): int(v) for k, v in out.split.value_counts().items()},
+                      "infinite_new_predictor_values": int(np.isinf(out[[c for c in extra if not c.startswith("agent2_")]]).sum().sum())},
         "model_feature_columns": [c for c in ["pm2_5", "pm10", "no2", "so2", "o3", "co",
                                   "temperature_2m", "relative_humidity_2m", "wind_speed_ms", "precipitation",
                                   "lat", "lon"] if c in df] + [c for c in extra if not c.startswith("agent2_")],
         "model_exclusions": ["target_*", "split", "station_id", "role", "region", "timestamp", "agent2_*",
                              "wind_direction_10m", "wind_speed_kmh", "b_proto_*", "*_anomaly"],
         "nan_counts": {c: int(out[c].isna().sum()) for c in extra},
+        "nan_fractions": {c: float(out[c].isna().mean()) for c in extra},
         "parameters": {"sigma_km": args.sigma_km, "calm_ms": CALM_MS, "wind_unit": unit,
                        "lag_hours": LAGS, "rolling_hours": WINDOWS, "rolling_ddof": 1,
                        "rolling_includes_current": True, "rolling_variable": "pm2_5",

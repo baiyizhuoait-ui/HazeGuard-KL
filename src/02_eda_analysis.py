@@ -22,6 +22,12 @@ COLORS = ["#167d9a", "#dc7732", "#7356a5", "#4c956c", "#c55867", "#656b75", "#c0
 LEVEL_COLORS = ["#31858c", "#deb349", "#de8546", "#af4355"]
 
 
+def require_training(df):
+    """Descriptive input/target associations must not use held-out samples."""
+    if df.empty or not df.split.eq("train").all():
+        raise ValueError("training summaries require nonempty train-only input")
+
+
 def save(fig, directory, slug):
     fig.savefig(directory / f"fig_eda_{slug}.png", dpi=300, facecolor="white")
     plt.close(fig)
@@ -46,6 +52,7 @@ def receptor_rows(df):
 
 
 def diurnal_seasonal(train, directory):
+    require_training(train)
     rec = receptor_rows(train)
     fig, axes = plt.subplots(1, 2, figsize=(12, 5), layout="constrained")
     peaks, nodes = {}, {}
@@ -83,6 +90,7 @@ def diurnal_seasonal(train, directory):
 
 
 def correlations(train, directory):
+    require_training(train)
     rec = receptor_rows(train).copy()
     u, v = F.wind_vectors(rec)
     rec["u_wind"], rec["v_wind"] = u, v
@@ -146,6 +154,7 @@ def class_distribution(df, directory):
 
 
 def wind_rose(train, directory):
+    require_training(train)
     rec = receptor_rows(train).copy()
     speed = F.wind_speed_ms(rec)
     valid = speed.ge(F.CALM_MS) & rec.wind_direction_10m.notna() & rec.pm2_5.notna()
@@ -214,10 +223,13 @@ def crosscorr(df, directory):
     # No duplicated aliases: Banting shares Sepang's CAMS cell in the current registry.
     pairs = [(a, b) for a in ("Port_Klang", "Banting") for b in ("Cheras_KL", "XMUM_Sepang")
              if a in available and b in available]
-    mapping = {"original": "Banting → Cheras_KL/XMUM_Sepang unavailable as independent series",
-               "used": "Port_Klang → KL_City/Sepang; no duplicate-cell curves"}
+    requested = ["Port_Klang", "Banting", "Cheras_KL", "XMUM_Sepang"]
+    mapping = {"requested_nodes": requested,
+               "missing_nodes": [s for s in requested if s not in available],
+               "note": "Available alternatives are comparisons, not verified aliases of missing coordinates."}
     if not pairs:
         pairs = [("Port_Klang", b) for b in ("KL_City", "Sepang") if {"Port_Klang", b} <= available]
+    mapping["used_pairs"] = [list(p) for p in pairs]
     df = df.copy()
     df["_residual"] = deseasonalized(df)
     fig, axes = plt.subplots(1, 2, figsize=(12, 5), sharey=True, layout="constrained")
@@ -249,6 +261,33 @@ def crosscorr(df, directory):
             "mapping": mapping, "records": records, "residual_fit": "training month/hour means only"}
 
 
+def spatial_similarity(train):
+    """Audit common-grid duplication on exactly timestamp-aligned training PM2.5."""
+    require_training(train)
+    values = train.pivot(index="_time", columns="station_id", values="pm2_5").sort_index()
+    correlations = values.corr(method="pearson", min_periods=3)
+    records = []
+    for i, a in enumerate(values.columns):
+        for b in values.columns[i + 1:]:
+            overlap = values[[a, b]].dropna()
+            r = correlations.loc[a, b]
+            records.append({"node_a": str(a), "node_b": str(b), "n_pairs": len(overlap),
+                            "pearson_r": None if pd.isna(r) else float(r),
+                            "identical_on_overlap": bool(len(overlap) >= 3 and overlap[a].eq(overlap[b]).all()),
+                            "complete_series_identical": bool(len(overlap) >= 3
+                                and values[a].notna().equals(values[b].notna())
+                                and overlap[a].eq(overlap[b]).all())})
+    finite = [p for p in records if p["pearson_r"] is not None]
+    return {"scope": "training rows only, quality flags excluded; exact hourly timestamp alignment",
+            "nodes": len(values.columns), "pair_count": len(records),
+            "exact_duplicate_pairs": [p for p in records if p["complete_series_identical"]],
+            "high_correlation_threshold": .95,
+            "high_correlation_pairs": [p for p in finite if abs(p["pearson_r"]) >= .95],
+            "max_pair": max(finite, key=lambda p: abs(p["pearson_r"])) if finite else None,
+            "pairs": records,
+            "interpretation": "Distinct series do not establish independent ground observations or independent model errors."}
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--input", type=Path, default=F.default_input())
@@ -278,7 +317,8 @@ def main():
                "correlations": correlations(corr_train, args.figures),
                "class_distribution": class_distribution(df, args.figures),
                "wind_rose": wind_rose(train, args.figures),
-               "crosscorr": crosscorr(clean, args.figures)}
+               "crosscorr": crosscorr(clean, args.figures),
+               "spatial_similarity": spatial_similarity(train)}
     args.metrics.parent.mkdir(parents=True, exist_ok=True)
     args.metrics.write_text(json.dumps(metrics, indent=2, ensure_ascii=False, allow_nan=False) + "\n", encoding="utf-8")
     print("Wrote five 300 dpi figures and reproducible EDA statistics")

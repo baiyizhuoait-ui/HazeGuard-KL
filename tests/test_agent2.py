@@ -5,7 +5,11 @@ Fixtures are synthetic and are never used in the reported EDA or parquet.
 """
 import importlib.util
 import json
+import os
 from pathlib import Path
+import shutil
+import subprocess
+import sys
 
 import numpy as np
 import pandas as pd
@@ -214,6 +218,71 @@ def test_spatial_source_must_be_same_split(panel):
     assert pd.isna(row.spatial_pm25_gradient)
 
 
+def test_sparse_spatial_history_keeps_exact_hour_alignment(panel):
+    # The absence of West(9h) must not silently promote West(8h) to a 1h lag.
+    missing = panel.station_id.eq("West") & panel.timestamp.eq(pd.Timestamp("2024-01-01 09:00"))
+    out = F.build_features(panel.loc[~missing].sample(frac=1, random_state=9))
+    row = select(out, "Center", 10)
+    assert pd.isna(row.upwind_pm25_advection_1h)
+    assert row.upwind_pm25_advection_2h == 16
+    assert row.upwind_neighbor_count_1h == 0
+
+
+def test_source_missingness_and_future_wind_cannot_change_past_predictors(panel):
+    base = F.build_features(panel)
+    changed = panel.copy()
+    future = changed.timestamp > pd.Timestamp("2024-01-01 20:00")
+    changed.loc[future, ["is_missing", "qc_interpolated", "qc_calm_wind"]] = 1
+    changed.loc[future, ["wind_speed_ms", "wind_speed_kmh"]] = [20., 72.]
+    changed.loc[future, ["target_pm25_3h", "target_level_3h"]] = [-999., -9.]
+    altered = F.build_features(changed)
+    pd.testing.assert_frame_equal(base.loc[~future, predictors(base)], altered.loc[~future, predictors(base)])
+
+
+def test_git_revision_archive_provenance_and_no_parent_git(tmp_path, monkeypatch):
+    monkeypatch.setattr(F, "ROOT", tmp_path)
+    # A source ZIP can sit inside another checkout. Its commit must never be inherited.
+    def unexpected_git(*args, **kwargs):
+        raise AssertionError("Git must not run without root .git metadata")
+    monkeypatch.setattr(F.subprocess, "check_output", unexpected_git)
+    assert F.git_revision() is None
+    commit = "a1" * 20
+    (tmp_path / "SOURCE_COMMIT.txt").write_text(commit + "\n", encoding="utf-8")
+    assert F.git_revision() == commit
+    (tmp_path / "SOURCE_COMMIT.txt").write_text("unverified", encoding="utf-8")
+    assert F.git_revision() is None
+
+
+def test_features_cli_from_extracted_source_without_git(panel, tmp_path):
+    # Execute a copied script, not the imported repository module.
+    source = tmp_path / "src"
+    source.mkdir()
+    shutil.copy2(ROOT / "src/02_spatiotemporal_features.py", source)
+    panel.to_parquet(tmp_path / "input.parquet", index=False)
+    commit = "b2" * 20
+    (tmp_path / "SOURCE_COMMIT.txt").write_text(commit + "\n", encoding="utf-8")
+    result = subprocess.run(
+        [sys.executable, str(source / "02_spatiotemporal_features.py"),
+         "--input", str(tmp_path / "input.parquet"), "--output", str(tmp_path / "features.parquet"),
+         "--audit", str(tmp_path / "audit.json")],
+        cwd=tmp_path, capture_output=True, text=True, encoding="utf-8",
+        env=dict(os.environ, PYTHONIOENCODING="utf-8"),
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    audit = json.loads((tmp_path / "audit.json").read_text(encoding="utf-8"))
+    assert audit["git_commit"] == commit
+    assert audit["new_column_count"] == 56
+    assert audit["new_predictor_count"] == 50
+    assert sum(audit["feature_family_counts"].values()) == 56
+    assert audit["integrity"]["duplicate_primary_keys"] == 0
+    assert audit["integrity"]["original_columns_values_dtypes_and_row_order_preserved"]
+    assert audit["integrity"]["non_hourly_consecutive_intervals"] == 0
+    assert all(not c.startswith(("agent2_", "target_")) for c in audit["model_feature_columns"])
+    for name, count in audit["nan_counts"].items():
+        assert audit["nan_fractions"][name] == count / len(panel)
+    pd.testing.assert_frame_equal(pd.read_parquet(tmp_path / "features.parquet")[panel.columns], panel)
+
+
 def test_label_split_crossings_exact_horizon_and_thresholds(panel):
     out = F.build_features(panel)
     assert not select(out, "Center", 34).agent2_target_within_split_3h
@@ -281,6 +350,34 @@ def test_ccf_sign_uses_hours_and_not_row_offsets():
 def test_bootstrap_reproducible():
     x = np.arange(24*40).reshape(40,24)
     np.testing.assert_array_equal(E.block_diurnal_ci(x), E.block_diurnal_ci(x))
+
+
+def test_feature_design_eda_rejects_heldout_or_empty_rows(panel):
+    train = panel.loc[panel.split.eq("train")]
+    E.require_training(train)
+    with pytest.raises(ValueError, match="train-only"):
+        E.require_training(panel)
+    with pytest.raises(ValueError, match="train-only"):
+        E.require_training(train.iloc[:0])
+
+
+def test_grid_similarity_uses_timestamp_overlap_instead_of_row_order():
+    clock = pd.date_range("2024-01-01", periods=5, freq="h")
+    records = []
+    for sid, hours, values in [("A", [0, 1, 2, 3, 4], [0., 11., 7., 20., 2.]),
+                               ("B", [0, 2, 3, 4], [0., 7., 20., 2.])]:
+        records.extend({"station_id": sid, "_time": clock[h], "pm2_5": v, "split": "train"}
+                       for h, v in zip(hours, values))
+    result = E.spatial_similarity(pd.DataFrame(records).sample(frac=1, random_state=31))
+    assert result["nodes"] == 2 and result["pair_count"] == 1
+    assert result["max_pair"]["n_pairs"] == 4
+    assert result["max_pair"]["pearson_r"] == pytest.approx(1)
+    assert result["max_pair"]["identical_on_overlap"]
+    assert not result["max_pair"]["complete_series_identical"]
+    assert result["exact_duplicate_pairs"] == []
+    complete = pd.DataFrame(records)
+    complete = complete[complete._time.ne(clock[1])]
+    assert len(E.spatial_similarity(complete)["exact_duplicate_pairs"]) == 1
 
 
 def test_legacy_v2_input_keeps_raw_units_and_columns(panel):

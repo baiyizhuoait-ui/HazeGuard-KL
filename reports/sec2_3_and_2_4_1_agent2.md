@@ -8,7 +8,7 @@
 
 This analysis uses the existing `data/haze_panel_clean.parquet` at upstream revision `2cd57c5`. The input contains 966,677 rows and 35 columns, spanning 4 August 2022 to 31 October 2026 in Kuala Lumpur local time. Its SHA256 was verified against Agent 1's manifest. Agent 2 neither downloaded another dataset nor changed any upstream file. The four upstream Gate 0 checks pass under the repository's revised receptor-based rules. This does not constitute a new validation against ground observations.
 
-The uploaded *HazeGuard-KL 技术规范 v2.0*, particularly Sections 3.1, 3.2 and the Agent 2 deliverables, defines the feature families and figure filenames. The repository has since changed its spatial and temporal scope. The following adaptations were approved for this implementation.
+The supplied *HazeGuard-KL 技术规范 v2.0*, particularly Sections 3.1, 3.2 and the Agent 2 deliverables, defines the feature families and figure filenames. The repository has since changed its spatial and temporal scope. The following adaptations preserve the actual upstream data contract. They do not satisfy the original requirement for eight independently available location series.
 
 | Item | Specification v2.0 | Implemented scope |
 |---|---|---|
@@ -16,11 +16,13 @@ The uploaded *HazeGuard-KL 技术规范 v2.0*, particularly Sections 3.1, 3.2 an
 | Main prediction population | Eight locations | Three receptor cells: KL_City, Port_Klang and Sepang; other cells supply spatial context |
 | Period | November 2024 to October 2026 | Existing panel from August 2022 to October 2026 |
 | Input path | `data/kl_8stations_clean.parquet` | `data/haze_panel_clean.parquet`; the legacy input is supported if supplied |
-| Diurnal and wind summaries | Eight locations | The three independent receptor cells |
+| Diurnal and wind summaries | Eight locations | The three retained receptor cells |
 | Cross-correlation pairs | Port_Klang/Banting to Cheras_KL/XMUM_Sepang | Port_Klang to KL_City and Sepang; no repeated alias series |
 | Spatial kernel | Gaussian bandwidth of 15 km | Retained as specified, with availability and weight diagnostics |
 
-The node registry groups Banting with Sepang and represents the Cheras and XMUM coordinates by KL_City and Sepang. Drawing separate curves for these aliases would overstate the amount of independent spatial evidence. The 26-cell distribution is shown for context, while receptor rows define the primary analysis population.
+The node registry groups Banting with Sepang. It contains neither Cheras_KL nor XMUM_Sepang, and does not establish their exact equivalence to the available receptor cells. Port_Klang to KL_City and Sepang is therefore an available coastal/inland comparison, not a verified alias mapping. Separate curves for missing locations are not fabricated. The 26-cell distribution is shown for context, while receptor rows define the primary analysis population.
+
+An additional check aligns clean training PM2.5 values by exact timestamp for every pair of the 26 retained cells. None of the 325 pairs is exactly identical on its overlapping training hours. The largest absolute Pearson correlation is 0.9086 for Alor_Setar and Penang, using 26,034 paired hours; no pair reaches the disclosed diagnostic threshold of 0.95. These results do not establish statistical independence or independent model errors. The historical discovery file documents duplicate candidate locations before deduplication, whereas this new check applies to the delivered panel.
 
 Air quality values are CAMS model estimates obtained through Open-Meteo, not measurements at monitoring stations. Open-Meteo documents the global product at approximately 45 km spatial resolution and three-hour native temporal resolution, although the supplied API table is hourly. An hourly table alone cannot establish independent hourly information. The weather acquisition code does not select a specific `models` value, and the repository does not retain response-level model metadata. Therefore, the weather archive cannot be identified conclusively as pure ERA5 or assigned a single verified resolution. Open-Meteo's default archive combines products. Both the archive and derived features are retrospective; operational availability at issue time has not been demonstrated. [Open-Meteo air quality documentation](https://open-meteo.com/en/docs/air-quality-api), [historical weather documentation](https://open-meteo.com/en/docs/historical-weather-api).
 
@@ -50,9 +52,9 @@ Figures 1, 2 and 4 use training receptor rows after excluding rows marked as int
 
 ![Figure 3](../figures/fig_eda_class_imbalance.png)
 
-**Observation.** Across receptor rows, the four future-level counts are 19,986, 55,480, 22,484 and 13,617. Level 1 accounts for approximately half of the receptor samples. Port_Klang has Level 2 and Level 3 proportions of 9.73% and 1.94%, respectively. This does not support the specification's suggested expectation that Port_Klang should necessarily contain more high-level samples.
+**Observation.** Across receptor rows, the four future-level counts are 19,986, 55,480, 22,484 and 13,617. Level 1 accounts for approximately half of the receptor samples. Level 3 represents 12.2% overall and is not globally scarce in this panel, although its local support differs across cells. Port_Klang has Level 2 and Level 3 proportions of 9.73% and 1.94%, respectively. This does not support the specification's suggested expectation that Port_Klang should necessarily contain more high-level samples.
 
-**Physical interpretation.** The differences describe model grid-cell estimates and cannot establish differences in measured personal exposure. Including low-concentration source and corridor cells in a pooled training population would change the class prior relevant to KL receptors. The four categories use the project's concentration thresholds of 15, 35 and 55 µg/m³; they are not presented as an independently validated hourly health standard.
+**Physical interpretation.** The differences describe model grid-cell estimates and cannot establish differences in measured personal exposure. Including low-concentration source and corridor cells in a pooled training population would change the class prior relevant to KL receptors. The four categories are project experimental risk levels with concentration thresholds of 15, 35 and 55 µg/m³. They are not official hourly AQI health standards.
 
 **Implication for modelling.** Main model comparisons should continue to train, validate and evaluate on receptor rows. The all-node stacked panel provides context without expanding the main training population. Downstream reports should disclose class counts after the eligibility filter, particularly when comparing high-risk recall. Figure 3 describes the original target table; it is not a count of all rows accepted for model fitting.
 
