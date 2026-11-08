@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-08T08:20:06.416595+00:00",
-  "git_commit": "c341797ac3f4c53eb0530ac07ae04f94b5ee793c",
+  "generated_at": "2026-11-08T07:16:47.483276+00:00",
+  "git_commit": "0027ece5e9a4b0e9de1b707f5dfdfa13f7bdcefb",
   "python": "3.13.9",
   "packages": {
     "numpy": "2.3.5",
@@ -14,86 +14,12 @@
     "joblib": "1.5.2"
   },
   "source_sha256": {
-    "src/02_eda_analysis.py": "6d63c58254f778c0d3c9606758026fa4ad2731b47e1682fdbcdbc6a483228b48",
-    "src/02_spatiotemporal_features.py": "56be3504e22bc2f7c2ad9e782c5d4504af1b55266d270ef1f503ae01262337f9",
-    "tools/verify_agent2.py": "760415ea9e6cdd3c4b924e31c475269f817807afa7cb35bd7f139999800974d2",
-    "tools/package_agent2.py": "931a64512d7a4dcf03cefec311a99e6451b2aa94510bea3e1821ef44bead383f",
+    "src/02_eda_analysis.py": "e28ce88e1e7544f1bbcb63dffa3561784c9e2201fc5f174871d7f1df375d35f8",
+    "src/02_spatiotemporal_features.py": "d324ca1aaa4467b81a766d1d494218a05d8b2cae30ac4b2c1f4fa3b5c6a5f6ea",
     "tests/test_agent2.py": "df9ff8887fb556112ad78295731c68d6409c81b913167ad0d452e5dd687e5888",
-    "tests/test_agent2_eda26.py": "f0580c3f2a65a8933b4d1c89abdc49fccf66099eaca632b5620432a3c5b3129b",
-    "tests/test_agent2_release.py": "284515be235595acb3537551bf3fe3c463cf2cea8e8cb651526fb07236b3c479",
-    "tests/test_agent2_spatial26.py": "2a259719d04b5f25270f741f6433e34d5b5a4eb578bfb8a0688ae59aeba705ed"
+    "tools/verify_agent2.py": "cc9db6f00082941ac4be48da14e80fde0429889e59779bff3be20fe3235f9d00"
   },
   "full_data_preflight_passed": true,
-  "input_profile": {
-    "rows": 966677,
-    "columns": 35,
-    "unique_grid_ids": 26,
-    "unique_sampling_coordinates": 26,
-    "registered_role_counts": {
-      "source": 13,
-      "corridor": 10,
-      "receptor": 3
-    },
-    "timestamp_min": "2022-08-04 08:00:00",
-    "timestamp_max": "2026-10-31 20:00:00",
-    "missing_counts": {
-      "station_id": 0,
-      "timestamp": 0,
-      "lat": 0,
-      "lon": 0,
-      "region": 0,
-      "role": 0,
-      "split": 0,
-      "pm2_5": 0,
-      "pm10": 0,
-      "no2": 2,
-      "so2": 0,
-      "o3": 31,
-      "co": 74,
-      "temperature_2m": 0,
-      "relative_humidity_2m": 0,
-      "wind_speed_ms": 0,
-      "precipitation": 0,
-      "wind_speed_kmh": 0,
-      "wind_direction_10m": 0,
-      "is_missing": 0,
-      "qc_pm25_gt_pm10": 0,
-      "qc_censored": 0,
-      "qc_calm_wind": 0,
-      "qc_interpolated": 0,
-      "month": 0,
-      "hour": 0,
-      "dayofweek": 0,
-      "b_proto_pm25": 0,
-      "b_proto_temp": 0,
-      "b_proto_n": 0,
-      "b_proto_src": 0,
-      "pm2_5_anomaly": 0,
-      "temp_anomaly": 0,
-      "target_pm25_3h": 0,
-      "target_level_3h": 0
-    },
-    "labels_by_split": {
-      "test": {
-        "0": 62323,
-        "1": 51447,
-        "2": 14989,
-        "3": 15980
-      },
-      "train": {
-        "0": 397500,
-        "1": 231141,
-        "2": 34737,
-        "3": 13506
-      },
-      "val": {
-        "0": 82677,
-        "1": 51526,
-        "2": 7797,
-        "3": 3054
-      }
-    }
-  },
   "figures": {
     "fig_eda_diurnal_seasonal.png": {
       "pixels": [
@@ -119,36 +45,36 @@
     },
     "fig_eda_class_imbalance.png": {
       "pixels": [
-        4500,
-        3000
+        3900,
+        2340
       ],
       "dpi": [
         299.9994,
         299.9994
       ],
-      "sha256": "7d3cf1fbf458bd1c04f5fcde67859e069a3a5e534bac110df04c12d46e978469"
+      "sha256": "1ac4492ed98f01dfc6d5c038fdf20bb964cd873e4cd3570d28a9ce7579e4be27"
     },
     "fig_eda_wind_rose_pollution.png": {
       "pixels": [
-        4500,
-        3120
+        3600,
+        1650
       ],
       "dpi": [
         299.9994,
         299.9994
       ],
-      "sha256": "76f3093be1c74dd568e2548fd55da7eff33e8edcb93e984978622f41d2be1457"
+      "sha256": "d68d2c3daa6110ac8fe225eb5958a6c181f2143871e1a9008d35caef70f3c1f4"
     },
     "fig_eda_spatial_crosscorr.png": {
       "pixels": [
-        4800,
-        3600
+        3600,
+        1500
       ],
       "dpi": [
         299.9994,
         299.9994
       ],
-      "sha256": "6532c2e611c82c920370a2f5ddadf970975d1535c159b218586dac302597183f"
+      "sha256": "b458508cc171777dc9a8c04bb0727c2c49b30305d366ab52e8f2aa9ecf85347c"
     }
   },
   "git_diff_applicable": true,
@@ -168,12 +94,12 @@
         "python",
         "-m",
         "pytest",
-        "tests/",
+        "tests/test_agent2.py",
         "-q",
         "-rs"
       ],
       "exit_code": 0,
-      "stdout": "..........................................................               [100%]\n============================== warnings summary ===============================\n..\\26grid-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:64\n  <python-env>\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:64: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'\n    prop = Group((name + Suppress(\"=\") + comma_separated(value)) | oneOf(_CONSTANTS))\n\n..\\26grid-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85\n..\\26grid-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85\n..\\26grid-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85\n..\\26grid-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85\n..\\26grid-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85\n..\\26grid-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85\n  <python-env>\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85: PyparsingDeprecationWarning: 'parseString' deprecated - use 'parse_string'\n    parse = parser.parseString(pattern)\n\n..\\26grid-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89\n..\\26grid-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89\n..\\26grid-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89\n..\\26grid-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89\n..\\26grid-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89\n..\\26grid-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89\n  <python-env>\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89: PyparsingDeprecationWarning: 'resetCache' deprecated - use 'reset_cache'\n    parser.resetCache()\n\n..\\26grid-clean-env\\Lib\\site-packages\\matplotlib\\_mathtext.py:45\n  <python-env>\\Lib\\site-packages\\matplotlib\\_mathtext.py:45: PyparsingDeprecationWarning: 'enablePackrat' deprecated - use 'enable_packrat'\n    ParserElement.enablePackrat()\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n58 passed, 14 warnings in 6.47s",
+      "stdout": ".......................................                                  [100%]\n============================== warnings summary ===============================\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:64\n  <python-env>\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:64: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'\n    prop = Group((name + Suppress(\"=\") + comma_separated(value)) | oneOf(_CONSTANTS))\n\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85\n  <python-env>\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85: PyparsingDeprecationWarning: 'parseString' deprecated - use 'parse_string'\n    parse = parser.parseString(pattern)\n\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89\n  <python-env>\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89: PyparsingDeprecationWarning: 'resetCache' deprecated - use 'reset_cache'\n    parser.resetCache()\n\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_mathtext.py:45\n  <python-env>\\Lib\\site-packages\\matplotlib\\_mathtext.py:45: PyparsingDeprecationWarning: 'enablePackrat' deprecated - use 'enable_packrat'\n    ParserElement.enablePackrat()\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n39 passed, 14 warnings in 5.93s",
       "stderr": ""
     },
     {
@@ -183,7 +109,7 @@
         "reports/"
       ],
       "exit_code": 0,
-      "stdout": "[PASS] reports\\sec1_data_and_baseline.md\n       2605 词 / 131 句 | 破折号 4 处 (1.54/千词) | 平均句长 18.7 | 变异系数 0.57\n[WARN] reports\\sec2_3_and_2_4_1_agent2.md\n       3040 词 / 185 句 | 破折号 0 处 (0.0/千词) | 平均句长 15.1 | 变异系数 0.34\n       ! 句长变异系数 0.34（建议 ≥ 0.35，太均匀像模板）\n\n共 2 个文件，0 个有硬性问题。",
+      "stdout": "[PASS] reports\\sec1_data_and_baseline.md\n       2605 词 / 131 句 | 破折号 4 处 (1.54/千词) | 平均句长 18.7 | 变异系数 0.57\n[WARN] reports\\sec2_3_and_2_4_1_agent2.md\n       2648 词 / 162 句 | 破折号 0 处 (0.0/千词) | 平均句长 14.9 | 变异系数 0.34\n       ! 句长变异系数 0.34（建议 ≥ 0.35，太均匀像模板）\n\n共 2 个文件，0 个有硬性问题。",
       "stderr": ""
     },
     {
@@ -194,9 +120,7 @@
         "-q",
         "src/02_eda_analysis.py",
         "src/02_spatiotemporal_features.py",
-        "tests/",
-        "tools/verify_agent2.py",
-        "tools/package_agent2.py"
+        "tests/test_agent2.py"
       ],
       "exit_code": 0,
       "stdout": "",
@@ -211,23 +135,21 @@
         "--",
         "src/02_eda_analysis.py",
         "src/02_spatiotemporal_features.py",
-        "tests/",
-        "tools/",
+        "tests/test_agent2.py",
+        "tools/verify_agent2.py",
         "README.md",
         "requirements-agent2.txt",
         "reports/",
-        "docs/",
-        ".gitignore",
-        "CONTRIBUTING.md"
+        "docs/handover/"
       ],
       "exit_code": 0,
       "stdout": "",
-      "stderr": "warning: in the working copy of 'README.md', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'docs/handover/02_eda_and_spatiotemporal.md', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'docs/repository_audit_agent2_26grid.md', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'reports/sec2_3_and_2_4_1_agent2.md', CRLF will be replaced by LF the next time Git touches it"
+      "stderr": ""
     }
   ],
   "all_exit_codes_zero": true,
   "limitations": [
-    "Agent 2 is tested with requirements-agent2.lock.txt; the upstream full-project pins are a separate environment.",
+    "Agent 2 is tested with requirements-agent2.txt; the upstream full-project pins are a separate environment.",
     "No downstream model performance, operational availability or ground-observation validation is claimed."
   ]
 }

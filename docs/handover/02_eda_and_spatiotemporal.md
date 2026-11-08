@@ -1,6 +1,6 @@
 # 02 模块交接 EDA 与时空特征
 
-基于已合并main `3cdf1ba`继续完善；保留01的全部数据、代码、模型和manifest。项目组已正式确认26格点，当前验收以 [26格点技术契约](../technical_spec_26grid.md) 为准，不再将旧八站视为待补工作。
+基于 main 的 `2cd57c5` 实现；保留 01 的全部文件。本次按用户确认的最新 26 格点范围交付，对上传 v2.0 的差异详见报告开头。
 
 ## 1. 我产出了什么
 
@@ -11,9 +11,7 @@
 - `models/metrics_stage2_features.json`：输入输出 SHA256、列清单、缺失计数、参数、空间覆盖率、候选特征清单和 Gate 0 披露。
 - `models/metrics_stage2_verification.json`：检查结果、实际运行环境和已知限制。
 - `reports/sec2_3_and_2_4_1_agent2.md`：有数据证据的英文章节技术草稿，需作者核实并遵守课程的写作要求。
-- `tests/test_agent2*.py`：原测试及26格点EDA、空间权重诊断的独立测试。
-- `docs/repository_audit_agent2_26grid.md`：42个原文件分类、先审查后清理的计划和执行记录。
-- `tools/package_agent2.py`：从固定提交打包、展开LFS并实际解压重跑。
+- `tests/test_agent2.py`：人工可核对的合成例子、未来扰动检查和实际交付物完整性检查。
 
 完整 parquet 约 81 MB，通过 Git LFS 存放；普通 Git 中只保存指针。克隆后先执行 `git lfs pull`，不要把小指针当成数据读取。精确字节数和完整 SHA256 以 feature audit 为准。
 
@@ -34,12 +32,10 @@
 | `agent2_history_complete` | 本模块要求的滞后和 PM2.5 滚动/趋势全部可计算 |
 | `agent2_target_within_split_3h` | 原表中能找到同格点、同 split 的 t+3h 行 |
 | `agent2_target_aligned_3h` | 原未来值及分级标签能由精确 t+3h 行核对 |
-| `agent2_target_safe_3h` | 上述目标核对通过，未来来源行也未被插值/缺失标记 |
+| `agent2_target_safe_3h` | 上述目标核对通过，未来源行也未被插值/缺失标记 |
 | `agent2_model_eligible` | 当前源行、历史完整性和未来目标检查同时通过 |
 
 新增连续值是 float32，布尔标记是 bool。历史不够、真实缺口、分区边界和无有效邻居均保留 NaN。NaN 不是 0，不能统一填 0。空间权重的数值下限为 1e−12 m/s；自身和同坐标链接排除。无邻居时权重和/计数为零；没有历史时它们也可以为 NaN。
-
-全26格点的上风向浓度/梯度缺失率约73.39%，受体一小时上风向缺失率分别约13.85%（KL_City）、27.13%（Port_Klang）、4.59%（Sepang）；切勿将区域整体缺失率误当每个受体的比例。逐字段精确缺失率在feature JSON。正式表还保留原始NO₂/O₃/CO的少量缺失，成员3必须在训练折内处理。
 
 ## 3. 关键决策和理由
 
@@ -47,9 +43,9 @@
 
 源浓度和源风矢量始终取相同的 t−k，且源行 split 必须匹配目标行。没有用目标格点的风代替源格点的风。上风向来自气象“来向”的反向矢量，距离为大圆距离 km。保留 sigma=15 km，不用测试集选新尺度，也不声称一两小时足以跨海输送。
 
-日内/目标相关及风玫瑰使用训练数据；类别分布和互相关使用全时段纯描述。图3增加split和年份变化；图4增加SW季风与受体分图，JSON记录全部26格点。日内置信带用连续七天块bootstrap。互相关按坐标、role、region预先选局部及区域候选对，再比较raw和去训练month/hour气候态残差；正k定义为corr(source(t−k),destination(t))，禁止按污染相关性择对。
+前三张中的日内/相关及第四张风玫瑰，以训练受体为主；类别分布和互相关使用全时段纯描述。日内置信带用连续七天块 bootstrap，保持一天内所有小时一起抽样。互相关另画训练 month/hour 气候态残差版本，正滞后表示沿海领先。
 
-训练空间支持诊断在 `spatial_training_diagnostics`，包含有效采样坐标距离、零权重、邻居数量、最大归一化权重和有效邻居数1/Σp²。15km为继承基线，不因本次诊断静默换尺度。无有效邻居不等于污染浓度为零。
+原文件缺少独立的 Banting/Cheras/XMUM 序列，实际互相关是 Port_Klang 到 KL_City、Sepang。图中没有制造八条独立曲线。本数据的互相关峰在 −1h，季风中位数差较小，风向最高均值在 ENE；报告如实写明，不能拿预期叙事替代结果。
 
 ## 4. 已知缺陷和坑
 
@@ -68,11 +64,11 @@ git lfs pull
 python src/01_verify_data.py --check
 python src/02_eda_analysis.py
 python src/02_spatiotemporal_features.py
-python -m pytest tests/ -q
+python -m pytest tests/test_agent2.py -q
 python tools/check_prose.py reports/
 ```
 
-默认只读 `haze_panel_clean.parquet`，缺少时直接报错，不隐式回退旧方案。兼容旧字段的其他文件必须显式传 `--input`；仅有未注明单位的 `wind_speed_10m` 时必须用 `--wind-speed-unit km/h` 或 `m/s`，不能靠量级猜。正式验证器要求当前26个ID、角色与坐标匹配注册表。
+默认只读最新 `haze_panel_clean.parquet`；若它不存在，寻找原规范的 `kl_8stations_clean.parquet`。也可显式传 `--input`。原规范若只含未注明单位的 `wind_speed_10m`，需用 `--wind-speed-unit km/h` 或 `m/s` 明确指定；不能靠量级猜。EDA 同样支持该参数。
 
 ```python
 import json
@@ -91,4 +87,4 @@ y = train["target_level_3h"]
 
 ## 6. 我没做的事
 
-没有修改01的代码、数据、manifest、配置、模型或原依赖文件；本轮按授权更新README、协作示例与忽略规则。没有重拉API、训练RF、替成员3构造FIG结果、调sigma、验证真实地面浓度、验证火点归因或评估上线延迟。成员3程序尚未提交，只完成其读取契约验证。没有删除共享分支。GitHub合并结果、最终commit和ZIP复验结果以随包交付记录为准。报告为可核查的技术草稿，需作者核实。
+没有修改任何 01 的代码、数据、manifest、配置或原依赖文件；按本次任务要求更新了 README 的 02 状态和运行入口。没有重拉 API、补造原八点位、训练 RF、选择特征、调 sigma、验证真实地面浓度、验证火点归因或评估上线延迟。GitHub 合并结果、最终 commit 和 ZIP 复验结果以随包交付记录为准。报告为可核查的技术草稿，需作者核实。

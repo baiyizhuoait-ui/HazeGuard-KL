@@ -10,19 +10,3 @@ data/raw/
 # 中间产物
 *.tmp
 *.log
-
-# Python execution and local environments
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
-.coverage
-htmlcov/
-.venv/
-venv/
-.tox/
-
-# Local distribution and scratch output; formal data/results stay versioned
-*.zip
-build/
-dist/
-.env

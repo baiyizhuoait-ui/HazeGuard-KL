@@ -2,25 +2,25 @@
 
 *Technical draft for verification and integration by the student authors.*
 
-## 2.3 Exploratory Data Analysis
+## 2.3 EDA & Key Spatiotemporal Insights
 
-### Adopted 26 grid data scope
+### Data scope and departures from specification v2.0
 
 This analysis uses the existing `data/haze_panel_clean.parquet` at upstream revision `2cd57c5`. The input contains 966,677 rows and 35 columns, spanning 4 August 2022 to 31 October 2026 in Kuala Lumpur local time. Its SHA256 was verified against Agent 1's manifest. Agent 2 neither downloaded another dataset nor changed any upstream file. The four upstream Gate 0 checks pass under the repository's revised receptor-based rules. This does not constitute a new validation against ground observations.
 
-The project group has formally adopted the 26 grid design. The current consolidated contract is `docs/technical_spec_26grid.md`, based on the existing registry, data dictionary, manifest and project decision. No separate newer specification document was present in the audited repository or its branches. Non-conflicting temporal feature definitions, figure filenames and the spatial baseline are inherited from v2.0. The adopted design, rather than the former eight-location proposal, defines this delivery's acceptance scope.
+The supplied *HazeGuard-KL 技术规范 v2.0*, particularly Sections 3.1, 3.2 and the Agent 2 deliverables, defines the feature families and figure filenames. The repository has since changed its spatial and temporal scope. The following adaptations preserve the actual upstream data contract. They do not satisfy the original requirement for eight independently available location series.
 
-| Item | Current contract | Implemented scope |
+| Item | Specification v2.0 | Implemented scope |
 |---|---|---|
-| Spatial units | 26 registered grid sampling series | Actual IDs, roles, coordinates and series differences checked |
-| Main prediction population | Three receptors | KL_City, Port_Klang and Sepang; 10 corridors and 13 sources provide context |
-| Period | Existing cleaned panel | August 2022 to October 2026 |
-| Input path | `data/haze_panel_clean.parquet` | Read-only current default; alternate inputs require explicit arguments |
-| Diurnal and wind summaries | Training receptor population | Pooled and per-receptor views, with all-node wind statistics in JSON |
-| Cross-correlation pairs | Geometry and role selected candidates | 12 fixed pairs from 75 directed candidates; no pollution ranking |
-| Spatial kernel | Reproducible 15 km baseline | Retained with training-only distance, support and concentration diagnostics |
+| Spatial units | Eight named KL locations | Twenty-six distinct CAMS grid-cell series already in the repository |
+| Main prediction population | Eight locations | Three receptor cells: KL_City, Port_Klang and Sepang; other cells supply spatial context |
+| Period | November 2024 to October 2026 | Existing panel from August 2022 to October 2026 |
+| Input path | `data/kl_8stations_clean.parquet` | `data/haze_panel_clean.parquet`; the legacy input is supported if supplied |
+| Diurnal and wind summaries | Eight locations | The three retained receptor cells |
+| Cross-correlation pairs | Port_Klang/Banting to Cheras_KL/XMUM_Sepang | Port_Klang to KL_City and Sepang; no repeated alias series |
+| Spatial kernel | Gaussian bandwidth of 15 km | Retained as specified, with availability and weight diagnostics |
 
-Historical candidate names and the original deduplication evidence are retained for provenance, but do not control current runtime pair selection. Coordinates are the existing valid sampling coordinates; the archive does not establish that they are the exact model grid centres. The 26-cell distribution supplies network context, while receptor rows define the primary modelling population.
+The node registry groups Banting with Sepang. It contains neither Cheras_KL nor XMUM_Sepang, and does not establish their exact equivalence to the available receptor cells. Port_Klang to KL_City and Sepang is therefore an available coastal/inland comparison, not a verified alias mapping. Separate curves for missing locations are not fabricated. The 26-cell distribution is shown for context, while receptor rows define the primary analysis population.
 
 An additional check aligns clean training PM2.5 values by exact timestamp for every pair of the 26 retained cells. None of the 325 pairs is exactly identical on its overlapping training hours. The largest absolute Pearson correlation is 0.9086 for Alor_Setar and Penang, using 26,034 paired hours; no pair reaches the disclosed diagnostic threshold of 0.95. These results do not establish statistical independence or independent model errors. The historical discovery file documents duplicate candidate locations before deduplication, whereas this new check applies to the delivered panel.
 
@@ -52,31 +52,31 @@ Figures 1, 2 and 4 use training receptor rows after excluding rows marked as int
 
 ![Figure 3](../figures/fig_eda_class_imbalance.png)
 
-**Observation.** Across receptor rows, the four future-level counts are 19,986, 55,480, 22,484 and 13,617. Level 1 accounts for approximately half of the receptor samples. Level 3 represents 12.2% overall and is not globally scarce in this panel, although its local support differs across cells. Port_Klang has Level 2 and Level 3 proportions of 9.73% and 1.94%. The new time panels show Level 3 proportions of 11.13%, 10.59% and 18.85% in train, validation and test. Its calendar-year share increases from 10.37% in 2025 to 17.92% in the available part of 2026. The endpoints of 2022 and 2026 cover partial years, so these bars are not balanced annual comparisons.
+**Observation.** Across receptor rows, the four future-level counts are 19,986, 55,480, 22,484 and 13,617. Level 1 accounts for approximately half of the receptor samples. Level 3 represents 12.2% overall and is not globally scarce in this panel, although its local support differs across cells. Port_Klang has Level 2 and Level 3 proportions of 9.73% and 1.94%, respectively. This does not support the specification's suggested expectation that Port_Klang should necessarily contain more high-level samples.
 
 **Physical interpretation.** The differences describe model grid-cell estimates and cannot establish differences in measured personal exposure. Including low-concentration source and corridor cells in a pooled training population would change the class prior relevant to KL receptors. The four categories are project experimental risk levels with concentration thresholds of 15, 35 and 55 µg/m³. They are not official hourly AQI health standards.
 
-**Implication for modelling.** Main model comparisons should continue to train, validate and evaluate on receptor rows. The all-node stacked panel provides context without expanding the main training population. Level 2 is 20.05%, 18.61% and 22.18% across the three splits, while the stronger Level 3 change motivates reporting class-specific support. These descriptive held-out distributions are not used to choose thresholds or features. Downstream reports should disclose class counts after the eligibility filter. Figure 3 describes the original target table, not only rows accepted for fitting.
+**Implication for modelling.** Main model comparisons should continue to train, validate and evaluate on receptor rows. The all-node stacked panel provides context without expanding the main training population. Downstream reports should disclose class counts after the eligibility filter, particularly when comparing high-risk recall. Figure 3 describes the original target table; it is not a count of all rows accepted for model fitting.
 
 ### Figure 4 Wind direction, speed and concentration
 
 ![Figure 4](../figures/fig_eda_wind_rose_pollution.png)
 
-**Observation.** The training wind summary contains 73,189 non-calm receptor rows. The sector centred on 67.5° has the highest sector mean, 38.11 µg/m³, whereas the 225° southwest sector has a mean of 29.36 µg/m³. The six-panel figure retains wind-speed and pollution summaries and adds a southwest-monsoon calendar slice and three receptor views. The calendar slice contains 24,528 non-calm receptor rows. Within it, southwest-from winds from 202.5° inclusive to 247.5° exclusive account for 10.15% of rows, with mean PM2.5 of 27.28 µg/m³. Under those winds, the corresponding receptor means are 33.04 for KL_City, 19.17 for Port_Klang and 27.41 for Sepang. All 26 nodes have separate all-month and southwest-monsoon summaries in the JSON.
+**Observation.** The training wind summary contains 73,189 non-calm receptor rows. The sector centred on 67.5° has the highest sector mean, 38.11 µg/m³, whereas the 225° southwest sector has a mean of 29.36 µg/m³. The highest sector mean therefore occurs under east-northeasterly flow, not southwesterly flow. The first polar panel separates wind-speed frequencies; the second colors directional frequency bars by mean PM2.5.
 
-**Physical interpretation.** Southwest-monsoon months and southwest-from winds describe different conditions: a calendar subset need not contain only southwest winds. Their separation avoids attributing a calendar contrast to one direction. A directional association may reflect season, local emissions, receptor composition or parent-model circulation, and cannot identify a geographic emission source. Calm hours are excluded because their directions are unreliable. Direction denotes where wind comes from, with north at zero and clockwise angles; the feature vector describes air movement in the opposite direction.
+**Physical interpretation.** A directional association may reflect season, local emissions, receptor composition or circulation in the parent model. It cannot identify a geographic emission source. Calm hours are excluded because their directions are unreliable. Here, direction denotes where the wind comes from, with north at zero and angles increasing clockwise.
 
 **Implication for modelling.** The wind-vector and geometric aggregation features are implemented as hypotheses to test. Their value should be determined by validation ablations and quality-sensitive analyses, without assuming that southwest flow must increase pollution. Regional fire attribution would require additional evidence beyond this single-source project.
 
-### Figure 5 Geometry selected local and regional lead lag associations
+### Figure 5 Coastal and inland lead–lag association
 
 ![Figure 5](../figures/fig_eda_spatial_crosscorr.png)
 
-**Observation.** Positive lag k is corr[source(t−k), destination(t)], so positive peaks indicate source lead. Candidate pairs are fixed before reading pollution: each receptor receives its nearest other receptor and nearest corridor within 150 km, plus the nearest source in each source region. All 75 directed candidates and the 12 selected pairs are recorded. Local raw peaks range from 0.482 to 0.867 and occur at 0 or +1 hour. The KL_City-to-Port_Klang peak is +1 hour with r=0.614, so this direction indicates inland lead rather than coastal lead. Regional raw peaks range from 0.199 to 0.297, with lags from 0 to +2 hours. Dumai-to-Port_Klang changes from +2 hours and r=0.297 before adjustment to 0 hours and r=0.253 after adjustment. The training-climatology residuals therefore do not support one uniform regional lead time.
+**Observation.** Positive lag k is defined as corr[coast(t−k), inland(t)], so a positive peak would indicate coastal lead. Both raw curves peak at −1h, with coefficients of 0.614 for Port_Klang–KL_City and 0.614 for Port_Klang–Sepang. After subtracting month/hour climatologies fitted only on training data, both peaks remain at −1h, with coefficients of 0.612 and 0.599. Thus the descriptive curves do not support the proposed positive coastal lead.
 
 **Physical interpretation.** Removing a training climatology reduces shared calendar structure but does not remove all confounding or autocorrelation. Adjacent cells may share atmospheric forcing and model dynamics. A broad correlation maximum, including one at a negative lag, is insufficient evidence for transport direction, causal transmission or a stable travel time.
 
-**Implication for modelling.** The fixed one- and two-hour spatial features remain unchanged; their lags and distance bandwidth are not selected from the all-split curves. Geometry-only selection includes weak regional associations instead of hiding them or searching for favourable peaks. No transport-speed estimate is inferred. Cross-correlations use exact timestamp joins over −12h to +12h; gaps remain missing rather than compressing time. Stability across years and independent pollution evidence remains to be investigated.
+**Implication for modelling.** The specified one- and two-hour spatial lags are retained without choosing them from these all-split curves. No transport-speed estimate is inferred. Cross-correlations use exact timestamp joins over −12h to +12h; gaps remain missing rather than compressing the time axis. Stability across years and independently measured pollution episodes remains to be investigated.
 
 ## 2.4.1 Temporal Lag, Rolling & Monsoon Upwind Advection Features
 
@@ -106,8 +106,6 @@ Projection values at floating-point zero and weights at or below 10⁻¹² m/s a
 
 The 15 km bandwidth is narrow relative to the expanded regional network. One-hour advection is available for 86.15% of KL_City rows, 72.87% of Port_Klang rows and 95.41% of Sepang rows. These are numerical support rates, not evidence of useful inter-island transport. Distant Sumatra and Borneo cells receive negligible weight at this scale, and the aggregation has no travel-time model. Any broader bandwidth or longer transport lag requires a separately reported validation experiment. No bandwidth search was conducted here.
 
-The additional training-only diagnostic covers all 676,884 training rows. There are 325 coordinate pairs, no duplicate sampling coordinates, and no pair within the 15 km bandwidth. The nearest-neighbour distance across nodes has a minimum of 28.33 km and a median of 133.32 km. Zero usable directional weight occurs in 496,245 rows, or 73.31% of this whole-network training population. When support exists, the median largest normalized weight is 1.0 and the median effective neighbour count, defined as 1/Σp² for normalized weights p, is also 1.0. Its mean is 1.114. This measures strong single-source concentration rather than broad regional mixing. Training one-hour coverage for the three receptors is 85.09%, 71.60% and 94.77%, respectively; these training rates differ from the preceding all-split rates. The diagnostics share production weight calculations and cannot change the fixed kernel or use held-out labels.
-
 ### Availability flags and downstream use
 
 Upstream linear interpolation uses future endpoints and was performed before splitting. Agent 2 conservatively treats rows flagged `qc_interpolated` or `is_missing` as unavailable for new concentration histories and wind/spatial contributions. Original interpolated values and upstream fitted baselines remain unchanged. The eligibility flag alone cannot make every retained upstream column safe: downstream code should use the explicit `model_feature_columns` list in the feature audit rather than all numeric columns. That list excludes labels, diagnostic eligibility flags, raw wind direction and upstream baseline/anomaly columns.
@@ -125,7 +123,6 @@ These checks establish the documented transformations on the available panel. Th
 ### Sources and reproducible evidence
 
 - Uploaded specification: *HazeGuard-KL_技术规范_v2.0.docx*, SHA256 `e15c706d08d86ce6939938c55666d16b8d4c15aea7ebf479b12504921ee7bd04`.
-- Current adopted scope: `docs/technical_spec_26grid.md`, consolidated from the project group's confirmed decision and the existing machine-readable registry and data contract. The older specification supplies only non-conflicting inherited definitions.
 - Repository evidence: `src/config.py`, `src/01_data_pipeline.py`, `docs/node_discovery.json`, `data/manifest.json`, `models/gate0_report.json` and `docs/handover/01_data_and_baseline.md` at the stated upstream revision.
 - [Open-Meteo Air Quality API](https://open-meteo.com/en/docs/air-quality-api), consulted 8 November 2026. Underlying CAMS data and Open-Meteo require attribution under their stated licences.
 - [Open-Meteo Historical Weather API](https://open-meteo.com/en/docs/historical-weather-api), consulted 8 November 2026. This documents default model selection and the distinction between reanalysis and station observations.

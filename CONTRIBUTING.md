@@ -72,9 +72,9 @@ git checkout feat/02-eda        # 换成自己那条
 git add -A
 git commit -m "feat(02): EDA 五张图 + 时空传导特征
 
-- 五张图基于真实统计，报告具体数值以生成 JSON 为准
-- 上风向权重用 sigma=15km，并记录空间支持与集中度
-- 新增 56 列，未改名未删列"
+- 日内双峰与季风期对比：西南季风期 PM2.5 中位数比东北季风高 1.8 倍
+- 上风向权重用 sigma=15km，静风时段按 qc_calm_wind 置零
+- 新增 42 列，未改名未删列"
 
 git push
 ```
@@ -98,7 +98,7 @@ git push
 01（已完成）→ 02 → 03 → 04 / 05（这两条可以真并行）→ 06 → 07
 ```
 
-03 想提前开工是可以的：先写 `src/03_granulation_features.py`，用 01 的清洗表单独跑 FIG 特征，
+03 想提前开工是可以的：先写 `src/03_fuzzy_granulation.py`，用 01 的清洗表单独跑 FIG 特征，
 等 02 合并后再做合并和消融。但不要写着"并行"结果去读一个还不存在的文件。
 
 ### 保护 main
@@ -125,7 +125,7 @@ git push
 5. **不许用 test 段做任何选择。** 调超参、挑特征、定阈值，统统在 val 上做。
    test 只在最后报一次。用了就是数据泄露，结论作废。
 6. **随机种子固定 42。** 要比较两个模型，至少跑 3 个种子，报均值 ± 标准差。
-7. **主实验统一在 3 个受体节点上训练**（`role == "receptor"`，原 train 实测78,102行；02离线完整性筛选后77,753行）。
+7. **主实验统一在 3 个受体节点上训练**（`role == "receptor"`，train 78,100 行）。
    走廊和源区那 23 个节点只作特征输入与泛化对照，不许混进训练集——
    它们 Level 3 占比接近 0，混进去会把高危先验稀释到 3.37%，和 M1 就没法比了。
 8. **调 `TimeSeriesSplit` 之前必须先按 `timestamp` 排序。** 面板是按
@@ -140,7 +140,7 @@ git push
 ### 文件
 
 ```
-src/NN_<english_slug>.py          例：03_granulation_features.py
+src/NN_<english_slug>.py          例：03_fuzzy_granulation.py
 models/metrics_stage<N>.json      例：metrics_stage4.json
 models/<model_key>.joblib         model_key: rf_nominal / rf_balanced / rf_regressor / ordinal_rf / boosting
 models/<name>.npz                 概率矩阵，键名统一 val_probs / test_probs / val_y / test_y
@@ -190,7 +190,7 @@ n_high_risk
 - [ ] `reports/sec*.md` 是英文学术写法，图表编号连续，每个数字能在 json 里查到
 - [ ] `python tools/check_prose.py reports/` 通过（第 9 节，AI 腔自查）
 - [ ] `git diff main --stat` 里没有 `data/raw/`、没有绝对路径（`D:\`、`C:\Users`）、没有密钥
-- [ ] 普通 Git blob 不超过50MB；更大的正式特征表使用Git LFS，并验证实体可下载及SHA256
+- [ ] 没有单个文件超过 50 MB
 - [ ] 没有改别人负责的、已经存在的文件
 
 ### 什么能提交，什么不能
@@ -201,9 +201,9 @@ n_high_risk
 | `reports/*.md`、`docs/*.md/json` | `__pycache__/`、`.ipynb_checkpoints/` |
 | `figures/*.png`（单张 < 5 MB） | API key、token、`.env` |
 | `models/*.json`、`*.joblib`（< 20 MB） | 任何绝对路径（换台电脑就废了） |
-| `data/*.parquet`（小文件普通Git；超过50MB用Git LFS并记录校验） | 超过 2 MB 的 notebook 输出 |
+| `data/*.parquet`（单个 < 50 MB） | 超过 2 MB 的 notebook 输出 |
 
-仓库总量控制 **200 MB** 以内；当前清洗表约25MB、02特征LFS实体约81MB，精确字节数以生成统计和交付清单为准。GitHub自动源码ZIP可能只有LFS指针，完整交付必须补入已核验实体。当前26格点约定见 [技术契约](docs/technical_spec_26grid.md)，历史候选点名称仅作追溯证据。
+仓库总量控制 **200 MB** 以内，当前约 26 MB。
 
 ### 交作业那一步：Moodle 只收 20 MB
 

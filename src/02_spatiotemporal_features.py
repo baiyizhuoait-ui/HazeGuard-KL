@@ -1,4 +1,4 @@
-"""Agent 2 features for the confirmed 26-cell panel; legacy input must be explicit.
+"""Agent 2 features, compatible with the current panel and the v2.0 input.
 
 All histories use exact hourly timestamps within (station_id, split). Rolling
 windows end at issue time t and include t. No interpolation, backfill, learned
@@ -51,8 +51,8 @@ def git_revision():
 
 
 def default_input():
-    # The confirmed 26-cell panel is the only default. Legacy input is explicit.
-    return ROOT / "data/haze_panel_clean.parquet"
+    current = ROOT / "data/haze_panel_clean.parquet"
+    return current if current.exists() else ROOT / "data/kl_8stations_clean.parquet"
 
 
 def local_time(values):
@@ -103,8 +103,6 @@ def wind_vectors(df, raw_unit=None):
     calm = speed.lt(CALM_MS)
     if "qc_calm_wind" in df:
         calm |= df.qc_calm_wind.eq(1)
-    # A calm flag cannot supply a missing speed. Known zero speed needs no direction.
-    calm &= speed.notna()
     u, v = u.mask(calm, 0.0), v.mask(calm, 0.0)
     return u.where(clean_rows(df)), v.where(clean_rows(df))
 
@@ -201,7 +199,11 @@ def spatial_features(work, sigma_km):
             idx = sub.index[sub.station_id.eq(sid)]
             if not len(idx):
                 continue
-            weights, valid = directional_weights(pm, u, v, east[:, i], north[:, i], kernel[:, i])
+            projection = u * east[:, i] + v * north[:, i]
+            # Remove floating-point cos(pi/2) noise from exactly perpendicular winds.
+            weights = np.where(projection > 1e-12, projection, 0) * kernel[:, i]
+            valid = np.isfinite(pm) & np.isfinite(weights) & (weights > WEIGHT_EPS)
+            weights = np.where(valid, weights, 0)
             denom = weights.sum(axis=1)
             numerator = (np.where(valid, pm, 0) * weights).sum(axis=1)
             aggregate = np.divide(numerator, denom, out=np.full(len(clock), np.nan), where=denom > 0)
@@ -215,132 +217,6 @@ def spatial_features(work, sigma_km):
             out.loc[idx, "spatial_pm25_gradient"] = (work.loc[idx, "_safe_pm25"].to_numpy()
                                                        - series.reindex(work.loc[idx, "_time"]).to_numpy())
     return out
-
-
-def directional_weights(pm, u, v, east, north, kernel):
-    """The shared production/diagnostic weights; arrays are [hour, source]."""
-    projection = u * east + v * north
-    # Remove floating-point cos(pi/2) noise from exactly perpendicular winds.
-    weights = np.where(projection > 1e-12, projection, 0) * kernel
-    valid = np.isfinite(pm) & np.isfinite(weights) & (weights > WEIGHT_EPS)
-    return np.where(valid, weights, 0), valid
-
-
-def numeric_summary(values):
-    """Finite-only JSON summary; unavailable statistics are null rather than zero."""
-    values = np.asarray(values, dtype=float).ravel()
-    finite = values[np.isfinite(values)]
-    result = {"n": int(len(values)), "n_finite": int(len(finite))}
-    for name, q in (("min", 0), ("p25", .25), ("median", .5), ("p75", .75),
-                    ("p95", .95), ("max", 1)):
-        result[name] = float(np.quantile(finite, q)) if len(finite) else None
-    result["mean"] = float(finite.mean()) if len(finite) else None
-    return result
-
-
-def spatial_training_diagnostics(train, sigma_km=15.0, raw_wind_unit=None):
-    """Diagnose the fixed spatial design without using held-out rows or labels.
-
-    Coordinates are the available sampling coordinates, not verified CAMS cell
-    centres. Weight summaries use exactly the production threshold and QC mask.
-    """
-    if train.empty or "split" not in train or not train.split.eq("train").all():
-        raise ValueError("spatial diagnostics require nonempty train-only input")
-    if not np.isfinite(sigma_km) or sigma_km <= 0:
-        raise ValueError("sigma_km must be positive and finite")
-    work = train.reset_index(drop=True).copy()
-    work["_time"] = validate_panel(work)
-    work["u_wind"], work["v_wind"] = wind_vectors(work, raw_wind_unit)
-    work["_safe_pm25"] = work.pm2_5.where(clean_rows(work))
-    nodes = work.groupby("station_id", observed=True)[["lat", "lon"]].first().sort_index()
-    distance, east, north = geometry(nodes.to_numpy())
-    kernel = np.exp(-.5 * (distance / sigma_km) ** 2)
-    kernel[distance < 1e-6] = 0
-    pairs = np.triu_indices(len(nodes), 1)
-    duplicate_pairs = [{"node_a": str(nodes.index[i]), "node_b": str(nodes.index[j])}
-                       for i, j in zip(*pairs) if distance[i, j] < 1e-6]
-    others = distance.copy()
-    np.fill_diagonal(others, np.inf)
-    distinct = np.where(distance >= 1e-6, distance, np.inf)
-    nearest = others.min(axis=1)
-    nearest_distinct = distinct.min(axis=1)
-    clock = pd.date_range(work._time.min(), work._time.max(), freq="h")
-    def pivot(column):
-        return (work.pivot(index="_time", columns="station_id", values=column)
-                .reindex(index=clock, columns=nodes.index).to_numpy())
-    pm, u, v = pivot("_safe_pm25"), pivot("u_wind"), pivot("v_wind")
-    by_node, combined = {}, []
-    for i, sid in enumerate(nodes.index):
-        weights, valid = directional_weights(pm, u, v, east[:, i], north[:, i], kernel[:, i])
-        denom = weights.sum(axis=1)
-        neighbors = valid.sum(axis=1)
-        normalized = np.divide(weights, denom[:, None], out=np.zeros_like(weights),
-                               where=denom[:, None] > 0)
-        dominant = normalized.max(axis=1)
-        dominant[denom == 0] = np.nan
-        concentration = (normalized ** 2).sum(axis=1)
-        effective = np.divide(1., concentration, out=np.full(len(clock), np.nan), where=concentration > 0)
-        target = work.loc[work.station_id.eq(sid)]
-        positions = clock.get_indexer(target._time)
-        d, n, m, e = (x[positions] for x in (denom, neighbors, dominant, effective))
-        observed = (np.isfinite(pm) & np.isfinite(u) & np.isfinite(v)
-                    & (distance[:, i] >= 1e-6))
-        unavailable = ~observed.any(axis=1)[positions]
-        lag_stats = {}
-        for k in (1, 2):
-            history = pd.Series(denom, index=clock).shift(k).reindex(target._time)
-            lag_stats[str(k)] = {"positive_weight_rows": int(history.gt(0).sum()),
-                                 "zero_weight_rows": int(history.eq(0).sum()),
-                                 "missing_history_rows": int(history.isna().sum()),
-                                 "coverage_fraction": float(history.gt(0).mean())}
-        by_node[str(sid)] = {
-            "rows": len(target), "zero_weight_rows": int((d == 0).sum()),
-            "zero_weight_fraction": float((d == 0).mean()),
-            "all_other_source_observations_unavailable_rows": int(unavailable.sum()),
-            "weight_sum_ms": numeric_summary(d), "positive_weight_neighbor_count": numeric_summary(n),
-            "max_normalized_weight_when_available": numeric_summary(m),
-            "effective_neighbor_count_when_available": numeric_summary(e),
-            "one_neighbor_fraction_when_available": float((n[d > 0] == 1).mean()) if (d > 0).any() else None,
-            "advection_availability_by_lag_h": lag_stats,
-        }
-        combined.append(np.column_stack([d, n, m, e]))
-    all_rows = np.concatenate(combined, axis=0)
-    speed = wind_speed_ms(work, raw_wind_unit)
-    return {
-        "scope": "train-only target rows; no validation/test rows or target labels consumed",
-        "sigma_km": float(sigma_km), "minimum_weight_ms": WEIGHT_EPS,
-        "rows": len(work), "node_count": len(nodes),
-        "time_min": work._time.min().isoformat(), "time_max": work._time.max().isoformat(),
-        "coordinate_basis": "Available sampling coordinates; exact atmospheric-model cell centres are not verified.",
-        "coordinate_pair_count": len(pairs[0]), "duplicate_coordinate_pairs": duplicate_pairs,
-        "pair_distance_km": numeric_summary(distance[pairs]),
-        "nearest_neighbor_distance_km": numeric_summary(nearest),
-        "nearest_distinct_neighbor_distance_km": numeric_summary(nearest_distinct),
-        "nearest_neighbor_by_node": {
-            str(sid): {"nearest_km": float(nearest[i]) if np.isfinite(nearest[i]) else None,
-                       "nearest_distinct_km": float(nearest_distinct[i]) if np.isfinite(nearest_distinct[i]) else None}
-            for i, sid in enumerate(nodes.index)},
-        "coordinate_pairs_within_sigma": int((distance[pairs] <= sigma_km).sum()),
-        "coordinate_pairs_within_3sigma": int((distance[pairs] <= 3 * sigma_km).sum()),
-        "source_quality": {"excluded_qc_rows": int((~clean_rows(work)).sum()),
-                           "missing_pm25_rows": int(work.pm2_5.isna().sum()),
-                           "missing_wind_speed_rows": int(speed.isna().sum()),
-                           "missing_wind_direction_rows": int(work.wind_direction_10m.isna().sum()),
-                           "unavailable_wind_vector_rows": int((work.u_wind.isna() | work.v_wind.isna()).sum())},
-        "overall": {"zero_weight_rows": int((all_rows[:, 0] == 0).sum()),
-                    "zero_weight_fraction": float((all_rows[:, 0] == 0).mean()),
-                    "weight_sum_ms": numeric_summary(all_rows[:, 0]),
-                    "positive_weight_neighbor_count": numeric_summary(all_rows[:, 1]),
-                    "max_normalized_weight_when_available": numeric_summary(all_rows[:, 2]),
-                    "effective_neighbor_count_when_available": numeric_summary(all_rows[:, 3])},
-        "by_node": by_node,
-        "definitions": {"effective_neighbor_count": "1 / sum(normalized_weight_j ** 2); null at zero weight",
-                        "positive_weight_neighbor_count": "Number of QC-valid source weights > minimum_weight_ms",
-                        "zero_weight": "No usable directional source contribution; never replaced by a zero PM2.5 estimate",
-                        "weight_concentration": "Maximum normalized weight; values near 1 imply one-source dominance",
-                        "model_series_similarity": "See training-only spatial_similarity in metrics_stage2_eda.json"},
-        "limitations": ["The supplied sigma (default 15 km) is diagnosed, not selected using held-out performance.",
-                         "Directional weights are associations and do not establish physical transport or travel times."]}
 
 
 def label_audit(work):
@@ -462,8 +338,6 @@ def main():
         "spatial_coverage_by_receptor": {
             str(s): {f"advection_{k}h_fraction": float(g[f"upwind_pm25_advection_{k}h"].notna().mean())
                      for k in (1, 2)} for s, g in out.loc[rec].groupby("station_id", observed=True)},
-        "spatial_training_diagnostics": spatial_training_diagnostics(
-            df.loc[df.split.eq("train")], args.sigma_km, args.wind_speed_unit),
         "limitations": ["CAMS grid estimates, not ground observations; weather archive is retrospective.",
                          "15 km is retained from v2.0 and is narrow relative to the expanded network.",
                          "Original interpolated values and fitted baselines remain upstream-owned.",

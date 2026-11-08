@@ -121,31 +121,13 @@ def correlations(train, directory):
     return result
 
 
-def risk_summary(df):
-    """Observed target counts; missing classes retain their ordered zero counts."""
-    counts = df.target_level_3h.value_counts().reindex(range(4), fill_value=0)
-    total = int(counts.sum())
-    return {"n_labeled": total, "counts": {str(k): int(v) for k, v in counts.items()},
-            "proportions": {str(k): float(v / total) if total else None for k, v in counts.items()}}
-
-
-def class_time_summary(df):
-    rec = receptor_rows(df)
-    years = pd.to_datetime(rec._time).dt.year
-    return {"by_split": {s: risk_summary(rec.loc[rec.split.eq(s)]) for s in ("train", "val", "test")},
-            "by_year": {str(y): risk_summary(rec.loc[years.eq(y)]) for y in sorted(years.unique())}}
-
-
 def class_distribution(df, directory):
     rec = receptor_rows(df)
     counts = rec.target_level_3h.value_counts().reindex(range(4), fill_value=0)
     proportions = counts / counts.sum()
     all_counts = pd.crosstab(df.station_id, df.target_level_3h).reindex(columns=range(4), fill_value=0)
     all_prop = all_counts.div(all_counts.sum(axis=1), axis=0)
-    time_summary = class_time_summary(df)
-    fig = plt.figure(figsize=(15, 10), layout="constrained")
-    grid = fig.add_gridspec(2, 2, width_ratios=[1, 1.3])
-    axes = [fig.add_subplot(grid[0, 0]), fig.add_subplot(grid[:, 1]), fig.add_subplot(grid[1, 0])]
+    fig, axes = plt.subplots(1, 2, figsize=(13, 7.8), gridspec_kw={"width_ratios": [1, 1.7]}, layout="constrained")
     bars = axes[0].bar([f"Level {i}" for i in range(4)], proportions, color=LEVEL_COLORS)
     axes[0].set(yscale="log", ylabel="Fraction of receptor rows (log scale)", title="(a) Receptor target risk levels")
     for bar, n, p in zip(bars, counts, proportions):
@@ -162,108 +144,56 @@ def class_distribution(df, directory):
     axes[1].set(xlabel="Fraction within each grid cell", xlim=(0, 1), title="(b) All 26 cells (sources are context only)" if len(all_prop)==26 else "(b) All cells")
     axes[1].invert_yaxis()
     axes[1].legend(ncol=4, fontsize=8, loc="lower right")
-    time_items = [(s, v) for s, v in time_summary["by_split"].items()]
-    time_items += [(y, v) for y, v in time_summary["by_year"].items()]
-    bottom = np.zeros(len(time_items))
-    for level in range(4):
-        heights = [v["proportions"][str(level)] or 0 for _, v in time_items]
-        axes[2].bar(range(len(time_items)), heights, bottom=bottom,
-                    color=LEVEL_COLORS[level], label=f"Level {level}")
-        bottom += heights
-    axes[2].axvline(2.5, color="#777777", ls=":", lw=1)
-    axes[2].set(xticks=range(len(time_items)), xticklabels=[s for s, _ in time_items], ylim=(0, 1.08),
-                ylabel="Fraction within interval", title="(c) Receptors: split and calendar-year shifts")
-    axes[2].tick_params(axis="x", rotation=45)
-    axes[2].legend(ncol=4, fontsize=8, loc="upper center")
     fig.suptitle("All splits · descriptive target distribution; no feature or threshold selection", fontweight="bold", fontsize=12)
     save(fig, directory, "class_imbalance")
     return {"scope": "all splits, receptor total and all-node context; descriptive only",
             "receptor_counts": {str(k): int(v) for k, v in counts.items()},
             "receptor_proportions": {str(k): float(v) for k, v in proportions.items()},
             "node_proportions": {str(s): {str(k): float(v) for k, v in row.items()} for s, row in all_prop.iterrows()},
-            "node_counts": {str(s): {str(k): int(v) for k, v in row.items()} for s, row in all_counts.iterrows()},
-            "receptor_by_split": time_summary["by_split"], "receptor_by_year": time_summary["by_year"],
-            "risk_definition": "Project experimental levels [<15, 15-<35, 35-<55, >=55]; not official hourly AQI."}
+            "node_counts": {str(s): {str(k): int(v) for k, v in row.items()} for s, row in all_counts.iterrows()}}
 
 
-def wind_summary(frame):
-    """Non-calm, quality-checked wind-FROM sectors on an explicit input period."""
-    speed = F.wind_speed_ms(frame)
-    valid = (speed.ge(F.CALM_MS) & frame.wind_direction_10m.notna()
-             & frame.pm2_5.notna() & F.clean_rows(frame))
-    if "qc_calm_wind" in frame:
-        valid &= frame.qc_calm_wind.eq(0)
-    data = frame.loc[valid]
+def wind_rose(train, directory):
+    require_training(train)
+    rec = receptor_rows(train).copy()
+    speed = F.wind_speed_ms(rec)
+    valid = speed.ge(F.CALM_MS) & rec.wind_direction_10m.notna() & rec.pm2_5.notna()
+    if "qc_calm_wind" in rec:
+        valid &= rec.qc_calm_wind.eq(0)
+    data = rec.loc[valid]
     sector = np.floor(((data.wind_direction_10m % 360 + 11.25) % 360) / 22.5).astype(int)
     bins = [F.CALM_MS, 2, 4, 6, np.inf]
     speed_bin = pd.cut(speed[valid], bins=bins, right=False, labels=False)
     counts = pd.crosstab(sector, speed_bin).reindex(index=range(16), columns=range(4), fill_value=0)
     freq = counts / len(data) * 100 if len(data) else counts.astype(float)
     means = data.pm2_5.groupby(sector).mean().reindex(range(16))
-    sw_flow = (data.wind_direction_10m % 360).ge(202.5) & (data.wind_direction_10m % 360).lt(247.5)
-    return {"n_noncalm": len(data), "n_excluded_calm_or_missing": len(frame)-len(data),
-            "sector_center_degrees": (np.arange(16)*22.5).tolist(),
-            "sector_mean_pm25": [None if pd.isna(x) else float(x) for x in means],
-            "sector_count": counts.sum(axis=1).astype(int).tolist(),
-            "sector_frequency_percent": freq.sum(axis=1).tolist(),
-            "speed_direction_frequency_percent": freq.to_numpy().tolist(),
-            "speed_bins_ms": ["0.5–2", "2–4", "4–6", ">=6"],
-            "sw_flow_sector_degrees": [202.5, 247.5], "sw_flow_count": int(sw_flow.sum()),
-            "sw_flow_fraction": float(sw_flow.mean()) if len(data) else None,
-            "sw_flow_mean_pm25": float(data.loc[sw_flow, "pm2_5"].mean()) if sw_flow.any() else None}
-
-
-def wind_rose(train, directory):
-    require_training(train)
-    rec = receptor_rows(train).copy()
-    summary = wind_summary(rec)
-    sw = rec.loc[rec._time.dt.month.isin([6, 7, 8, 9])]
-    sw_summary = wind_summary(sw)
-    nodes = {str(s): {"all_months": wind_summary(g),
-                      "sw_monsoon": wind_summary(g.loc[g._time.dt.month.isin([6, 7, 8, 9])])}
-             for s, g in train.groupby("station_id", observed=True, sort=True)}
-    receptor_ids = sorted(rec.station_id.unique())
-    # Retain one row per receptor; the current network has three receptor cells.
-    extra_rows = int(np.ceil(len(receptor_ids) / 3))
-    fig = plt.figure(figsize=(15, 5.2 * (1 + extra_rows)), layout="constrained")
-    grid = fig.add_gridspec(1 + extra_rows, 3)
-    axes = [fig.add_subplot(grid[0, i], projection="polar") for i in range(3)]
+    fig = plt.figure(figsize=(12, 5.5), layout="constrained")
+    axes = [fig.add_subplot(121, projection="polar"), fig.add_subplot(122, projection="polar")]
     angles = np.arange(16) * 2 * np.pi / 16
     bottom = np.zeros(16)
     for i, color in enumerate(["#d7e9ed", "#93c6d0", "#4c9fb1", "#17627b"]):
-        heights = np.array(summary["speed_direction_frequency_percent"])[:, i]
-        axes[0].bar(angles, heights, bottom=bottom, width=2*np.pi/16*.9, color=color,
+        axes[0].bar(angles, freq[i], bottom=bottom, width=2*np.pi/16*.9, color=color,
                     edgecolor="white", linewidth=.4, label=["0.5–2", "2–4", "4–6", "≥6"][i]+" m/s")
-        bottom += heights
-    axes[0].legend(loc="upper center", bbox_to_anchor=(.5, -.08), ncol=2, fontsize=8)
-    axes[0].set_title("All receptors: speed and direction", pad=20)
-    panels = [(axes[1], summary, "All receptors: all months"),
-              (axes[2], sw_summary, "All receptors: SW monsoon (Jun–Sep)")]
-    for i, sid in enumerate(receptor_ids):
-        ax = fig.add_subplot(grid[1 + i // 3, i % 3], projection="polar")
-        axes.append(ax)
-        panels.append((ax, nodes[str(sid)]["all_months"], f"{sid}: all training months"))
-    finite = [v for _, stats, _ in panels for v in stats["sector_mean_pm25"] if v is not None]
-    norm = Normalize(vmin=min(finite) if finite else 0, vmax=max(finite) if finite else 1)
-    max_frequency = max([max(stats["sector_frequency_percent"]) for _, stats, _ in panels] + [1])
-    for ax, stats, title in panels:
-        means = np.array([np.nan if v is None else v for v in stats["sector_mean_pm25"]])
-        ax.bar(angles, stats["sector_frequency_percent"], width=2*np.pi/16*.9,
-               color=plt.cm.YlOrRd(norm(means)), edgecolor="white", linewidth=.4)
-        ax.set_ylim(0, max_frequency * 1.05)
-        ax.set_title(f"{title}\nn = {stats['n_noncalm']:,} non-calm hours", pad=20, fontsize=10)
-    fig.colorbar(plt.cm.ScalarMappable(norm=norm, cmap="YlOrRd"), ax=[p[0] for p in panels],
-                 shrink=.6, pad=.07, label="Sector mean PM2.5 (µg/m³), shared color scale")
+        bottom += freq[i].to_numpy()
+    axes[0].legend(loc="lower left", bbox_to_anchor=(-.25, -.16), ncol=2, fontsize=8)
+    axes[0].set_title("(a) Direction frequency by wind speed", pad=20)
+    finite = means.dropna()
+    norm = Normalize(vmin=float(finite.min()) if len(finite) else 0, vmax=float(finite.max()) if len(finite) else 1)
+    axes[1].bar(angles, freq.sum(axis=1), width=2*np.pi/16*.9,
+                color=plt.cm.YlOrRd(norm(means.fillna(0))), edgecolor="white", linewidth=.4)
+    axes[1].set_title("(b) Frequency, colored by mean PM2.5", pad=20)
+    fig.colorbar(plt.cm.ScalarMappable(norm=norm, cmap="YlOrRd"), ax=axes[1], shrink=.65, pad=.1, label="PM2.5 (µg/m³)")
     for ax in axes:
         ax.set_theta_zero_location("N")
         ax.set_theta_direction(-1)
         ax.set_thetagrids(np.arange(0, 360, 45), ["N", "NE", "E", "SE", "S", "SW", "W", "NW"])
         ax.set_rlabel_position(70)
-    fig.suptitle("Training data · wind FROM direction · radial scale: non-calm hours (%)", fontsize=13, fontweight="bold")
+    fig.suptitle("Training receptors · wind FROM direction · radial scale: non-calm hours (%)", fontsize=12, fontweight="bold")
     save(fig, directory, "wind_rose_pollution")
-    return {"scope": "training only; receptor plots, all-node statistics; calm/flagged hours excluded",
-            **summary, "sw_monsoon": sw_summary, "sw_monsoon_months": [6, 7, 8, 9], "by_node": nodes,
-            "interpretation": "Calendar SW monsoon and wind-from SW sector are separate descriptive quantities; no source attribution."}
+    return {"scope": "training receptors; calm/flagged hours excluded", "n_noncalm": len(data),
+            "n_excluded_calm_or_missing": len(rec)-len(data), "sector_center_degrees": (np.arange(16)*22.5).tolist(),
+            "sector_mean_pm25": [None if pd.isna(x) else float(x) for x in means],
+            "sector_frequency_percent": freq.sum(axis=1).tolist(), "speed_bins_ms": ["0.5–2", "2–4", "4–6", ">=6"]}
 
 
 def lag_correlations(source, destination, lags=range(-12, 13)):
@@ -288,88 +218,47 @@ def deseasonalized(df):
     return pd.Series(df.pm2_5.to_numpy() - proto.reindex(lookup).to_numpy(), index=df.index)
 
 
-def geometry_pair_candidates(df, local_radius_km=150.0):
-    """Predefine pairs using coordinates/roles alone, before reading pollution.
-
-    For each receptor select its nearest other receptor and corridor within the
-    fixed local radius, plus the nearest source from each registered source
-    region. Distance, then node identifier, breaks ties. All network candidates
-    are retained for auditing; correlations never rank or filter these pairs.
-    """
-    metadata = df[["station_id", "lat", "lon", "role", "region"]].drop_duplicates().copy()
-    if metadata.station_id.duplicated().any():
-        raise ValueError("node coordinates, roles or regions vary within the panel")
-    metadata = metadata.sort_values("station_id").reset_index(drop=True)
-    distance, _, _ = F.geometry(metadata[["lat", "lon"]].to_numpy())
-    candidates = []
-    for i, destination in metadata.iterrows():
-        if destination.role != "receptor":
-            continue
-        for j, source in metadata.iterrows():
-            if i == j or distance[j, i] < 1e-6:
-                continue
-            category = "regional_source" if source.role == "source" else f"local_{source.role}"
-            eligible = source.role == "source" or distance[j, i] <= local_radius_km
-            candidates.append({"source": str(source.station_id), "destination": str(destination.station_id),
-                               "source_role": str(source.role), "source_region": str(source.region),
-                               "distance_km": float(distance[j, i]), "category": category,
-                               "eligible_by_geometry": bool(eligible)})
-    groups = {}
-    for pair in candidates:
-        if not pair["eligible_by_geometry"]:
-            continue
-        key = (pair["destination"], pair["category"],
-               pair["source_region"] if pair["source_role"] == "source" else "")
-        groups.setdefault(key, []).append(pair)
-    selected = [min(groups[k], key=lambda p: (p["distance_km"], p["source"])) for k in sorted(groups)]
-    return {"rule": "Nearest other receptor and corridor within 150 km per receptor; nearest source per source region and receptor; distance then ID; no pollution ranking.",
-            "local_radius_km": local_radius_km, "network_nodes": metadata.to_dict(orient="records"),
-            "candidate_count": len(candidates), "candidates": candidates, "selected_pairs": selected}
-
-
 def crosscorr(df, directory):
-    selection = geometry_pair_candidates(df)
-    pairs = selection["selected_pairs"]
+    available = set(df.station_id)
+    # No duplicated aliases: Banting shares Sepang's CAMS cell in the current registry.
+    pairs = [(a, b) for a in ("Port_Klang", "Banting") for b in ("Cheras_KL", "XMUM_Sepang")
+             if a in available and b in available]
+    requested = ["Port_Klang", "Banting", "Cheras_KL", "XMUM_Sepang"]
+    mapping = {"requested_nodes": requested,
+               "missing_nodes": [s for s in requested if s not in available],
+               "note": "Available alternatives are comparisons, not verified aliases of missing coordinates."}
+    if not pairs:
+        pairs = [("Port_Klang", b) for b in ("KL_City", "Sepang") if {"Port_Klang", b} <= available]
+    mapping["used_pairs"] = [list(p) for p in pairs]
     df = df.copy()
     df["_residual"] = deseasonalized(df)
-    fig, axes = plt.subplots(2, 2, figsize=(16, 12), sharey=True, layout="constrained")
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5), sharey=True, layout="constrained")
     records = []
-    color_positions = {"local": 0, "regional": 0}
-    for pair in pairs:
-        a, b = pair["source"], pair["destination"]
-        group = "regional" if pair["category"] == "regional_source" else "local"
-        row = 1 if group == "regional" else 0
-        color = COLORS[color_positions[group] % len(COLORS)]
-        color_positions[group] += 1
-        for ax, column, label in zip(axes[row], ("pm2_5", "_residual"), ("raw", "deseasonalized")):
+    for i, (a, b) in enumerate(pairs):
+        for ax, column, label in zip(axes, ("pm2_5", "_residual"), ("raw", "deseasonalized")):
             src = df[df.station_id.eq(a)].set_index("_time")[column]
             dst = df[df.station_id.eq(b)].set_index("_time")[column]
             points = lag_correlations(src, dst)
             finite = [p for p in points if p["r"] is not None]
             peak = max(finite, key=lambda x: x["r"]) if finite else None
-            peak_text = f"peak {peak['lag_h']:+d}h, r={peak['r']:.3f}" if peak else "no paired estimate"
             ax.plot([p["lag_h"] for p in points], [np.nan if p["r"] is None else p["r"] for p in points],
-                    lw=1.7, color=color, label=f"{a} → {b} ({peak_text})")
+                    lw=2, color=COLORS[i], label=f"{a} → {b}")
             if peak:
-                ax.scatter(peak["lag_h"], peak["r"], color=color, s=24, zorder=3)
-            records.append({**pair, "series": label, "points": points, "peak": peak})
-    for row, context in enumerate(("Local neighbors → receptors", "Regional source cells → receptors")):
-        for col, series in enumerate(("Raw PM2.5", "Training-climatology residuals")):
-            ax = axes[row, col]
-            ax.axvline(0, color="#777777", ls="--", lw=.8)
-            ax.set(xlim=(-12, 12), xticks=range(-12, 13, 3),
-                   xlabel="Lag (hours); positive = source leads, negative = destination leads",
-                   title=f"{context}\n{series}")
-            if ax.lines and color_positions["regional" if row else "local"]:
-                ax.legend(fontsize=7.5, loc="upper center", bbox_to_anchor=(.5, -.18), ncol=1)
-            else:
-                ax.text(.5, .5, "No pairs satisfy the geometry rule", transform=ax.transAxes, ha="center")
-        axes[row, 0].set_ylabel("Pearson cross-correlation")
-    fig.suptitle("26-cell network context · all splits, descriptive only\nPairs fixed by coordinates and roles; correlations do not establish physical transport", fontweight="bold", fontsize=13)
+                ax.scatter(peak["lag_h"], peak["r"], color=COLORS[i], zorder=3)
+                ax.annotate(f"peak {peak['lag_h']:+d}h", (peak["lag_h"], peak["r"]),
+                            xytext=(7, -18-i*12), textcoords="offset points", fontsize=8, color=COLORS[i])
+            records.append({"source": a, "destination": b, "series": label, "points": points, "peak": peak})
+    for ax, title in zip(axes, ("(a) Raw PM2.5", "(b) Training-climatology residuals")):
+        ax.axvline(0, color="#777777", ls="--", lw=.8)
+        ax.set(xlim=(-12, 12), xticks=range(-12, 13, 3), xlabel="Lag (hours); positive = coastal cell leads", title=title)
+        ax.legend(fontsize=8, loc="lower center")
+    axes[0].set_ylabel("Pearson cross-correlation")
+    if not pairs:
+        axes[0].text(.5, .5, "Required independent cell pairs unavailable", transform=axes[0].transAxes, ha="center")
+    fig.suptitle("All splits · descriptive lead–lag association; no causal transport inference", fontweight="bold", fontsize=12)
     save(fig, directory, "spatial_crosscorr")
     return {"lag_definition": "corr(source(t-k), destination(t)); positive k = source leads",
-            "pair_selection": selection, "records": records, "residual_fit": "training month/hour means only",
-            "interpretation": "Regional pairs provide network context; a ±12h correlation peak is not a validated transport time or an emissions attribution."}
+            "mapping": mapping, "records": records, "residual_fit": "training month/hour means only"}
 
 
 def spatial_similarity(train):
@@ -430,10 +319,6 @@ def main():
                "wind_rose": wind_rose(train, args.figures),
                "crosscorr": crosscorr(clean, args.figures),
                "spatial_similarity": spatial_similarity(train)}
-    metrics["figure_sha256"] = {
-        f"fig_eda_{slug}.png": F.digest(args.figures / f"fig_eda_{slug}.png")
-        for slug in ("diurnal_seasonal", "correlation_matrix", "class_imbalance",
-                     "wind_rose_pollution", "spatial_crosscorr")}
     args.metrics.parent.mkdir(parents=True, exist_ok=True)
     args.metrics.write_text(json.dumps(metrics, indent=2, ensure_ascii=False, allow_nan=False) + "\n", encoding="utf-8")
     print("Wrote five 300 dpi figures and reproducible EDA statistics")
