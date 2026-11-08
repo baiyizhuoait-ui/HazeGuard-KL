@@ -135,7 +135,7 @@ No cleanup action or new remote mutation was performed by this audit subtask.
 
 ## Implementation and cleanup outcome
 
-The parent implementation followed the preceding pre-edit plan. It added the consolidated `technical_spec_26grid.md`, removed implicit old-input fallback and old-name cross-correlation selection, expanded time-slice/wind/geometry EDA, and added training-only spatial-support diagnostics. Existing field names and all 56 added columns remain unchanged. README, the member 2 report/handover and contradictory collaboration/LFS examples now point to the adopted current contract. The verifier runs all three test modules and checks actual IDs, roles, sampling coordinates and generation-source hashes.
+The parent implementation followed the preceding pre-edit plan. It added the consolidated `technical_spec_26grid.md`, removed implicit old-input fallback and old-name cross-correlation selection, expanded time-slice/wind/geometry EDA, and added training-only spatial-support diagnostics. Existing field names and all 56 added columns remain unchanged. README, the member 2 report/handover and contradictory collaboration/LFS examples now point to the adopted current contract. The verifier runs all available test modules and checks actual IDs, roles, sampling coordinates and generation-source hashes.
 
 | Scope | Action | Reason / confirmation status |
 |---|---|---|
