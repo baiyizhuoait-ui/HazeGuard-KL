@@ -2,6 +2,8 @@
 
 **大吉隆坡跨境烟霾 3 小时短临风险预警系统**
 
+当前以项目组确认的 **26格点方案** 为准；统一约定见 [26格点技术契约](docs/technical_spec_26grid.md)，本轮审计与安全清理决策见 [仓库审查记录](docs/repository_audit_agent2_26grid.md)。机器可读节点注册表仍为 `src/config.py`，未更换数据方案。
+
 AIT201 Applied Machine Learning · 2026/09 · 小组项目
 
 ---
@@ -160,7 +162,7 @@ M5 把顺序交给回归的连续性，M6 把顺序写进三个累积二分类�
 |---|---|---|---|
 | 01 数据工程与基线 | 1号（组长） | ✅ 完成 | `haze_panel_clean.parquet`、M1 基线 |
 | 02 EDA 与时空传导特征 | 2号 | ✅ 已实现并验证 | `feat_spatiotemporal.parquet`、5 张 EDA 图、测试与交接文档 |
-| 03 趋势粒化与特征选择 | 3号 | ⬜ 待 02 | `features_final.parquet`、`selected_features.json` |
+| 03 趋势粒化与特征选择 | 3号 | ⬜ 02 输入已就绪，03 尚未提交 | `features_final.parquet`、`selected_features.json` |
 | 04 名义 RF / 类权重 / 提升 | 4号 | ⬜ 待 03 | M2 / M3 / M4 |
 | 05 两种保序范式 | 5号 | ⬜ 待 03 | M5 / M6、区间带、跳级误差分布 |
 | 06 代价敏感与可解释性 | 6号 | ⬜ 待 05 | M7、置换重要性、PDP、ROC、泛化实验 |
@@ -187,7 +189,7 @@ python src/01_baseline_dt.py       # M1 基线（约 10 秒）
 
 ### Agent 2 独立运行与成员 3 入口
 
-Agent 2 以现有 `data/haze_panel_clean.parquet` 为只读输入，输出 966,677 行 × 91 列，完整保留原 35 列。新增 56 列中，50 列是预测输入，6 列是离线审计标记。当前数据含 26 个 CAMS 格点、3 个受体，不能当作原规范的八个独立实测站。
+Agent 2 以现有 `data/haze_panel_clean.parquet` 为只读输入，输出 966,677 行 × 91 列，完整保留原 35 列。新增 56 列中，50 列是预测输入，6 列是离线审计标记。正式采用26个CAMS格点序列、3个受体；采样坐标和实际序列均需校验，不能将这些格点称为地面监测站。
 
 ```bash
 python -m venv .venv
@@ -199,6 +201,8 @@ python src/02_spatiotemporal_features.py
 python src/02_eda_analysis.py
 python tools/verify_agent2.py
 ```
+
+验证器会运行整个 `tests/`。五图覆盖受体日内与季风统计、目标相关性、26格点及时间区间等级分布、全年/SW季风风场差异，以及按坐标和角色预先选对的局部/区域互相关。训练集空间权重诊断保存在 feature JSON 的 `spatial_training_diagnostics`：保留15km基线并披露无邻居和单源主导，不用测试成绩选择距离尺度。
 
 无需重新抓取 API，也无需 Git 目录即可从完整 ZIP 重跑。普通 GitHub 源码 ZIP 的 parquet 可能只是 LFS 指针，不能将其视为完整数据；缺少 LFS 工具时，从上述真实清洗数据运行两个 `02_*.py` 即可重建。特征与五图均有 SHA256 和实际运行统计，见 `models/metrics_stage2_*.json`。
 
@@ -219,9 +223,12 @@ python tools/verify_agent2.py
 │   ├── 01_data_pipeline.py       采集 → 清洗 → 目标 → 切分 → 基线 → QC → Gate 0
 │   ├── 01_baseline_dt.py         M1 基线模型
 │   ├── 01_verify_data.py         完整性校验 + 生成 manifest（11 项）
+│   ├── 02_eda_analysis.py        五张26格点EDA图及训练相似度审计
+│   ├── 02_spatiotemporal_features.py  精确小时历史、风场及动态上风向统计
 │   └── utils_metrics.py          六指标唯一实现
 ├── data/
 │   ├── haze_panel_clean.parquet  966,677 × 35
+│   ├── feat_spatiotemporal.parquet 966,677 × 91（Git LFS）
 │   ├── manifest.json             SHA256 + 校验结果
 │   └── data_dictionary.json      字段口径
 ├── models/
@@ -229,12 +236,19 @@ python tools/verify_agent2.py
 │   ├── metrics_stage1.json     六指标 + 超参 + 分节点结果
 │   ├── gate0_report.json         数据可行性四项闸门
 │   └── cleaning_report.json      清洗计数（可追溯）
+│   # metrics_stage2_{eda,features,verification}.json 为02统计和验收记录
 ├── figures/                      混淆矩阵、特征重要性
 ├── reports/                      报告章节（Markdown，英文）
 ├── docs/
 │   ├── node_discovery.json       格点去重证据
+│   ├── technical_spec_26grid.md   当前统一技术契约
+│   ├── repository_audit_agent2_26grid.md  分类、清理计划和分支记录
 │   └── handover/                 交接文档
 ├── tools/discover_nodes.py       格点发现脚本
+├── tools/verify_agent2.py        完整数据、全部测试和26格点契约验收
+├── tools/package_agent2.py       固定提交导出及ZIP解压重跑
+├── tests/test_agent2*.py          时间/风场/空间/防泄漏/交付测试
+├── requirements-agent2.lock.txt  02已验证完整依赖锁
 ├── CONTRIBUTING.md               协作规范（分工、分支、合并规矩）
 └── README.md
 ```
