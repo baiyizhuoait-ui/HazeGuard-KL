@@ -430,6 +430,10 @@ def main():
                "wind_rose": wind_rose(train, args.figures),
                "crosscorr": crosscorr(clean, args.figures),
                "spatial_similarity": spatial_similarity(train)}
+    metrics["figure_sha256"] = {
+        f"fig_eda_{slug}.png": F.digest(args.figures / f"fig_eda_{slug}.png")
+        for slug in ("diurnal_seasonal", "correlation_matrix", "class_imbalance",
+                     "wind_rose_pollution", "spatial_crosscorr")}
     args.metrics.parent.mkdir(parents=True, exist_ok=True)
     args.metrics.write_text(json.dumps(metrics, indent=2, ensure_ascii=False, allow_nan=False) + "\n", encoding="utf-8")
     print("Wrote five 300 dpi figures and reproducible EDA statistics")

@@ -104,16 +104,18 @@ def main():
         assert verified["all_exit_codes_zero"] and verified["git_commit"] == commit
         rebuilt = {name: digest(release / name) == item["sha256"] for name, item in files.items()
                    if name == "data/feat_spatiotemporal.parquet" or name.startswith("figures/fig_eda_")}
-        # Byte identity is recorded explicitly. Other platform builds can differ
-        # in low floating-point bits and fonts; schema/hash checks still apply.
+        # This release is verified in its locked build environment. A differing
+        # platform build needs its own reviewed artifacts and cannot pass silently.
         record = {"generated_at": datetime.now(timezone.utc).isoformat(), "commit": commit,
                   "zip": package.name, "zip_bytes": package.stat().st_size, "zip_sha256": digest(package),
                   "zip_files": len(files)+1, "all_manifest_files_verified": True,
                   "no_git_directory": True, "commands": results, "regenerated_byte_identical": rebuilt,
-                  "verification": verified, "all_checks_passed": True}
+                  "verification": verified, "all_checks_passed": all(rebuilt.values())}
         package.with_suffix(".verification.json").write_text(json.dumps(record, indent=2, ensure_ascii=False), encoding="utf-8")
         package.with_suffix(".manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
         package.with_suffix(".zip.sha256").write_text(digest(package) + "  " + package.name + "\n", encoding="ascii")
+        if not record["all_checks_passed"]:
+            raise RuntimeError(f"Regenerated artifacts differ from this commit; release verification failed: {rebuilt}")
         print(json.dumps({k: record[k] for k in ("commit", "zip_files", "zip_bytes", "zip_sha256", "regenerated_byte_identical")}, indent=2))
 
 

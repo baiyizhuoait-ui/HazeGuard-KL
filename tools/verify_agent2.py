@@ -13,13 +13,24 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def verified_figure(path, expected_sha256):
+    """A decodable 300 dpi image must also be the actual generated image."""
+    from PIL import Image
+    actual = hashlib.sha256(Path(path).read_bytes()).hexdigest()
+    if actual != expected_sha256:
+        raise ValueError(f"Generated figure hash mismatch: {Path(path).name}")
+    with Image.open(path) as im:
+        im.load()
+        assert im.width >= 3000 and all(abs(d - 300) < .01 for d in im.info["dpi"])
+        return {"pixels": list(im.size), "dpi": list(im.info["dpi"]), "sha256": actual}
+
+
 def main():
     spec = importlib.util.spec_from_file_location("features", ROOT / "src/02_spatiotemporal_features.py")
     features = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(features)
     # A developer integration-test skip is never sufficient release evidence.
     import pandas as pd
-    from PIL import Image
     path = ROOT / "data/feat_spatiotemporal.parquet"
     if not path.is_file() or path.stat().st_size < 1024:
         raise RuntimeError("Full feature parquet required; LFS pointers are not release data. Run both 02 scripts.")
@@ -62,10 +73,7 @@ def main():
     figure_info = {}
     for slug in ("diurnal_seasonal", "correlation_matrix", "class_imbalance", "wind_rose_pollution", "spatial_crosscorr"):
         figure = ROOT / f"figures/fig_eda_{slug}.png"
-        with Image.open(figure) as im:
-            im.load()
-            assert im.width >= 3000 and all(abs(d - 300) < .01 for d in im.info["dpi"])
-            figure_info[figure.name] = {"pixels": list(im.size), "dpi": list(im.info["dpi"]), "sha256": features.digest(figure)}
+        figure_info[figure.name] = verified_figure(figure, eda_audit["figure_sha256"][figure.name])
     del data, original
     commands = [
         [sys.executable, "src/01_verify_data.py", "--check"],
@@ -76,7 +84,7 @@ def main():
     git_available = (ROOT / ".git").exists()
     if git_available:
         commands.append(["git", "diff", "--check", "HEAD", "--", "src/02_eda_analysis.py",
-                         "src/02_spatiotemporal_features.py", "tests/test_agent2.py",
+                         "src/02_spatiotemporal_features.py", "tests/",
                          "tools/", "README.md", "requirements-agent2.txt", "reports/", "docs/", ".gitignore", "CONTRIBUTING.md"])
     results = []
     def portable_log(value):
