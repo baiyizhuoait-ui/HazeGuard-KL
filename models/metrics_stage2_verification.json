@@ -1,0 +1,84 @@
+{
+  "generated_at": "2026-11-08T05:05:44.388474+00:00",
+  "git_commit": "2cd57c5a2c029e21f58a92aaa7b1d4c499ecd3a8",
+  "python": "3.13.9",
+  "packages": {
+    "numpy": "2.3.5",
+    "pandas": "2.3.3",
+    "pyarrow": "21.0.0",
+    "matplotlib": "3.10.6",
+    "scipy": "1.16.3",
+    "pytest": "8.4.2",
+    "Pillow": "12.0.0"
+  },
+  "source_sha256": {
+    "src/02_eda_analysis.py": "7f428f11f5cc38646cde773cbdd1ec6b33e3dca6b71cb11c210cabaa2832f7fb",
+    "src/02_spatiotemporal_features.py": "a1fcbefc22dff3f78de49c964d7621bdb85f54197268f29a68189ec20a6c3606",
+    "tests/test_agent2.py": "72a5e6a2102bcb16f44a7685d88be2c9d6c3d644dc90359fddb56c65bfab15fa"
+  },
+  "checks": [
+    {
+      "command": [
+        "python",
+        "src/01_verify_data.py",
+        "--check"
+      ],
+      "exit_code": 0,
+      "stdout": "校验 data\\haze_panel_clean.parquet\n  [PASS] schema：必需列齐全                                 35 列全部存在\n  [PASS] schema：无意外新增列                                无\n  [PASS] 主键 (station_id, timestamp) 唯一                重复 0 行\n  [PASS] 时间轴单调且步长为整小时                                 26 节点全部为 1h 整数倍步长\n  [PASS] 切分严格时序且不重叠                                   全部 26 节点 train<val<test\n  [PASS] 四级标签与阈值一致                                    966,677 行全部匹配 [15,35,55]\n  [PASS] target_pm25_3h = 3 小时后的 pm2_5                抽检 78 行\n  [PASS] 基线未泄露（可用 train 重算复现）                         966,677 行全部可复现\n  [PASS] 受体 Level 3 占比 ≥ 1%                           12.21%\n  [PASS] 质量标记列齐全                                      {'qc_pm25_gt_pm10': 303, 'qc_censored': 4, 'qc_calm_wind': 48621, 'qc_interpolated': 356}\n  [PASS] 关键列无 NaN                                     {'pm2_5': 0, 'target_pm25_3h': 0, 'target_level_3h': 0, 'b_proto_pm25': 0}\n\n11/11 项通过",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python",
+        "-m",
+        "pytest",
+        "tests/test_agent2.py",
+        "-q"
+      ],
+      "exit_code": 0,
+      "stdout": ".................................                                        [100%]\n33 passed in 4.65s",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python",
+        "tools/check_prose.py",
+        "reports/"
+      ],
+      "exit_code": 0,
+      "stdout": "[PASS] reports\\sec1_data_and_baseline.md\n       2605 词 / 131 句 | 破折号 4 处 (1.54/千词) | 平均句长 18.7 | 变异系数 0.57\n[WARN] reports\\sec2_3_and_2_4_1_agent2.md\n       2505 词 / 152 句 | 破折号 0 处 (0.0/千词) | 平均句长 14.9 | 变异系数 0.34\n       ! 句长变异系数 0.34（建议 ≥ 0.35，太均匀像模板）\n\n共 2 个文件，0 个有硬性问题。",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python",
+        "-m",
+        "compileall",
+        "-q",
+        "src/02_eda_analysis.py",
+        "src/02_spatiotemporal_features.py",
+        "tests/test_agent2.py"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "HEAD"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "all_exit_codes_zero": true,
+  "limitations": [
+    "Runtime versions differ from requirements.txt; exact pinned environment not exercised.",
+    "Report style checker can emit a rhythm warning; its output is retained verbatim.",
+    "No downstream modelling, live-data availability or ground-observation validation performed."
+  ]
+}
