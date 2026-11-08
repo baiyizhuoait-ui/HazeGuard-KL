@@ -54,12 +54,17 @@ def main():
                          "src/02_spatiotemporal_features.py", "tests/test_agent2.py",
                          "tools/verify_agent2.py", "README.md", "requirements-agent2.txt", "reports/", "docs/handover/"])
     results = []
+    def portable_log(value):
+        for prefix, replacement in ((sys.prefix, "<python-env>"), (str(ROOT.parent), "<workspace>"),
+                                    (sys.base_prefix, "<python-base>")):
+            value = value.replace(prefix, replacement)
+        return value.strip()
     for command in commands:
         result = subprocess.run(command, cwd=ROOT, env=dict(os.environ, PYTHONIOENCODING="utf-8"),
                                 text=True, encoding="utf-8", errors="replace", capture_output=True)
         label = ["python", *command[1:]] if command[0] == sys.executable else command
         results.append({"command": label, "exit_code": result.returncode,
-                        "stdout": result.stdout.strip(), "stderr": result.stderr.strip()})
+                        "stdout": portable_log(result.stdout), "stderr": portable_log(result.stderr)})
         print(f"{'PASS' if result.returncode == 0 else 'FAIL'} {' '.join(label)}")
     sources = ["src/02_eda_analysis.py", "src/02_spatiotemporal_features.py", "tests/test_agent2.py", "tools/verify_agent2.py"]
     output = {

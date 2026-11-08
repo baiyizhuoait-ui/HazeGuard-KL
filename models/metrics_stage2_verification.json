@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-08T07:15:12.672527+00:00",
-  "git_commit": "b0a7db30f82628f14842ca1534fc93ad8d48268d",
+  "generated_at": "2026-11-08T07:16:47.483276+00:00",
+  "git_commit": "0027ece5e9a4b0e9de1b707f5dfdfa13f7bdcefb",
   "python": "3.13.9",
   "packages": {
     "numpy": "2.3.5",
@@ -17,7 +17,7 @@
     "src/02_eda_analysis.py": "e28ce88e1e7544f1bbcb63dffa3561784c9e2201fc5f174871d7f1df375d35f8",
     "src/02_spatiotemporal_features.py": "d324ca1aaa4467b81a766d1d494218a05d8b2cae30ac4b2c1f4fa3b5c6a5f6ea",
     "tests/test_agent2.py": "df9ff8887fb556112ad78295731c68d6409c81b913167ad0d452e5dd687e5888",
-    "tools/verify_agent2.py": "9916cea9fb4e1ee2b027a21837b98fa0db8c1f137e5ec17831a0ac5366d04413"
+    "tools/verify_agent2.py": "cc9db6f00082941ac4be48da14e80fde0429889e59779bff3be20fe3235f9d00"
   },
   "full_data_preflight_passed": true,
   "figures": {
@@ -77,7 +77,7 @@
       "sha256": "b458508cc171777dc9a8c04bb0727c2c49b30305d366ab52e8f2aa9ecf85347c"
     }
   },
-  "git_diff_applicable": false,
+  "git_diff_applicable": true,
   "checks": [
     {
       "command": [
@@ -99,7 +99,7 @@
         "-rs"
       ],
       "exit_code": 0,
-      "stdout": ".......................................                                  [100%]\n============================== warnings summary ===============================\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:64\n  C:\\Users\\ROG\\Documents\\Codex\\2026-11-08\\files-pasted-by-the-user-hazeguard\\work\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:64: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'\n    prop = Group((name + Suppress(\"=\") + comma_separated(value)) | oneOf(_CONSTANTS))\n\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85\n  C:\\Users\\ROG\\Documents\\Codex\\2026-11-08\\files-pasted-by-the-user-hazeguard\\work\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85: PyparsingDeprecationWarning: 'parseString' deprecated - use 'parse_string'\n    parse = parser.parseString(pattern)\n\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89\n  C:\\Users\\ROG\\Documents\\Codex\\2026-11-08\\files-pasted-by-the-user-hazeguard\\work\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89: PyparsingDeprecationWarning: 'resetCache' deprecated - use 'reset_cache'\n    parser.resetCache()\n\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_mathtext.py:45\n  C:\\Users\\ROG\\Documents\\Codex\\2026-11-08\\files-pasted-by-the-user-hazeguard\\work\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_mathtext.py:45: PyparsingDeprecationWarning: 'enablePackrat' deprecated - use 'enable_packrat'\n    ParserElement.enablePackrat()\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n39 passed, 14 warnings in 6.09s",
+      "stdout": ".......................................                                  [100%]\n============================== warnings summary ===============================\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:64\n  <python-env>\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:64: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'\n    prop = Group((name + Suppress(\"=\") + comma_separated(value)) | oneOf(_CONSTANTS))\n\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85\n  <python-env>\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85: PyparsingDeprecationWarning: 'parseString' deprecated - use 'parse_string'\n    parse = parser.parseString(pattern)\n\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89\n  <python-env>\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89: PyparsingDeprecationWarning: 'resetCache' deprecated - use 'reset_cache'\n    parser.resetCache()\n\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_mathtext.py:45\n  <python-env>\\Lib\\site-packages\\matplotlib\\_mathtext.py:45: PyparsingDeprecationWarning: 'enablePackrat' deprecated - use 'enable_packrat'\n    ParserElement.enablePackrat()\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n39 passed, 14 warnings in 5.93s",
       "stderr": ""
     },
     {
@@ -121,6 +121,26 @@
         "src/02_eda_analysis.py",
         "src/02_spatiotemporal_features.py",
         "tests/test_agent2.py"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "HEAD",
+        "--",
+        "src/02_eda_analysis.py",
+        "src/02_spatiotemporal_features.py",
+        "tests/test_agent2.py",
+        "tools/verify_agent2.py",
+        "README.md",
+        "requirements-agent2.txt",
+        "reports/",
+        "docs/handover/"
       ],
       "exit_code": 0,
       "stdout": "",
