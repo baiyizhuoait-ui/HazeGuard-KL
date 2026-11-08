@@ -2,77 +2,71 @@
 
 ## 1.1 Background
 
-Malaysia's Klang Valley experiences two superimposed pollution regimes. The first is a
-local diurnal background driven by traffic and industry, which repeats with remarkable
-regularity and is therefore relatively easy to anticipate. The second is transboundary
-biomass-burning haze, transported by the south-west monsoon from Sumatra and Kalimantan
-between June and October, which can raise ground-level PM2.5 from roughly 20 µg/m³ to
-above 100 µg/m³ within a few hours.
+The Klang Valley has two kinds of pollution at the same time. One is the local daily
+cycle from traffic and industry. It repeats in much the same way every day, so it is
+fairly easy to anticipate. The other is transboundary biomass-burning haze, carried from
+Sumatra and Kalimantan by the south-west monsoon between June and October. It can raise
+ground-level PM2.5 from about 20 µg/m³ to over 100 µg/m³ within a few hours.
 
-The two regimes demand different responses. A commuter can adapt to the first by habit.
-The second is the one that closes schools, cancels outdoor events, and drives asthma
-admissions — and it is precisely the one that is hardest to anticipate from the metric
-most Malaysians actually consult.
+The two need different responses. Most people deal with the first by habit. The second is
+what closes schools, cancels outdoor events and sends asthma patients to hospital, and it
+is also the harder one to anticipate from the number most Malaysians look at.
 
 ## 1.2 Problem Statement
 
-The Department of Environment (DOE) publishes the Air Pollutant Index (API), which is
-derived from a **24-hour moving average**. That design is defensible for regulatory
-reporting and long-term health epidemiology: it smooths out transient spikes and
-produces a stable, comparable number. It is, however, structurally unsuitable for
-short-horizon decisions, for two reasons.
+The Department of Environment (DOE) publishes the Air Pollutant Index (API), which is a
+**24-hour moving average**. For regulatory reporting and long-term health studies this is
+a reasonable choice: it smooths out short spikes and gives a stable number that can be
+compared over time. For decisions within the next few hours it does not work well, for
+two reasons.
 
-**First, a 24-hour average is a lagging filter, not a leading one.** A haze front that
-arrives at 14:00 and lifts PM2.5 from 25 to 95 µg/m³ contributes only 70 µg/m³ to the
-24-hour mean, spread across a denominator that is mostly clean air. The index therefore
-crosses the "unhealthy" threshold hours after the air has already become unhealthy. The
-information needed to act has been averaged away.
+**A 24-hour average lags behind the air.** If a haze front arrives at 14:00 and lifts PM2.5 from
+25 to 95 µg/m³, it adds only about 70 µg/m³ to the 24-hour mean, because most of the
+denominator is clean air. The index therefore crosses the "unhealthy" threshold several
+hours after the air has already become unhealthy.
 
-**Second, the index reports a level, not a trajectory.** Even a perfectly current
-reading answers "how bad is it now", which is the wrong question at 07:00 when the
-decision is whether to cycle to campus at 10:00. The decision-relevant quantity is the
-three-hour-ahead level, together with an honest statement of how uncertain that
-projection is.
+**The index reports a level, not a trend.** A current reading only answers "how bad is it
+now". At 07:00 the question is usually a different one: what will it be like at 10:00.
+That is when I have to decide whether to cycle to campus. Answering it needs a
+three-hour-ahead estimate, and it needs some statement of how reliable the estimate is.
 
-A third, subtler problem is that the index is a **scalar with an ordinal meaning**. The
-four bands (good / moderate / unhealthy / very unhealthy) are ordered, and the cost of
-misclassification is violently asymmetric: telling someone the air is moderate when it
-is in fact very unhealthy is not the same magnitude of error as the reverse. Any model
-that treats the four levels as four interchangeable categories has discarded both the
-ordering and the asymmetry before it has seen a single sample.
+There is a third issue. The four bands (good, moderate, unhealthy, very unhealthy) are
+ordered, and the two directions of error cost very different amounts. Telling someone the
+air is moderate when it is in fact very unhealthy is much worse than the opposite mistake.
+A model that treats the four levels as four unrelated categories throws away both the
+ordering and the cost difference.
 
 ## 1.3 Objectives
 
 This work develops and evaluates a three-hour-ahead PM2.5 risk nowcasting system for the
 Klang Valley. Specifically, it aims to:
 
-1. **O1** — Construct a leakage-free, chronologically split panel of ground-truth-referenced
-   atmospheric composition and meteorology covering the Klang Valley and its upwind
-   source regions, at hourly resolution over fifty-one months.
-2. **O2** — Separate the climatological background from pollution anomalies, so that a
-   model is forced to learn *deviation from normal* rather than *which month it is*.
-3. **O3** — Compare six model families under a single evaluation contract: a decision-tree
-   floor, nominal random forests with and without class reweighting, a
-   regression-then-threshold formulation, a boosting baseline, an ordinal decomposition,
-   and a cost-sensitive ordinal model whose decision thresholds are tuned by grid search.
-4. **O4** — Quantify what happens when the model meets an unseen station (leave-one-node-out)
-   and an unseen year (temporal extrapolation), rather than reporting a single
-   in-distribution score.
-5. **O5** — Deliver the whole pipeline as a reproducible, inspectable artifact suitable for
-   classroom demonstration, including the negative results.
+1. **O1**: build a leakage-free, chronologically split hourly panel of atmospheric
+   composition and meteorology for the Klang Valley and its upwind source regions, covering
+   fifty-one months.
+2. **O2**: subtract the climatological background so that the model has to learn *deviation
+   from normal* instead of *which month it is*.
+3. **O3**: compare seven model families under one evaluation contract. These are a
+   decision-tree floor, nominal random forests with and without class reweighting, a
+   boosting baseline, a regression-then-threshold formulation, an ordinal decomposition,
+   and a cost-sensitive ordinal model whose thresholds are tuned by grid search.
+4. **O4**: measure what happens when the model meets an unseen node (leave-one-node-out)
+   and an unseen year (temporal extrapolation), instead of reporting one in-distribution
+   score.
+5. **O5**: package the pipeline so that another group can rerun it, including the negative
+   results.
 
 ## 1.4 Scope and Honest Framing
 
-Two limitations are stated here rather than buried in a conclusions section, because they
-shape every number that follows.
+Two limitations belong here rather than in the conclusion, because both change how the
+numbers should be read.
 
-**The pollutant fields are model products, not regulatory monitors.** The air-quality
-variables are taken from the Copernicus Atmosphere Monitoring Service (CAMS) global
-composition product distributed by Open-Meteo, at a native resolution of 0.4°
-(approximately 45 km). Values are therefore grid-cell estimates from a
-physics-and-chemistry assimilation system, not readings from a DOE station. This is
-adequate for studying *regional transport*, whose characteristic scale is hundreds of
-kilometres, and inadequate for making claims about street-level exposure.
+**The pollutant fields are model output, not monitor readings.** The air-quality variables
+come from the Copernicus Atmosphere Monitoring Service (CAMS) global composition product,
+distributed by Open-Meteo, at a native resolution of 0.4 degrees (about 45 km). They are
+grid-cell estimates from a chemistry and transport model, not readings from a DOE station.
+That is adequate for studying *regional transport*, which happens over hundreds of
+kilometres, and not adequate for claims about exposure at street level.
 
 **The spatial unit is a grid cell, not a monitoring station.** Because 45 km exceeds the
 extent of the Klang Valley itself, the eight administrative sites originally proposed for
@@ -126,10 +120,10 @@ single grid value per cell rather than an interpolated field. Meteorological var
 by contrast, differ at every one of the 8 original sites, because ERA5's ~9 km grid is
 finer than the inter-site spacing.
 
-Two consequences follow, and both were designed around rather than papered over:
+Two consequences follow, and the design changed because of them:
 
 1. **The upwind-transport feature requires regional, not municipal, separation.** Computing
-   an advection index between two coordinates that share a grid cell is meaningless — the
+   an advection index between two coordinates that share a grid cell is meaningless. The
    "neighbour" contribution is the target's own value. The domain is therefore extended to
    include Sumatra and Kalimantan source cells, which is physically the correct scale for
    transboundary haze anyway.
@@ -163,7 +157,7 @@ in µg/m³ rather than ppm would silently mis-scale any ratio computed against i
 
 Wind direction is a circular quantity: 359° and 1° are two degrees apart but numerically
 358 apart. Passing raw degrees to a tree invites spurious splits at the 0/360 boundary, so
-`wd_sin` and `wd_cos` are derived. This is unit handling, not feature engineering — no
+`wd_sin` and `wd_cos` are derived. This is unit handling rather than feature engineering: no
 temporal lag or spatial aggregation is involved.
 
 ## 2.1.4 Quality Control Procedure
@@ -174,7 +168,7 @@ Applied per node, in order:
 2. **Hourly grid reconstruction** via `reindex` on a complete `pd.date_range`. Without this,
    `shift(1)` means "the previous record", not "one hour ago", and every lag silently
    becomes wrong whenever a row is missing. *Rows added: 0* (all nodes already complete).
-3. **Leading-block trimming** — the CAMS archive edge. *Rows trimmed: 2,080*
+3. **Leading-block trimming** (the CAMS archive edge). *Rows trimmed: 2,080*
    (80 hours × 26 nodes).
 4. **Physical bounds** → NaN. Thresholds: PM2.5 [0, 900], PM10 [0, 1200], NO₂/SO₂/O₃
    [0, 500], CO [0, 20000], T [−20, 50] °C, RH [0, 100] %, wind [0, 60] m/s,
@@ -192,12 +186,12 @@ Net: 969,072 → **966,677 rows** (99.75 % retention).
 
 Both targets are built with `groupby("station_id")["pm2_5"].shift(-3)`:
 
-- `target_pm25_3h` — the PM2.5 concentration three hours ahead;
-- `target_level_3h` — its ordinal band, via thresholds (15, 35, 55) µg/m³.
+- `target_pm25_3h`: the PM2.5 concentration three hours ahead;
+- `target_level_3h`: its ordinal band, using the thresholds (15, 35, 55) µg/m³.
 
 The `groupby` is not incidental. A global `shift(-3)` would concatenate the tail of one
 node to the head of the next, manufacturing labels that mix two locations. This is a
-silent failure: the code runs, the model trains, and only the metrics are quietly wrong.
+quiet failure: the code runs, the model trains, and only the metrics are wrong.
 
 ## 2.1.6 Gate 0: Feasibility Checks Before Modelling
 
@@ -223,10 +217,10 @@ rather than patched, since interpolating 37 hours would fabricate a haze episode
 
 ## 2.2.1 Why Subtract a Baseline
 
-PM2.5 has an overwhelming seasonal and diurnal structure. A model given raw concentrations
-and a month index can achieve respectable accuracy by learning "July is hazier than
-November" and never represent transport at all. Worse, it will look competent in-sample
-and collapse on an anomalous event — precisely the case the system exists for.
+PM2.5 has a strong seasonal and daily pattern. A model given raw concentrations and a
+month index can reach a decent accuracy by learning that "July is hazier than November",
+without representing transport at all. It will also look fine in-sample and then fail on
+an unusual event, which is the case the system is built for.
 
 The baseline removes the predictable part so that the model is forced to explain the
 residual:
@@ -241,7 +235,7 @@ whether the boundary layer is unusually warm (convective, dispersive) or unusual
 
 **The baseline is fitted on the training split only**, then broadcast to validation and
 test. Computing it over the full panel would leak future information into training
-features through the group means — the most common and least visible form of leakage in
+features through the group means. This is the most common and least visible form of leakage in
 time-series work. The implementation asserts the input frame is already filtered to
 `split == 'train'`.
 
@@ -267,7 +261,7 @@ The test split happens to contain the severe haze episode of August–October 20
 `KL_City`, the Level 3 share reaches **46.9 % in September and 51.0 % in October 2026**,
 with a monthly PM2.5 95th percentile of **151.8 µg/m³**.
 
-This is not a defect to be smoothed away. It means the reported High-Risk Recall is
+We kept this rather than adjusting the split. It means the reported High-Risk Recall is
 measured on a real event rather than on background noise, and it is the reason the
 cost-sensitive models have something meaningful to improve. It also means the test set is
 *harder* than the training distribution (Level 3: 18.85 % vs 11.13 %), which should be
@@ -280,10 +274,10 @@ Receptor-level distributions:
 | train | 18.54 % | 50.29 % | 20.05 % | 11.13 % |
 | test | 11.78 % | 47.18 % | 22.18 % | 18.85 % |
 
-The distribution is workably balanced — no class falls below 11 % — so this project does
+The distribution is workably balanced (no class falls below 11 %), so this project does
 not face the extreme-rarity regime that motivates most cost-sensitive literature. The
 asymmetry that matters here is in the **cost matrix**, not in the class frequencies.
-Stating this plainly is preferable to invoking "severe imbalance" as a reflex.
+We report the shares as they are; calling this "severe imbalance" would overstate it.
 
 ---
 
@@ -291,21 +285,21 @@ Stating this plainly is preferable to invoking "severe imbalance" as a reflex.
 
 ## 2.2.4.1 Configuration
 
-The baseline is deliberately austere: current-hour observations only, no lag, no rolling
+The baseline uses current-hour observations only, with no lag or rolling
 statistic, no spatial aggregation. Features are the six pollutants, five meteorological
 variables, the two anomaly residuals, three calendar variables, and the wind sin/cos pair
-— eighteen columns in total.
+which comes to eighteen columns in total.
 
 Hyperparameters are selected by `TimeSeriesSplit(n_splits=5)` grid search scored on
 macro-F1, over `max_depth ∈ {3, 5, 7, 9, 12, None}`, `min_samples_leaf ∈ {5, 20, 50, 100}`
-and `criterion ∈ {gini, entropy}` — 48 configurations.
+and `criterion ∈ {gini, entropy}`, giving 48 configurations.
 
 Selected: `criterion=gini, max_depth=9, min_samples_leaf=20`, giving 384 leaves and a
 depth of 9. Cross-validated macro-F1: **0.6315**.
 
 Overfitting check: training macro-F1 0.7017 vs validation 0.6867, a gap of **0.015**. The
-model is not memorising; the remaining error is structural, which is exactly what a floor
-should look like.
+model is not memorising the training set; the remaining error comes from the features,
+which is what a baseline should show.
 
 ## 2.2.4.2 Results
 
@@ -348,9 +342,9 @@ Three findings from the baseline set the agenda for the rest of the project.
 **The tree is essentially a persistence-plus-diurnal model.** `pm2_5` alone accounts for
 roughly two-thirds of Gini importance, with `hour` second. Every meteorological variable
 other than `no2`, `so2` and `o3` contributes almost nothing. In other words, the baseline
-has learned "tomorrow's air resembles today's air, adjusted for the time of day" — and
-that is a strong prior precisely because PM2.5 is autocorrelated. The burden of proof for
-any added complexity is therefore not "beat a naive model" but "beat persistence".
+has learned that "tomorrow's air resembles today's air, adjusted for the time of day".
+That works because PM2.5 is autocorrelated. So any added complexity has to be compared
+against persistence, not against an empty model.
 
 **Aggregate metrics improve, but the metric that matters does not.** Macro-F1 rises by
 0.04, MAOE falls by 18 %, and average asymmetric cost falls by 11 %; on every summary
@@ -375,5 +369,4 @@ dynamic range. A single pooled number would have hidden both behaviours.
 
 These three observations motivate the ordinal decomposition (which attacks the downward
 hedging directly by modelling cumulative probabilities), the class reweighting variants,
-and the cost-sensitive threshold search — rather than being introduced as unmotivated
-extras.
+and the cost-sensitive threshold search. They are not added as extras.
