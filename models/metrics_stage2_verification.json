@@ -1,0 +1,155 @@
+{
+  "generated_at": "2026-11-08T07:16:47.483276+00:00",
+  "git_commit": "0027ece5e9a4b0e9de1b707f5dfdfa13f7bdcefb",
+  "python": "3.13.9",
+  "packages": {
+    "numpy": "2.3.5",
+    "pandas": "2.3.3",
+    "pyarrow": "21.0.0",
+    "matplotlib": "3.10.6",
+    "scipy": "1.16.3",
+    "pytest": "8.4.2",
+    "Pillow": "12.0.0",
+    "scikit-learn": "1.7.2",
+    "joblib": "1.5.2"
+  },
+  "source_sha256": {
+    "src/02_eda_analysis.py": "e28ce88e1e7544f1bbcb63dffa3561784c9e2201fc5f174871d7f1df375d35f8",
+    "src/02_spatiotemporal_features.py": "d324ca1aaa4467b81a766d1d494218a05d8b2cae30ac4b2c1f4fa3b5c6a5f6ea",
+    "tests/test_agent2.py": "df9ff8887fb556112ad78295731c68d6409c81b913167ad0d452e5dd687e5888",
+    "tools/verify_agent2.py": "cc9db6f00082941ac4be48da14e80fde0429889e59779bff3be20fe3235f9d00"
+  },
+  "full_data_preflight_passed": true,
+  "figures": {
+    "fig_eda_diurnal_seasonal.png": {
+      "pixels": [
+        3600,
+        1500
+      ],
+      "dpi": [
+        299.9994,
+        299.9994
+      ],
+      "sha256": "d46bd8b1637e62ac7315d40904f81b05e615a4b4f9a44aeb730889d0ae175948"
+    },
+    "fig_eda_correlation_matrix.png": {
+      "pixels": [
+        3900,
+        1800
+      ],
+      "dpi": [
+        299.9994,
+        299.9994
+      ],
+      "sha256": "8965fc1a87feee748c1aa5c016f4d0a523d76e3d8437e340e7755a3bd662f115"
+    },
+    "fig_eda_class_imbalance.png": {
+      "pixels": [
+        3900,
+        2340
+      ],
+      "dpi": [
+        299.9994,
+        299.9994
+      ],
+      "sha256": "1ac4492ed98f01dfc6d5c038fdf20bb964cd873e4cd3570d28a9ce7579e4be27"
+    },
+    "fig_eda_wind_rose_pollution.png": {
+      "pixels": [
+        3600,
+        1650
+      ],
+      "dpi": [
+        299.9994,
+        299.9994
+      ],
+      "sha256": "d68d2c3daa6110ac8fe225eb5958a6c181f2143871e1a9008d35caef70f3c1f4"
+    },
+    "fig_eda_spatial_crosscorr.png": {
+      "pixels": [
+        3600,
+        1500
+      ],
+      "dpi": [
+        299.9994,
+        299.9994
+      ],
+      "sha256": "b458508cc171777dc9a8c04bb0727c2c49b30305d366ab52e8f2aa9ecf85347c"
+    }
+  },
+  "git_diff_applicable": true,
+  "checks": [
+    {
+      "command": [
+        "python",
+        "src/01_verify_data.py",
+        "--check"
+      ],
+      "exit_code": 0,
+      "stdout": "校验 data\\haze_panel_clean.parquet\n  [PASS] schema：必需列齐全                                 35 列全部存在\n  [PASS] schema：无意外新增列                                无\n  [PASS] 主键 (station_id, timestamp) 唯一                重复 0 行\n  [PASS] 时间轴单调且步长为整小时                                 26 节点全部为 1h 整数倍步长\n  [PASS] 切分严格时序且不重叠                                   全部 26 节点 train<val<test\n  [PASS] 四级标签与阈值一致                                    966,677 行全部匹配 [15,35,55]\n  [PASS] target_pm25_3h = 3 小时后的 pm2_5                抽检 78 行\n  [PASS] 基线未泄露（可用 train 重算复现）                         966,677 行全部可复现\n  [PASS] 受体 Level 3 占比 ≥ 1%                           12.21%\n  [PASS] 质量标记列齐全                                      {'qc_pm25_gt_pm10': 303, 'qc_censored': 4, 'qc_calm_wind': 48621, 'qc_interpolated': 356}\n  [PASS] 关键列无 NaN                                     {'pm2_5': 0, 'target_pm25_3h': 0, 'target_level_3h': 0, 'b_proto_pm25': 0}\n\n11/11 项通过",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python",
+        "-m",
+        "pytest",
+        "tests/test_agent2.py",
+        "-q",
+        "-rs"
+      ],
+      "exit_code": 0,
+      "stdout": ".......................................                                  [100%]\n============================== warnings summary ===============================\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:64\n  <python-env>\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:64: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'\n    prop = Group((name + Suppress(\"=\") + comma_separated(value)) | oneOf(_CONSTANTS))\n\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85\n  <python-env>\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85: PyparsingDeprecationWarning: 'parseString' deprecated - use 'parse_string'\n    parse = parser.parseString(pattern)\n\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89\n  <python-env>\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89: PyparsingDeprecationWarning: 'resetCache' deprecated - use 'reset_cache'\n    parser.resetCache()\n\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_mathtext.py:45\n  <python-env>\\Lib\\site-packages\\matplotlib\\_mathtext.py:45: PyparsingDeprecationWarning: 'enablePackrat' deprecated - use 'enable_packrat'\n    ParserElement.enablePackrat()\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n39 passed, 14 warnings in 5.93s",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python",
+        "tools/check_prose.py",
+        "reports/"
+      ],
+      "exit_code": 0,
+      "stdout": "[PASS] reports\\sec1_data_and_baseline.md\n       2605 词 / 131 句 | 破折号 4 处 (1.54/千词) | 平均句长 18.7 | 变异系数 0.57\n[WARN] reports\\sec2_3_and_2_4_1_agent2.md\n       2648 词 / 162 句 | 破折号 0 处 (0.0/千词) | 平均句长 14.9 | 变异系数 0.34\n       ! 句长变异系数 0.34（建议 ≥ 0.35，太均匀像模板）\n\n共 2 个文件，0 个有硬性问题。",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python",
+        "-m",
+        "compileall",
+        "-q",
+        "src/02_eda_analysis.py",
+        "src/02_spatiotemporal_features.py",
+        "tests/test_agent2.py"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "HEAD",
+        "--",
+        "src/02_eda_analysis.py",
+        "src/02_spatiotemporal_features.py",
+        "tests/test_agent2.py",
+        "tools/verify_agent2.py",
+        "README.md",
+        "requirements-agent2.txt",
+        "reports/",
+        "docs/handover/"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "all_exit_codes_zero": true,
+  "limitations": [
+    "Agent 2 is tested with requirements-agent2.txt; the upstream full-project pins are a separate environment.",
+    "No downstream model performance, operational availability or ground-observation validation is claimed."
+  ]
+}

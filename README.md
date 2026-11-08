@@ -159,7 +159,7 @@ M5 把顺序交给回归的连续性，M6 把顺序写进三个累积二分类�
 | 模块 | 负责人 | 状态 | 主要产物 |
 |---|---|---|---|
 | 01 数据工程与基线 | 1号（组长） | ✅ 完成 | `haze_panel_clean.parquet`、M1 基线 |
-| 02 EDA 与时空传导特征 | 2号 | ⬜ 待开工 | `feat_spatiotemporal.parquet`、5 张 EDA 图 |
+| 02 EDA 与时空传导特征 | 2号 | ✅ 已实现并验证 | `feat_spatiotemporal.parquet`、5 张 EDA 图、测试与交接文档 |
 | 03 趋势粒化与特征选择 | 3号 | ⬜ 待 02 | `features_final.parquet`、`selected_features.json` |
 | 04 名义 RF / 类权重 / 提升 | 4号 | ⬜ 待 03 | M2 / M3 / M4 |
 | 05 两种保序范式 | 5号 | ⬜ 待 03 | M5 / M6、区间带、跳级误差分布 |
@@ -184,6 +184,27 @@ python src/01_verify_data.py       # 先校验数据完整性，应 11/11 通过
 python src/01_data_pipeline.py     # 采集+清洗+切分+基线（首次约 3 分钟）
 python src/01_baseline_dt.py       # M1 基线（约 10 秒）
 ```
+
+### Agent 2 独立运行与成员 3 入口
+
+Agent 2 以现有 `data/haze_panel_clean.parquet` 为只读输入，输出 966,677 行 × 91 列，完整保留原 35 列。新增 56 列中，50 列是预测输入，6 列是离线审计标记。当前数据含 26 个 CAMS 格点、3 个受体，不能当作原规范的八个独立实测站。
+
+```bash
+python -m venv .venv
+# Windows: .venv\Scripts\activate
+# Linux/macOS: source .venv/bin/activate
+pip install -r requirements-agent2.lock.txt
+git lfs pull  # 克隆仓库时获取大文件；完整交付 ZIP 已含实体数据
+python src/02_spatiotemporal_features.py
+python src/02_eda_analysis.py
+python tools/verify_agent2.py
+```
+
+无需重新抓取 API，也无需 Git 目录即可从完整 ZIP 重跑。普通 GitHub 源码 ZIP 的 parquet 可能只是 LFS 指针，不能将其视为完整数据；缺少 LFS 工具时，从上述真实清洗数据运行两个 `02_*.py` 即可重建。特征与五图均有 SHA256 和实际运行统计，见 `models/metrics_stage2_*.json`。
+
+成员 3 读取 `data/feat_spatiotemporal.parquet`，只按 `models/metrics_stage2_features.json` 的 `model_feature_columns` 取预测列。`agent2_*` 包含未来标签核对结果，只能用于离线样本审计，不能输入模型或控制线上发出预测。主训练域仍为 `role == 'receptor'`，训练折内处理缺失值并重新拟合所有学习型变换。完整示例和数据限制见 [02 交接文档](docs/handover/02_eda_and_spatiotemporal.md)。
+
+四个风险等级是项目实验分组，不是官方小时级 AQI 健康标准。上风向特征描述方向加权统计关系，不能单独证明跨境污染传输。
 
 `01_data_pipeline.py` 会把 API 响应缓存到 `data/raw/`，第二次跑秒出。
 加 `--force-refresh` 可强制重新拉取。
