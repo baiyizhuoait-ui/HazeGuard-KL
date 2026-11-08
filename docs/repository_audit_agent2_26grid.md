@@ -132,3 +132,19 @@ Do not delete any historical or downstream branch. Their zero ahead count makes 
 9. Use isolated branch and PR, respect protected-main rules, fetch merged remote main anew, then create a complete LFS-expanded delivery ZIP with actual data and recorded commit. Validate from extraction without `.git` in the locked environment. Distinguish repository tracked additions from packaging-only metadata.
 
 No cleanup action or new remote mutation was performed by this audit subtask.
+
+## Implementation and cleanup outcome
+
+The parent implementation followed the preceding pre-edit plan. It added the consolidated `technical_spec_26grid.md`, removed implicit old-input fallback and old-name cross-correlation selection, expanded time-slice/wind/geometry EDA, and added training-only spatial-support diagnostics. Existing field names and all 56 added columns remain unchanged. README, the member 2 report/handover and contradictory collaboration/LFS examples now point to the adopted current contract. The verifier runs all three test modules and checks actual IDs, roles, sampling coordinates and generation-source hashes.
+
+| Scope | Action | Reason / confirmation status |
+|---|---|---|
+| All 42 baseline tracked files | Retained; only authorized 02 outputs and shared navigation/rules updated | No content duplicates or obsolete executable artifact justified removal |
+| Member 1 source/config/data/models/manifest/report/handover | Preserved unchanged | Upstream and downstream evidence; verified by Git blob comparison and original-data checker |
+| Discovery records and historical candidate names | Retained in place | Necessary provenance; no active eight-location selection remains |
+| `.pytest_cache/`, `src/__pycache__/`, `tests/__pycache__/`, `tools/__pycache__/` | Disposable local caches cleaned after final checkout testing; ignored and excluded from exported ZIP | Reproducible runtime output; cleanup restricted to resolved directories inside this checkout |
+| Temporary logs, ZIPs, scratch CSVs, obsolete models | No tracked deletion or archive | None found among baseline tracked files; prior user delivery ZIPs outside the checkout are preserved and not copied into this release |
+| `feat/02-eda`, `fix/02-agent2-verified` | Retained; deletion only a suggestion | Already merged with no unique committed changes at baseline; actual shared-branch deletion requires explicit user confirmation |
+| `feat/03-granulation` through `feat/07-streamlit` | Retained | Reserved member branches; owners should normally update them from main before work |
+
+New `.gitignore` rules cover pytest/type-check caches, virtual environments, coverage files and distribution ZIP/build outputs. Valid CSV/parquet/model files are deliberately not covered by broad ignore patterns. No tracked file was deleted, no historical file moved, no data/LFS object pruned, and no remote branch deleted. The full release exports only tracked files plus explicit provenance metadata, expands the checksum-verified LFS object and tests the extracted project without a Git directory. Exact tests, source commit and final ZIP hashes are recorded by the generated verification JSON, rather than frozen into this audit's pre-edit findings.

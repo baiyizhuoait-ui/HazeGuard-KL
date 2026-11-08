@@ -33,7 +33,7 @@ AIT201 Applied Machine Learning · 2026/09 · 小组项目
 
 ## 我们要做的东西
 
-**输入**：某站点过去若干小时的逐小时观测（污染物 + 气象）。
+**输入**：某格点过去若干小时的逐小时模式估计（污染物 + 气象）。
 **输出**：
 
 1. `target_pm25_3h` — 三小时后的 PM2.5 浓度（回归）
@@ -61,7 +61,7 @@ AIT201 Applied Machine Learning · 2026/09 · 小组项目
 | 数据 | 接口 | 分辨率 | 变量 |
 |---|---|---|---|
 | 空气质量 | Open-Meteo `air-quality-api`（CAMS 全球大气成分产品） | 0.4°（约 45 km） | PM2.5、PM10、NO₂、SO₂、O₃、CO |
-| 气象 | Open-Meteo `archive-api`（ERA5 再分析） | 约 9 km | 气温、相对湿度、风速、风向、降水 |
+| 气象 | Open-Meteo `archive-api`（历史气象模式/再分析产品） | 依所选产品；本次未保存逐响应模型元数据 | 气温、相对湿度、风速、风向、降水 |
 
 时间范围 **2022-08-01 → 2026-10-31**（51 个月，逐小时），时区 `Asia/Kuala_Lumpur`。
 两个接口都免费、无需密钥，任何人 clone 下来都能重跑。
@@ -90,7 +90,7 @@ AIT201 Applied Machine Learning · 2026/09 · 小组项目
 | **走廊 Corridor** | 10 | 既是目标也是上风向源 | 半岛各城（Seremban、Malacca、Johor Bahru、Kuantan、Temerloh、Kota Bharu、Kuala Terengganu、Penang、Alor Setar、Ipoh） |
 | **源区 Source** | 13 | 仅作上风向特征输入 | 苏门答腊 8（Banda_Aceh…Bengkulu）+ 加里曼丹 5（Pontianak…Bintulu） |
 
-气象数据在每个点位都不同（ERA5 网格更细），所以上风向风矢量特征是有信息量的。
+气象数据在这些采样点位存在差异，因此可以计算风矢量空间统计。具体气象产品未逐响应核实，特征的预测价值仍需训练/验证内消融，不能仅由数值不同推断。
 
 ### 数据规模
 
@@ -98,13 +98,11 @@ AIT201 Applied Machine Learning · 2026/09 · 小组项目
 - 切分：train 676,884 / val 145,054 / test 144,739（逐节点按时间 70/15/15，**绝不 shuffle**）
 - 全部字段口径见 `data/data_dictionary.json`，完整性清单见 `data/manifest.json`
 
-### 测试集里有一次真实的烟霾事件
+### 测试集中的高浓度模式片段与类别变化
 
 2026 年 8–10 月，`KL_City` 单月 Level 3 占比达 **46.9% / 51.0%**，PM2.5 的 95 分位是 **151.8 µg/m³**。
 
-这对我们是好事：高危召回率是在真实事件上测出来的，不是在背景噪声上。
-但它也意味着**测试集比训练集更难**（Level 3：18.85% vs 11.13%），
-所以别拿我们的测试数字去和别人的同分布结果直接比。
+这些是当前模式序列中的高浓度片段，尚未通过地面监测或火点资料独立证实事件来源。它意味着**测试集的类别分布发生变化**（Level 3：18.85% vs 11.13%），不能直接与其他同分布任务的成绩比较，也不能仅凭该片段认定跨境烟霾归因。
 
 ---
 
@@ -324,7 +322,7 @@ M0 没有任何学习：直接把 t 时刻的等级当成 t+3h 的等级。
 
 ## 致谢与数据引用
 
-- 空气质量与气象数据：Open-Meteo（CC BY 4.0），底层为 Copernicus CAMS 与 ECMWF ERA5
+- 空气质量与气象数据：Open-Meteo（CC BY 4.0），底层为 Copernicus CAMS 与历史气象产品；后者具体模型未逐响应核实
 - 课程：AIT201 Applied Machine Learning，厦门大学马来西亚分校
 
 ---
