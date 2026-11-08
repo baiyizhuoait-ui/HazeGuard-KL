@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-08T05:05:44.388474+00:00",
-  "git_commit": "2cd57c5a2c029e21f58a92aaa7b1d4c499ecd3a8",
+  "generated_at": "2026-11-08T07:15:12.672527+00:00",
+  "git_commit": "b0a7db30f82628f14842ca1534fc93ad8d48268d",
   "python": "3.13.9",
   "packages": {
     "numpy": "2.3.5",
@@ -9,13 +9,75 @@
     "matplotlib": "3.10.6",
     "scipy": "1.16.3",
     "pytest": "8.4.2",
-    "Pillow": "12.0.0"
+    "Pillow": "12.0.0",
+    "scikit-learn": "1.7.2",
+    "joblib": "1.5.2"
   },
   "source_sha256": {
-    "src/02_eda_analysis.py": "7f428f11f5cc38646cde773cbdd1ec6b33e3dca6b71cb11c210cabaa2832f7fb",
-    "src/02_spatiotemporal_features.py": "a1fcbefc22dff3f78de49c964d7621bdb85f54197268f29a68189ec20a6c3606",
-    "tests/test_agent2.py": "72a5e6a2102bcb16f44a7685d88be2c9d6c3d644dc90359fddb56c65bfab15fa"
+    "src/02_eda_analysis.py": "e28ce88e1e7544f1bbcb63dffa3561784c9e2201fc5f174871d7f1df375d35f8",
+    "src/02_spatiotemporal_features.py": "d324ca1aaa4467b81a766d1d494218a05d8b2cae30ac4b2c1f4fa3b5c6a5f6ea",
+    "tests/test_agent2.py": "df9ff8887fb556112ad78295731c68d6409c81b913167ad0d452e5dd687e5888",
+    "tools/verify_agent2.py": "9916cea9fb4e1ee2b027a21837b98fa0db8c1f137e5ec17831a0ac5366d04413"
   },
+  "full_data_preflight_passed": true,
+  "figures": {
+    "fig_eda_diurnal_seasonal.png": {
+      "pixels": [
+        3600,
+        1500
+      ],
+      "dpi": [
+        299.9994,
+        299.9994
+      ],
+      "sha256": "d46bd8b1637e62ac7315d40904f81b05e615a4b4f9a44aeb730889d0ae175948"
+    },
+    "fig_eda_correlation_matrix.png": {
+      "pixels": [
+        3900,
+        1800
+      ],
+      "dpi": [
+        299.9994,
+        299.9994
+      ],
+      "sha256": "8965fc1a87feee748c1aa5c016f4d0a523d76e3d8437e340e7755a3bd662f115"
+    },
+    "fig_eda_class_imbalance.png": {
+      "pixels": [
+        3900,
+        2340
+      ],
+      "dpi": [
+        299.9994,
+        299.9994
+      ],
+      "sha256": "1ac4492ed98f01dfc6d5c038fdf20bb964cd873e4cd3570d28a9ce7579e4be27"
+    },
+    "fig_eda_wind_rose_pollution.png": {
+      "pixels": [
+        3600,
+        1650
+      ],
+      "dpi": [
+        299.9994,
+        299.9994
+      ],
+      "sha256": "d68d2c3daa6110ac8fe225eb5958a6c181f2143871e1a9008d35caef70f3c1f4"
+    },
+    "fig_eda_spatial_crosscorr.png": {
+      "pixels": [
+        3600,
+        1500
+      ],
+      "dpi": [
+        299.9994,
+        299.9994
+      ],
+      "sha256": "b458508cc171777dc9a8c04bb0727c2c49b30305d366ab52e8f2aa9ecf85347c"
+    }
+  },
+  "git_diff_applicable": false,
   "checks": [
     {
       "command": [
@@ -33,10 +95,11 @@
         "-m",
         "pytest",
         "tests/test_agent2.py",
-        "-q"
+        "-q",
+        "-rs"
       ],
       "exit_code": 0,
-      "stdout": ".................................                                        [100%]\n33 passed in 4.65s",
+      "stdout": ".......................................                                  [100%]\n============================== warnings summary ===============================\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:64\n  C:\\Users\\ROG\\Documents\\Codex\\2026-11-08\\files-pasted-by-the-user-hazeguard\\work\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:64: PyparsingDeprecationWarning: 'oneOf' deprecated - use 'one_of'\n    prop = Group((name + Suppress(\"=\") + comma_separated(value)) | oneOf(_CONSTANTS))\n\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85\n  C:\\Users\\ROG\\Documents\\Codex\\2026-11-08\\files-pasted-by-the-user-hazeguard\\work\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:85: PyparsingDeprecationWarning: 'parseString' deprecated - use 'parse_string'\n    parse = parser.parseString(pattern)\n\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89\n  C:\\Users\\ROG\\Documents\\Codex\\2026-11-08\\files-pasted-by-the-user-hazeguard\\work\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_fontconfig_pattern.py:89: PyparsingDeprecationWarning: 'resetCache' deprecated - use 'reset_cache'\n    parser.resetCache()\n\n..\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_mathtext.py:45\n  C:\\Users\\ROG\\Documents\\Codex\\2026-11-08\\files-pasted-by-the-user-hazeguard\\work\\agent2-clean-env\\Lib\\site-packages\\matplotlib\\_mathtext.py:45: PyparsingDeprecationWarning: 'enablePackrat' deprecated - use 'enable_packrat'\n    ParserElement.enablePackrat()\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n39 passed, 14 warnings in 6.09s",
       "stderr": ""
     },
     {
@@ -46,7 +109,7 @@
         "reports/"
       ],
       "exit_code": 0,
-      "stdout": "[PASS] reports\\sec1_data_and_baseline.md\n       2605 词 / 131 句 | 破折号 4 处 (1.54/千词) | 平均句长 18.7 | 变异系数 0.57\n[WARN] reports\\sec2_3_and_2_4_1_agent2.md\n       2505 词 / 152 句 | 破折号 0 处 (0.0/千词) | 平均句长 14.9 | 变异系数 0.34\n       ! 句长变异系数 0.34（建议 ≥ 0.35，太均匀像模板）\n\n共 2 个文件，0 个有硬性问题。",
+      "stdout": "[PASS] reports\\sec1_data_and_baseline.md\n       2605 词 / 131 句 | 破折号 4 处 (1.54/千词) | 平均句长 18.7 | 变异系数 0.57\n[WARN] reports\\sec2_3_and_2_4_1_agent2.md\n       2648 词 / 162 句 | 破折号 0 处 (0.0/千词) | 平均句长 14.9 | 变异系数 0.34\n       ! 句长变异系数 0.34（建议 ≥ 0.35，太均匀像模板）\n\n共 2 个文件，0 个有硬性问题。",
       "stderr": ""
     },
     {
@@ -62,23 +125,11 @@
       "exit_code": 0,
       "stdout": "",
       "stderr": ""
-    },
-    {
-      "command": [
-        "git",
-        "diff",
-        "--check",
-        "HEAD"
-      ],
-      "exit_code": 0,
-      "stdout": "",
-      "stderr": ""
     }
   ],
   "all_exit_codes_zero": true,
   "limitations": [
-    "Runtime versions differ from requirements.txt; exact pinned environment not exercised.",
-    "Report style checker can emit a rhythm warning; its output is retained verbatim.",
-    "No downstream modelling, live-data availability or ground-observation validation performed."
+    "Agent 2 is tested with requirements-agent2.txt; the upstream full-project pins are a separate environment.",
+    "No downstream model performance, operational availability or ground-observation validation is claimed."
   ]
 }

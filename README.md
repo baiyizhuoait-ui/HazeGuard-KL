@@ -193,7 +193,7 @@ Agent 2 以现有 `data/haze_panel_clean.parquet` 为只读输入，输出 966,6
 python -m venv .venv
 # Windows: .venv\Scripts\activate
 # Linux/macOS: source .venv/bin/activate
-pip install -r requirements-agent2.txt
+pip install -r requirements-agent2.lock.txt
 git lfs pull  # 克隆仓库时获取大文件；完整交付 ZIP 已含实体数据
 python src/02_spatiotemporal_features.py
 python src/02_eda_analysis.py

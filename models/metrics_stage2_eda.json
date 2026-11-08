@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-11-08T05:03:39.356780+00:00",
-  "git_commit": "2cd57c5a2c029e21f58a92aaa7b1d4c499ecd3a8",
+  "generated_at": "2026-11-08T07:14:58.452593+00:00",
+  "git_commit": "b0a7db30f82628f14842ca1534fc93ad8d48268d",
   "source_sha256": {
-    "eda": "7f428f11f5cc38646cde773cbdd1ec6b33e3dca6b71cb11c210cabaa2832f7fb",
-    "features": "a1fcbefc22dff3f78de49c964d7621bdb85f54197268f29a68189ec20a6c3606"
+    "eda": "e28ce88e1e7544f1bbcb63dffa3561784c9e2201fc5f174871d7f1df375d35f8",
+    "features": "d324ca1aaa4467b81a766d1d494218a05d8b2cae30ac4b2c1f4fa3b5c6a5f6ea"
   },
   "input_sha256": "97b5db123352861b6cd41224daf1ce278c90d6d528031b9bdc2744317a5ead93",
   "rows": 966677,
@@ -1104,8 +1104,28 @@
   "crosscorr": {
     "lag_definition": "corr(source(t-k), destination(t)); positive k = source leads",
     "mapping": {
-      "original": "Banting → Cheras_KL/XMUM_Sepang unavailable as independent series",
-      "used": "Port_Klang → KL_City/Sepang; no duplicate-cell curves"
+      "requested_nodes": [
+        "Port_Klang",
+        "Banting",
+        "Cheras_KL",
+        "XMUM_Sepang"
+      ],
+      "missing_nodes": [
+        "Banting",
+        "Cheras_KL",
+        "XMUM_Sepang"
+      ],
+      "note": "Available alternatives are comparisons, not verified aliases of missing coordinates.",
+      "used_pairs": [
+        [
+          "Port_Klang",
+          "KL_City"
+        ],
+        [
+          "Port_Klang",
+          "Sepang"
+        ]
+      ]
     },
     "records": [
       {
@@ -1115,37 +1135,37 @@
         "points": [
           {
             "lag_h": -12,
-            "r": 0.21381923746585024,
+            "r": 0.2138192374658501,
             "n_pairs": 37158
           },
           {
             "lag_h": -11,
-            "r": 0.23067022340832297,
+            "r": 0.23067022340832286,
             "n_pairs": 37159
           },
           {
             "lag_h": -10,
-            "r": 0.2572100745192466,
+            "r": 0.25721007451924693,
             "n_pairs": 37160
           },
           {
             "lag_h": -9,
-            "r": 0.2954162832287677,
+            "r": 0.2954162832287678,
             "n_pairs": 37161
           },
           {
             "lag_h": -8,
-            "r": 0.34336588012666547,
+            "r": 0.34336588012666514,
             "n_pairs": 37162
           },
           {
             "lag_h": -7,
-            "r": 0.3977926992149431,
+            "r": 0.3977926992149433,
             "n_pairs": 37163
           },
           {
             "lag_h": -6,
-            "r": 0.4542741196213684,
+            "r": 0.45427411962136804,
             "n_pairs": 37164
           },
           {
@@ -1160,32 +1180,32 @@
           },
           {
             "lag_h": -3,
-            "r": 0.5875613117724673,
+            "r": 0.5875613117724671,
             "n_pairs": 37167
           },
           {
             "lag_h": -2,
-            "r": 0.6087068926907714,
+            "r": 0.6087068926907712,
             "n_pairs": 37168
           },
           {
             "lag_h": -1,
-            "r": 0.6136658087989108,
+            "r": 0.6136658087989112,
             "n_pairs": 37169
           },
           {
             "lag_h": 0,
-            "r": 0.5973017870687438,
+            "r": 0.5973017870687435,
             "n_pairs": 37170
           },
           {
             "lag_h": 1,
-            "r": 0.5440374433429364,
+            "r": 0.5440374433429358,
             "n_pairs": 37169
           },
           {
             "lag_h": 2,
-            "r": 0.48397108150006973,
+            "r": 0.4839710815000694,
             "n_pairs": 37168
           },
           {
@@ -1195,12 +1215,12 @@
           },
           {
             "lag_h": 4,
-            "r": 0.37879478110623616,
+            "r": 0.3787947811062361,
             "n_pairs": 37166
           },
           {
             "lag_h": 5,
-            "r": 0.3370236248097813,
+            "r": 0.33702362480978154,
             "n_pairs": 37165
           },
           {
@@ -1210,27 +1230,27 @@
           },
           {
             "lag_h": 7,
-            "r": 0.27171949131022344,
+            "r": 0.27171949131022355,
             "n_pairs": 37163
           },
           {
             "lag_h": 8,
-            "r": 0.24622806493856658,
+            "r": 0.24622806493856647,
             "n_pairs": 37162
           },
           {
             "lag_h": 9,
-            "r": 0.22519901608446408,
+            "r": 0.22519901608446422,
             "n_pairs": 37161
           },
           {
             "lag_h": 10,
-            "r": 0.2099057924819847,
+            "r": 0.20990579248198468,
             "n_pairs": 37160
           },
           {
             "lag_h": 11,
-            "r": 0.20041608857915877,
+            "r": 0.20041608857915863,
             "n_pairs": 37159
           },
           {
@@ -1241,7 +1261,7 @@
         ],
         "peak": {
           "lag_h": -1,
-          "r": 0.6136658087989108,
+          "r": 0.6136658087989112,
           "n_pairs": 37169
         }
       },
@@ -1252,22 +1272,22 @@
         "points": [
           {
             "lag_h": -12,
-            "r": 0.3557470296904478,
+            "r": 0.3557470296904475,
             "n_pairs": 37158
           },
           {
             "lag_h": -11,
-            "r": 0.3714085742632838,
+            "r": 0.3714085742632837,
             "n_pairs": 37159
           },
           {
             "lag_h": -10,
-            "r": 0.39074115236753393,
+            "r": 0.3907411523675339,
             "n_pairs": 37160
           },
           {
             "lag_h": -9,
-            "r": 0.41327391858378076,
+            "r": 0.4132739185837805,
             "n_pairs": 37161
           },
           {
@@ -1277,37 +1297,37 @@
           },
           {
             "lag_h": -7,
-            "r": 0.4681857805523258,
+            "r": 0.4681857805523263,
             "n_pairs": 37163
           },
           {
             "lag_h": -6,
-            "r": 0.49934239139188563,
+            "r": 0.4993423913918857,
             "n_pairs": 37164
           },
           {
             "lag_h": -5,
-            "r": 0.5303896534256584,
+            "r": 0.5303896534256588,
             "n_pairs": 37165
           },
           {
             "lag_h": -4,
-            "r": 0.5596819326419689,
+            "r": 0.5596819326419686,
             "n_pairs": 37166
           },
           {
             "lag_h": -3,
-            "r": 0.5849716772710122,
+            "r": 0.5849716772710126,
             "n_pairs": 37167
           },
           {
             "lag_h": -2,
-            "r": 0.6030949765672823,
+            "r": 0.603094976567282,
             "n_pairs": 37168
           },
           {
             "lag_h": -1,
-            "r": 0.6118883489667432,
+            "r": 0.6118883489667428,
             "n_pairs": 37169
           },
           {
@@ -1317,68 +1337,68 @@
           },
           {
             "lag_h": 1,
-            "r": 0.5707060633464033,
+            "r": 0.5707060633464034,
             "n_pairs": 37169
           },
           {
             "lag_h": 2,
-            "r": 0.5279694169422227,
+            "r": 0.5279694169422229,
             "n_pairs": 37168
           },
           {
             "lag_h": 3,
-            "r": 0.4889072857327887,
+            "r": 0.4889072857327883,
             "n_pairs": 37167
           },
           {
             "lag_h": 4,
-            "r": 0.45456396328907817,
+            "r": 0.4545639632890781,
             "n_pairs": 37166
           },
           {
             "lag_h": 5,
-            "r": 0.42551717403124556,
+            "r": 0.4255171740312453,
             "n_pairs": 37165
           },
           {
             "lag_h": 6,
-            "r": 0.4015856077356755,
+            "r": 0.40158560773567514,
             "n_pairs": 37164
           },
           {
             "lag_h": 7,
-            "r": 0.3822447728124884,
+            "r": 0.38224477281248886,
             "n_pairs": 37163
           },
           {
             "lag_h": 8,
-            "r": 0.36718326926822586,
+            "r": 0.3671832692682262,
             "n_pairs": 37162
           },
           {
             "lag_h": 9,
-            "r": 0.3552623452579927,
+            "r": 0.3552623452579925,
             "n_pairs": 37161
           },
           {
             "lag_h": 10,
-            "r": 0.3457848664784872,
+            "r": 0.345784866478487,
             "n_pairs": 37160
           },
           {
             "lag_h": 11,
-            "r": 0.3380094358055806,
+            "r": 0.3380094358055804,
             "n_pairs": 37159
           },
           {
             "lag_h": 12,
-            "r": 0.33247052731128945,
+            "r": 0.3324705273112893,
             "n_pairs": 37158
           }
         ],
         "peak": {
           "lag_h": -1,
-          "r": 0.6118883489667432,
+          "r": 0.6118883489667428,
           "n_pairs": 37169
         }
       },
@@ -1389,67 +1409,67 @@
         "points": [
           {
             "lag_h": -12,
-            "r": 0.26858840104085996,
+            "r": 0.2685884010408599,
             "n_pairs": 37164
           },
           {
             "lag_h": -11,
-            "r": 0.28258377691935227,
+            "r": 0.2825837769193522,
             "n_pairs": 37165
           },
           {
             "lag_h": -10,
-            "r": 0.30390732970425394,
+            "r": 0.3039073297042541,
             "n_pairs": 37166
           },
           {
             "lag_h": -9,
-            "r": 0.33470187022740067,
+            "r": 0.33470187022740056,
             "n_pairs": 37167
           },
           {
             "lag_h": -8,
-            "r": 0.3735668403302198,
+            "r": 0.37356684033022014,
             "n_pairs": 37168
           },
           {
             "lag_h": -7,
-            "r": 0.4179146363805818,
+            "r": 0.4179146363805815,
             "n_pairs": 37169
           },
           {
             "lag_h": -6,
-            "r": 0.4647526680208952,
+            "r": 0.46475266802089493,
             "n_pairs": 37170
           },
           {
             "lag_h": -5,
-            "r": 0.5101199225165048,
+            "r": 0.5101199225165055,
             "n_pairs": 37171
           },
           {
             "lag_h": -4,
-            "r": 0.5504437311800959,
+            "r": 0.5504437311800962,
             "n_pairs": 37172
           },
           {
             "lag_h": -3,
-            "r": 0.5831434166726375,
+            "r": 0.5831434166726372,
             "n_pairs": 37173
           },
           {
             "lag_h": -2,
-            "r": 0.6055332925068074,
+            "r": 0.6055332925068072,
             "n_pairs": 37174
           },
           {
             "lag_h": -1,
-            "r": 0.6141850445156732,
+            "r": 0.6141850445156729,
             "n_pairs": 37175
           },
           {
             "lag_h": 0,
-            "r": 0.6037454198816319,
+            "r": 0.6037454198816323,
             "n_pairs": 37176
           },
           {
@@ -1459,37 +1479,37 @@
           },
           {
             "lag_h": 2,
-            "r": 0.50614789757069,
+            "r": 0.5061478975706898,
             "n_pairs": 37174
           },
           {
             "lag_h": 3,
-            "r": 0.45659074016697576,
+            "r": 0.4565907401669757,
             "n_pairs": 37173
           },
           {
             "lag_h": 4,
-            "r": 0.41293912210979,
+            "r": 0.41293912210979034,
             "n_pairs": 37172
           },
           {
             "lag_h": 5,
-            "r": 0.3753233878202133,
+            "r": 0.37532338782021324,
             "n_pairs": 37171
           },
           {
             "lag_h": 6,
-            "r": 0.34331088502490076,
+            "r": 0.34331088502490087,
             "n_pairs": 37170
           },
           {
             "lag_h": 7,
-            "r": 0.3161126331556554,
+            "r": 0.31611263315565574,
             "n_pairs": 37169
           },
           {
             "lag_h": 8,
-            "r": 0.29309002215760765,
+            "r": 0.29309002215760743,
             "n_pairs": 37168
           },
           {
@@ -1499,7 +1519,7 @@
           },
           {
             "lag_h": 10,
-            "r": 0.26017494778034767,
+            "r": 0.26017494778034755,
             "n_pairs": 37166
           },
           {
@@ -1515,7 +1535,7 @@
         ],
         "peak": {
           "lag_h": -1,
-          "r": 0.6141850445156732,
+          "r": 0.6141850445156729,
           "n_pairs": 37175
         }
       },
@@ -1526,12 +1546,12 @@
         "points": [
           {
             "lag_h": -12,
-            "r": 0.37765008548532786,
+            "r": 0.3776500854853277,
             "n_pairs": 37164
           },
           {
             "lag_h": -11,
-            "r": 0.38992583249156076,
+            "r": 0.3899258324915608,
             "n_pairs": 37165
           },
           {
@@ -1541,92 +1561,92 @@
           },
           {
             "lag_h": -9,
-            "r": 0.42212928311128,
+            "r": 0.4221292831112798,
             "n_pairs": 37167
           },
           {
             "lag_h": -8,
-            "r": 0.4423303250444847,
+            "r": 0.4423303250444845,
             "n_pairs": 37168
           },
           {
             "lag_h": -7,
-            "r": 0.4653799353613736,
+            "r": 0.4653799353613738,
             "n_pairs": 37169
           },
           {
             "lag_h": -6,
-            "r": 0.4910532937703167,
+            "r": 0.4910532937703169,
             "n_pairs": 37170
           },
           {
             "lag_h": -5,
-            "r": 0.518049755548955,
+            "r": 0.5180497555489547,
             "n_pairs": 37171
           },
           {
             "lag_h": -4,
-            "r": 0.5447608779388275,
+            "r": 0.5447608779388274,
             "n_pairs": 37172
           },
           {
             "lag_h": -3,
-            "r": 0.5692123619314892,
+            "r": 0.5692123619314893,
             "n_pairs": 37173
           },
           {
             "lag_h": -2,
-            "r": 0.588451800551989,
+            "r": 0.5884518005519888,
             "n_pairs": 37174
           },
           {
             "lag_h": -1,
-            "r": 0.5994657154257287,
+            "r": 0.5994657154257289,
             "n_pairs": 37175
           },
           {
             "lag_h": 0,
-            "r": 0.5993232650095089,
+            "r": 0.5993232650095088,
             "n_pairs": 37176
           },
           {
             "lag_h": 1,
-            "r": 0.5683140788932274,
+            "r": 0.5683140788932273,
             "n_pairs": 37175
           },
           {
             "lag_h": 2,
-            "r": 0.5322360355591776,
+            "r": 0.5322360355591781,
             "n_pairs": 37174
           },
           {
             "lag_h": 3,
-            "r": 0.4983701308654683,
+            "r": 0.4983701308654684,
             "n_pairs": 37173
           },
           {
             "lag_h": 4,
-            "r": 0.46823117798844804,
+            "r": 0.46823117798844827,
             "n_pairs": 37172
           },
           {
             "lag_h": 5,
-            "r": 0.4420509707596834,
+            "r": 0.4420509707596836,
             "n_pairs": 37171
           },
           {
             "lag_h": 6,
-            "r": 0.4198647546132827,
+            "r": 0.41986475461328304,
             "n_pairs": 37170
           },
           {
             "lag_h": 7,
-            "r": 0.40154830720548046,
+            "r": 0.40154830720548096,
             "n_pairs": 37169
           },
           {
             "lag_h": 8,
-            "r": 0.38678024900660396,
+            "r": 0.38678024900660407,
             "n_pairs": 37168
           },
           {
@@ -1636,27 +1656,2646 @@
           },
           {
             "lag_h": 10,
-            "r": 0.3647752777792076,
+            "r": 0.36477527777920776,
             "n_pairs": 37166
           },
           {
             "lag_h": 11,
-            "r": 0.35647640760170674,
+            "r": 0.35647640760170646,
             "n_pairs": 37165
           },
           {
             "lag_h": 12,
-            "r": 0.3497199765983843,
+            "r": 0.34971997659838416,
             "n_pairs": 37164
           }
         ],
         "peak": {
           "lag_h": -1,
-          "r": 0.5994657154257287,
+          "r": 0.5994657154257289,
           "n_pairs": 37175
         }
       }
     ],
     "residual_fit": "training month/hour means only"
+  },
+  "spatial_similarity": {
+    "scope": "training rows only, quality flags excluded; exact hourly timestamp alignment",
+    "nodes": 26,
+    "pair_count": 325,
+    "exact_duplicate_pairs": [],
+    "high_correlation_threshold": 0.95,
+    "high_correlation_pairs": [],
+    "max_pair": {
+      "node_a": "Alor_Setar",
+      "node_b": "Penang",
+      "n_pairs": 26034,
+      "pearson_r": 0.9086000000575738,
+      "identical_on_overlap": false,
+      "complete_series_identical": false
+    },
+    "pairs": [
+      {
+        "node_a": "Alor_Setar",
+        "node_b": "Banda_Aceh",
+        "n_pairs": 26033,
+        "pearson_r": 0.1808535771855805,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Alor_Setar",
+        "node_b": "Banjarmasin",
+        "n_pairs": 26034,
+        "pearson_r": 0.07987476613031906,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Alor_Setar",
+        "node_b": "Bengkulu",
+        "n_pairs": 26034,
+        "pearson_r": 0.19893314319581024,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Alor_Setar",
+        "node_b": "Bintulu",
+        "n_pairs": 26034,
+        "pearson_r": 0.16510716479135928,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Alor_Setar",
+        "node_b": "Dumai",
+        "n_pairs": 26026,
+        "pearson_r": 0.11919588541376888,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Alor_Setar",
+        "node_b": "Ipoh",
+        "n_pairs": 26032,
+        "pearson_r": 0.5881566279267056,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Alor_Setar",
+        "node_b": "Jambi",
+        "n_pairs": 26028,
+        "pearson_r": 0.11495396064257664,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Alor_Setar",
+        "node_b": "Johor_Bahru",
+        "n_pairs": 26030,
+        "pearson_r": 0.219198699003665,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Alor_Setar",
+        "node_b": "KL_City",
+        "n_pairs": 26015,
+        "pearson_r": 0.34778803863896224,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Alor_Setar",
+        "node_b": "Kota_Bharu",
+        "n_pairs": 26034,
+        "pearson_r": 0.4306476152444412,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Alor_Setar",
+        "node_b": "Kuala_Terengganu",
+        "n_pairs": 26034,
+        "pearson_r": 0.35082059154614587,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Alor_Setar",
+        "node_b": "Kuantan",
+        "n_pairs": 26034,
+        "pearson_r": 0.37867336811131574,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Alor_Setar",
+        "node_b": "Kuching",
+        "n_pairs": 26034,
+        "pearson_r": 0.20053971735665338,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Alor_Setar",
+        "node_b": "Malacca",
+        "n_pairs": 26032,
+        "pearson_r": 0.3146364804579243,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Alor_Setar",
+        "node_b": "Medan",
+        "n_pairs": 26033,
+        "pearson_r": 0.390381555039865,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Alor_Setar",
+        "node_b": "Padang",
+        "n_pairs": 26034,
+        "pearson_r": 0.3291237964856291,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Alor_Setar",
+        "node_b": "Palangkaraya",
+        "n_pairs": 26034,
+        "pearson_r": -0.0172082676397135,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Alor_Setar",
+        "node_b": "Palembang",
+        "n_pairs": 26034,
+        "pearson_r": 0.028580318032856773,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Alor_Setar",
+        "node_b": "Pekanbaru",
+        "n_pairs": 26032,
+        "pearson_r": 0.28648456839934655,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Alor_Setar",
+        "node_b": "Penang",
+        "n_pairs": 26034,
+        "pearson_r": 0.9086000000575738,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Alor_Setar",
+        "node_b": "Pontianak",
+        "n_pairs": 26033,
+        "pearson_r": 0.11437889248288186,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Alor_Setar",
+        "node_b": "Port_Klang",
+        "n_pairs": 26034,
+        "pearson_r": 0.41839725983862047,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Alor_Setar",
+        "node_b": "Sepang",
+        "n_pairs": 26021,
+        "pearson_r": 0.2604960145777914,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Alor_Setar",
+        "node_b": "Seremban",
+        "n_pairs": 26033,
+        "pearson_r": 0.3267740833385645,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Alor_Setar",
+        "node_b": "Temerloh",
+        "n_pairs": 26033,
+        "pearson_r": 0.4260732273837557,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banda_Aceh",
+        "node_b": "Banjarmasin",
+        "n_pairs": 26033,
+        "pearson_r": 0.10356164566928105,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banda_Aceh",
+        "node_b": "Bengkulu",
+        "n_pairs": 26033,
+        "pearson_r": -0.025646355762166364,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banda_Aceh",
+        "node_b": "Bintulu",
+        "n_pairs": 26033,
+        "pearson_r": -0.09023039626735323,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banda_Aceh",
+        "node_b": "Dumai",
+        "n_pairs": 26025,
+        "pearson_r": 0.014246704028687005,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banda_Aceh",
+        "node_b": "Ipoh",
+        "n_pairs": 26031,
+        "pearson_r": 0.13127731428746242,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banda_Aceh",
+        "node_b": "Jambi",
+        "n_pairs": 26027,
+        "pearson_r": -0.031004076679993133,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banda_Aceh",
+        "node_b": "Johor_Bahru",
+        "n_pairs": 26029,
+        "pearson_r": -0.11798885450753653,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banda_Aceh",
+        "node_b": "KL_City",
+        "n_pairs": 26014,
+        "pearson_r": 0.14384238531703575,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banda_Aceh",
+        "node_b": "Kota_Bharu",
+        "n_pairs": 26033,
+        "pearson_r": 0.03755825115722733,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banda_Aceh",
+        "node_b": "Kuala_Terengganu",
+        "n_pairs": 26033,
+        "pearson_r": 0.07037846678627302,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banda_Aceh",
+        "node_b": "Kuantan",
+        "n_pairs": 26033,
+        "pearson_r": -0.06938352098703397,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banda_Aceh",
+        "node_b": "Kuching",
+        "n_pairs": 26033,
+        "pearson_r": -0.038496566383598926,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banda_Aceh",
+        "node_b": "Malacca",
+        "n_pairs": 26031,
+        "pearson_r": -0.017764419100504514,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banda_Aceh",
+        "node_b": "Medan",
+        "n_pairs": 26032,
+        "pearson_r": 0.37897489625455455,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banda_Aceh",
+        "node_b": "Padang",
+        "n_pairs": 26033,
+        "pearson_r": 0.25553191465582625,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banda_Aceh",
+        "node_b": "Palangkaraya",
+        "n_pairs": 26033,
+        "pearson_r": -0.049275865575704264,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banda_Aceh",
+        "node_b": "Palembang",
+        "n_pairs": 26033,
+        "pearson_r": -0.08495543149888916,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banda_Aceh",
+        "node_b": "Pekanbaru",
+        "n_pairs": 26031,
+        "pearson_r": 0.07552652426652848,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banda_Aceh",
+        "node_b": "Penang",
+        "n_pairs": 26033,
+        "pearson_r": 0.23149208323754913,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banda_Aceh",
+        "node_b": "Pontianak",
+        "n_pairs": 26032,
+        "pearson_r": 0.02548144577785285,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banda_Aceh",
+        "node_b": "Port_Klang",
+        "n_pairs": 26033,
+        "pearson_r": 0.13204707759336104,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banda_Aceh",
+        "node_b": "Sepang",
+        "n_pairs": 26020,
+        "pearson_r": 0.23108065808808556,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banda_Aceh",
+        "node_b": "Seremban",
+        "n_pairs": 26032,
+        "pearson_r": -0.052192241780058185,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banda_Aceh",
+        "node_b": "Temerloh",
+        "n_pairs": 26032,
+        "pearson_r": -0.04679093955814723,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banjarmasin",
+        "node_b": "Bengkulu",
+        "n_pairs": 26034,
+        "pearson_r": 0.08624987577855771,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banjarmasin",
+        "node_b": "Bintulu",
+        "n_pairs": 26034,
+        "pearson_r": 0.06913674508245321,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banjarmasin",
+        "node_b": "Dumai",
+        "n_pairs": 26026,
+        "pearson_r": 0.048406923381288214,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banjarmasin",
+        "node_b": "Ipoh",
+        "n_pairs": 26032,
+        "pearson_r": 0.146267440972957,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banjarmasin",
+        "node_b": "Jambi",
+        "n_pairs": 26028,
+        "pearson_r": 0.1927766782844704,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banjarmasin",
+        "node_b": "Johor_Bahru",
+        "n_pairs": 26030,
+        "pearson_r": 0.21079975406156493,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banjarmasin",
+        "node_b": "KL_City",
+        "n_pairs": 26015,
+        "pearson_r": 0.1673664636347588,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banjarmasin",
+        "node_b": "Kota_Bharu",
+        "n_pairs": 26034,
+        "pearson_r": 0.036738419951645916,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banjarmasin",
+        "node_b": "Kuala_Terengganu",
+        "n_pairs": 26034,
+        "pearson_r": -0.020440049724393724,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banjarmasin",
+        "node_b": "Kuantan",
+        "n_pairs": 26034,
+        "pearson_r": 0.05885724824786213,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banjarmasin",
+        "node_b": "Kuching",
+        "n_pairs": 26034,
+        "pearson_r": 0.11722272718283844,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banjarmasin",
+        "node_b": "Malacca",
+        "n_pairs": 26032,
+        "pearson_r": 0.12877786697606616,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banjarmasin",
+        "node_b": "Medan",
+        "n_pairs": 26033,
+        "pearson_r": 0.15484668832044313,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banjarmasin",
+        "node_b": "Padang",
+        "n_pairs": 26034,
+        "pearson_r": 0.1998031803108595,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banjarmasin",
+        "node_b": "Palangkaraya",
+        "n_pairs": 26034,
+        "pearson_r": 0.4997368684870291,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banjarmasin",
+        "node_b": "Palembang",
+        "n_pairs": 26034,
+        "pearson_r": 0.3436466766345122,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banjarmasin",
+        "node_b": "Pekanbaru",
+        "n_pairs": 26032,
+        "pearson_r": 0.1873276531989893,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banjarmasin",
+        "node_b": "Penang",
+        "n_pairs": 26034,
+        "pearson_r": 0.0580531411544931,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banjarmasin",
+        "node_b": "Pontianak",
+        "n_pairs": 26033,
+        "pearson_r": 0.11604723220878498,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banjarmasin",
+        "node_b": "Port_Klang",
+        "n_pairs": 26034,
+        "pearson_r": 0.03063629377846125,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banjarmasin",
+        "node_b": "Sepang",
+        "n_pairs": 26021,
+        "pearson_r": 0.11673138020763654,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banjarmasin",
+        "node_b": "Seremban",
+        "n_pairs": 26033,
+        "pearson_r": 0.18597470721336298,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Banjarmasin",
+        "node_b": "Temerloh",
+        "n_pairs": 26033,
+        "pearson_r": 0.16042364801111308,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bengkulu",
+        "node_b": "Bintulu",
+        "n_pairs": 26034,
+        "pearson_r": 0.19779057468292816,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bengkulu",
+        "node_b": "Dumai",
+        "n_pairs": 26026,
+        "pearson_r": 0.09157759206452194,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bengkulu",
+        "node_b": "Ipoh",
+        "n_pairs": 26032,
+        "pearson_r": 0.2381264854288518,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bengkulu",
+        "node_b": "Jambi",
+        "n_pairs": 26028,
+        "pearson_r": 0.24987722146819613,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bengkulu",
+        "node_b": "Johor_Bahru",
+        "n_pairs": 26030,
+        "pearson_r": 0.18310205641001334,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bengkulu",
+        "node_b": "KL_City",
+        "n_pairs": 26015,
+        "pearson_r": 0.16191628540113182,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bengkulu",
+        "node_b": "Kota_Bharu",
+        "n_pairs": 26034,
+        "pearson_r": 0.21509080521298787,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bengkulu",
+        "node_b": "Kuala_Terengganu",
+        "n_pairs": 26034,
+        "pearson_r": 0.1954461173213224,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bengkulu",
+        "node_b": "Kuantan",
+        "n_pairs": 26034,
+        "pearson_r": 0.2547180514212347,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bengkulu",
+        "node_b": "Kuching",
+        "n_pairs": 26034,
+        "pearson_r": 0.24823005733467413,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bengkulu",
+        "node_b": "Malacca",
+        "n_pairs": 26032,
+        "pearson_r": 0.1516817113053171,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bengkulu",
+        "node_b": "Medan",
+        "n_pairs": 26033,
+        "pearson_r": 0.21344418620513125,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bengkulu",
+        "node_b": "Padang",
+        "n_pairs": 26034,
+        "pearson_r": 0.39934741391745665,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bengkulu",
+        "node_b": "Palangkaraya",
+        "n_pairs": 26034,
+        "pearson_r": 0.11760143005896656,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bengkulu",
+        "node_b": "Palembang",
+        "n_pairs": 26034,
+        "pearson_r": 0.21406954351712906,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bengkulu",
+        "node_b": "Pekanbaru",
+        "n_pairs": 26032,
+        "pearson_r": 0.3127397821900787,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bengkulu",
+        "node_b": "Penang",
+        "n_pairs": 26034,
+        "pearson_r": 0.18433758849720164,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bengkulu",
+        "node_b": "Pontianak",
+        "n_pairs": 26033,
+        "pearson_r": 0.21862892611952603,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bengkulu",
+        "node_b": "Port_Klang",
+        "n_pairs": 26034,
+        "pearson_r": 0.1995360592788631,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bengkulu",
+        "node_b": "Sepang",
+        "n_pairs": 26021,
+        "pearson_r": 0.08534620317316237,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bengkulu",
+        "node_b": "Seremban",
+        "n_pairs": 26033,
+        "pearson_r": 0.1622881505286248,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bengkulu",
+        "node_b": "Temerloh",
+        "n_pairs": 26033,
+        "pearson_r": 0.25299961131585597,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bintulu",
+        "node_b": "Dumai",
+        "n_pairs": 26026,
+        "pearson_r": 0.14076426065246786,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bintulu",
+        "node_b": "Ipoh",
+        "n_pairs": 26032,
+        "pearson_r": 0.23887923714575388,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bintulu",
+        "node_b": "Jambi",
+        "n_pairs": 26028,
+        "pearson_r": 0.248476283884765,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bintulu",
+        "node_b": "Johor_Bahru",
+        "n_pairs": 26030,
+        "pearson_r": 0.27167124817897514,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bintulu",
+        "node_b": "KL_City",
+        "n_pairs": 26015,
+        "pearson_r": 0.21251544175171702,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bintulu",
+        "node_b": "Kota_Bharu",
+        "n_pairs": 26034,
+        "pearson_r": 0.17332643082711546,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bintulu",
+        "node_b": "Kuala_Terengganu",
+        "n_pairs": 26034,
+        "pearson_r": 0.23103693970062109,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bintulu",
+        "node_b": "Kuantan",
+        "n_pairs": 26034,
+        "pearson_r": 0.2822928549535487,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bintulu",
+        "node_b": "Kuching",
+        "n_pairs": 26034,
+        "pearson_r": 0.41371155064472914,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bintulu",
+        "node_b": "Malacca",
+        "n_pairs": 26032,
+        "pearson_r": 0.2497087732001488,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bintulu",
+        "node_b": "Medan",
+        "n_pairs": 26033,
+        "pearson_r": 0.14318690063936024,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bintulu",
+        "node_b": "Padang",
+        "n_pairs": 26034,
+        "pearson_r": 0.09456574711874585,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bintulu",
+        "node_b": "Palangkaraya",
+        "n_pairs": 26034,
+        "pearson_r": 0.047807396083998574,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bintulu",
+        "node_b": "Palembang",
+        "n_pairs": 26034,
+        "pearson_r": 0.12241040087492573,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bintulu",
+        "node_b": "Pekanbaru",
+        "n_pairs": 26032,
+        "pearson_r": 0.2651098474087668,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bintulu",
+        "node_b": "Penang",
+        "n_pairs": 26034,
+        "pearson_r": 0.1372429981296949,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bintulu",
+        "node_b": "Pontianak",
+        "n_pairs": 26033,
+        "pearson_r": 0.17689027321489184,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bintulu",
+        "node_b": "Port_Klang",
+        "n_pairs": 26034,
+        "pearson_r": 0.1521226033651562,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bintulu",
+        "node_b": "Sepang",
+        "n_pairs": 26021,
+        "pearson_r": 0.15822157548389648,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bintulu",
+        "node_b": "Seremban",
+        "n_pairs": 26033,
+        "pearson_r": 0.2769867321359196,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Bintulu",
+        "node_b": "Temerloh",
+        "n_pairs": 26033,
+        "pearson_r": 0.3238783966671172,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Dumai",
+        "node_b": "Ipoh",
+        "n_pairs": 26024,
+        "pearson_r": 0.16649312810908679,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Dumai",
+        "node_b": "Jambi",
+        "n_pairs": 26020,
+        "pearson_r": 0.07178176897704149,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Dumai",
+        "node_b": "Johor_Bahru",
+        "n_pairs": 26022,
+        "pearson_r": 0.10892595394061945,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Dumai",
+        "node_b": "KL_City",
+        "n_pairs": 26007,
+        "pearson_r": 0.15850518036881103,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Dumai",
+        "node_b": "Kota_Bharu",
+        "n_pairs": 26026,
+        "pearson_r": 0.0939433306304296,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Dumai",
+        "node_b": "Kuala_Terengganu",
+        "n_pairs": 26026,
+        "pearson_r": 0.11147737700325851,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Dumai",
+        "node_b": "Kuantan",
+        "n_pairs": 26026,
+        "pearson_r": 0.11824187090633086,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Dumai",
+        "node_b": "Kuching",
+        "n_pairs": 26026,
+        "pearson_r": 0.11673933239661373,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Dumai",
+        "node_b": "Malacca",
+        "n_pairs": 26025,
+        "pearson_r": 0.23454336610814697,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Dumai",
+        "node_b": "Medan",
+        "n_pairs": 26025,
+        "pearson_r": 0.07189354292525606,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Dumai",
+        "node_b": "Padang",
+        "n_pairs": 26026,
+        "pearson_r": 0.12822812629167626,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Dumai",
+        "node_b": "Palangkaraya",
+        "n_pairs": 26026,
+        "pearson_r": 0.032609971359390096,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Dumai",
+        "node_b": "Palembang",
+        "n_pairs": 26026,
+        "pearson_r": 0.06208295900448798,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Dumai",
+        "node_b": "Pekanbaru",
+        "n_pairs": 26026,
+        "pearson_r": 0.2551100036609649,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Dumai",
+        "node_b": "Penang",
+        "n_pairs": 26026,
+        "pearson_r": 0.11414983053144344,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Dumai",
+        "node_b": "Pontianak",
+        "n_pairs": 26025,
+        "pearson_r": 0.07623821785083287,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Dumai",
+        "node_b": "Port_Klang",
+        "n_pairs": 26026,
+        "pearson_r": 0.20723450855634462,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Dumai",
+        "node_b": "Sepang",
+        "n_pairs": 26013,
+        "pearson_r": 0.17507907120290006,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Dumai",
+        "node_b": "Seremban",
+        "n_pairs": 26025,
+        "pearson_r": 0.17727849220264652,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Dumai",
+        "node_b": "Temerloh",
+        "n_pairs": 26025,
+        "pearson_r": 0.1398340731322758,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Ipoh",
+        "node_b": "Jambi",
+        "n_pairs": 26026,
+        "pearson_r": 0.23245579730083252,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Ipoh",
+        "node_b": "Johor_Bahru",
+        "n_pairs": 26028,
+        "pearson_r": 0.35349262980921853,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Ipoh",
+        "node_b": "KL_City",
+        "n_pairs": 26013,
+        "pearson_r": 0.6308156676494614,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Ipoh",
+        "node_b": "Kota_Bharu",
+        "n_pairs": 26032,
+        "pearson_r": 0.4294779089046351,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Ipoh",
+        "node_b": "Kuala_Terengganu",
+        "n_pairs": 26032,
+        "pearson_r": 0.36721856900116573,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Ipoh",
+        "node_b": "Kuantan",
+        "n_pairs": 26032,
+        "pearson_r": 0.43526500281030667,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Ipoh",
+        "node_b": "Kuching",
+        "n_pairs": 26032,
+        "pearson_r": 0.2955313528998857,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Ipoh",
+        "node_b": "Malacca",
+        "n_pairs": 26030,
+        "pearson_r": 0.4375095839590541,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Ipoh",
+        "node_b": "Medan",
+        "n_pairs": 26031,
+        "pearson_r": 0.41439073999949,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Ipoh",
+        "node_b": "Padang",
+        "n_pairs": 26032,
+        "pearson_r": 0.32684483816167487,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Ipoh",
+        "node_b": "Palangkaraya",
+        "n_pairs": 26032,
+        "pearson_r": 0.08481909300627107,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Ipoh",
+        "node_b": "Palembang",
+        "n_pairs": 26032,
+        "pearson_r": 0.13812096538989038,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Ipoh",
+        "node_b": "Pekanbaru",
+        "n_pairs": 26030,
+        "pearson_r": 0.43951061937789143,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Ipoh",
+        "node_b": "Penang",
+        "n_pairs": 26032,
+        "pearson_r": 0.614312147820408,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Ipoh",
+        "node_b": "Pontianak",
+        "n_pairs": 26031,
+        "pearson_r": 0.18146431433152155,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Ipoh",
+        "node_b": "Port_Klang",
+        "n_pairs": 26032,
+        "pearson_r": 0.4906174643029902,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Ipoh",
+        "node_b": "Sepang",
+        "n_pairs": 26020,
+        "pearson_r": 0.49105260523346833,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Ipoh",
+        "node_b": "Seremban",
+        "n_pairs": 26032,
+        "pearson_r": 0.5710900575648211,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Ipoh",
+        "node_b": "Temerloh",
+        "n_pairs": 26031,
+        "pearson_r": 0.6169420621381545,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Jambi",
+        "node_b": "Johor_Bahru",
+        "n_pairs": 26024,
+        "pearson_r": 0.3393570322156367,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Jambi",
+        "node_b": "KL_City",
+        "n_pairs": 26009,
+        "pearson_r": 0.2556300996691787,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Jambi",
+        "node_b": "Kota_Bharu",
+        "n_pairs": 26028,
+        "pearson_r": 0.15070621643892573,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Jambi",
+        "node_b": "Kuala_Terengganu",
+        "n_pairs": 26028,
+        "pearson_r": 0.14162864107448134,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Jambi",
+        "node_b": "Kuantan",
+        "n_pairs": 26028,
+        "pearson_r": 0.24470569681829513,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Jambi",
+        "node_b": "Kuching",
+        "n_pairs": 26028,
+        "pearson_r": 0.2808094092309563,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Jambi",
+        "node_b": "Malacca",
+        "n_pairs": 26026,
+        "pearson_r": 0.282496395243202,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Jambi",
+        "node_b": "Medan",
+        "n_pairs": 26027,
+        "pearson_r": 0.1946354088305241,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Jambi",
+        "node_b": "Padang",
+        "n_pairs": 26028,
+        "pearson_r": 0.19288577948918229,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Jambi",
+        "node_b": "Palangkaraya",
+        "n_pairs": 26028,
+        "pearson_r": 0.195473509316938,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Jambi",
+        "node_b": "Palembang",
+        "n_pairs": 26028,
+        "pearson_r": 0.40867899982885525,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Jambi",
+        "node_b": "Pekanbaru",
+        "n_pairs": 26026,
+        "pearson_r": 0.40104601877569995,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Jambi",
+        "node_b": "Penang",
+        "n_pairs": 26028,
+        "pearson_r": 0.09302051340285163,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Jambi",
+        "node_b": "Pontianak",
+        "n_pairs": 26027,
+        "pearson_r": 0.19778411297294105,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Jambi",
+        "node_b": "Port_Klang",
+        "n_pairs": 26028,
+        "pearson_r": 0.12749523517553255,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Jambi",
+        "node_b": "Sepang",
+        "n_pairs": 26015,
+        "pearson_r": 0.1977671870704331,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Jambi",
+        "node_b": "Seremban",
+        "n_pairs": 26027,
+        "pearson_r": 0.3596991496022107,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Jambi",
+        "node_b": "Temerloh",
+        "n_pairs": 26027,
+        "pearson_r": 0.3416710564165027,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Johor_Bahru",
+        "node_b": "KL_City",
+        "n_pairs": 26011,
+        "pearson_r": 0.4077116032342032,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Johor_Bahru",
+        "node_b": "Kota_Bharu",
+        "n_pairs": 26030,
+        "pearson_r": 0.1578590670883543,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Johor_Bahru",
+        "node_b": "Kuala_Terengganu",
+        "n_pairs": 26030,
+        "pearson_r": 0.11879617077233852,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Johor_Bahru",
+        "node_b": "Kuantan",
+        "n_pairs": 26030,
+        "pearson_r": 0.29442213162545744,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Johor_Bahru",
+        "node_b": "Kuching",
+        "n_pairs": 26030,
+        "pearson_r": 0.35101852408278666,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Johor_Bahru",
+        "node_b": "Malacca",
+        "n_pairs": 26028,
+        "pearson_r": 0.42638499524595713,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Johor_Bahru",
+        "node_b": "Medan",
+        "n_pairs": 26029,
+        "pearson_r": 0.2183068526067531,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Johor_Bahru",
+        "node_b": "Padang",
+        "n_pairs": 26030,
+        "pearson_r": 0.16267077701238686,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Johor_Bahru",
+        "node_b": "Palangkaraya",
+        "n_pairs": 26030,
+        "pearson_r": 0.2219525134423721,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Johor_Bahru",
+        "node_b": "Palembang",
+        "n_pairs": 26030,
+        "pearson_r": 0.3176212120029119,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Johor_Bahru",
+        "node_b": "Pekanbaru",
+        "n_pairs": 26028,
+        "pearson_r": 0.3694247777096271,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Johor_Bahru",
+        "node_b": "Penang",
+        "n_pairs": 26030,
+        "pearson_r": 0.157955915143488,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Johor_Bahru",
+        "node_b": "Pontianak",
+        "n_pairs": 26029,
+        "pearson_r": 0.17053808705036855,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Johor_Bahru",
+        "node_b": "Port_Klang",
+        "n_pairs": 26030,
+        "pearson_r": 0.18149560780245186,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Johor_Bahru",
+        "node_b": "Sepang",
+        "n_pairs": 26017,
+        "pearson_r": 0.3000784696692742,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Johor_Bahru",
+        "node_b": "Seremban",
+        "n_pairs": 26029,
+        "pearson_r": 0.5239506829218435,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Johor_Bahru",
+        "node_b": "Temerloh",
+        "n_pairs": 26029,
+        "pearson_r": 0.41761124216991946,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "KL_City",
+        "node_b": "Kota_Bharu",
+        "n_pairs": 26015,
+        "pearson_r": 0.2556181367371818,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "KL_City",
+        "node_b": "Kuala_Terengganu",
+        "n_pairs": 26015,
+        "pearson_r": 0.23856209946339943,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "KL_City",
+        "node_b": "Kuantan",
+        "n_pairs": 26015,
+        "pearson_r": 0.3230525402462977,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "KL_City",
+        "node_b": "Kuching",
+        "n_pairs": 26015,
+        "pearson_r": 0.2786723923066244,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "KL_City",
+        "node_b": "Malacca",
+        "n_pairs": 26013,
+        "pearson_r": 0.3744526803913995,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "KL_City",
+        "node_b": "Medan",
+        "n_pairs": 26014,
+        "pearson_r": 0.38794094857717715,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "KL_City",
+        "node_b": "Padang",
+        "n_pairs": 26015,
+        "pearson_r": 0.3172337004114149,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "KL_City",
+        "node_b": "Palangkaraya",
+        "n_pairs": 26015,
+        "pearson_r": 0.11457654515395728,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "KL_City",
+        "node_b": "Palembang",
+        "n_pairs": 26015,
+        "pearson_r": 0.1638456746100312,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "KL_City",
+        "node_b": "Pekanbaru",
+        "n_pairs": 26013,
+        "pearson_r": 0.47263536535252443,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "KL_City",
+        "node_b": "Penang",
+        "n_pairs": 26015,
+        "pearson_r": 0.402004520853751,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "KL_City",
+        "node_b": "Pontianak",
+        "n_pairs": 26014,
+        "pearson_r": 0.16841709595942914,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "KL_City",
+        "node_b": "Port_Klang",
+        "n_pairs": 26015,
+        "pearson_r": 0.559659500340826,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "KL_City",
+        "node_b": "Sepang",
+        "n_pairs": 26002,
+        "pearson_r": 0.8637529337388634,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "KL_City",
+        "node_b": "Seremban",
+        "n_pairs": 26014,
+        "pearson_r": 0.6711551496180435,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "KL_City",
+        "node_b": "Temerloh",
+        "n_pairs": 26014,
+        "pearson_r": 0.4844105869418788,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kota_Bharu",
+        "node_b": "Kuala_Terengganu",
+        "n_pairs": 26034,
+        "pearson_r": 0.6544361953331777,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kota_Bharu",
+        "node_b": "Kuantan",
+        "n_pairs": 26034,
+        "pearson_r": 0.4875381359791356,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kota_Bharu",
+        "node_b": "Kuching",
+        "n_pairs": 26034,
+        "pearson_r": 0.19995211737920218,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kota_Bharu",
+        "node_b": "Malacca",
+        "n_pairs": 26032,
+        "pearson_r": 0.272046067445844,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kota_Bharu",
+        "node_b": "Medan",
+        "n_pairs": 26033,
+        "pearson_r": 0.2651853152379196,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kota_Bharu",
+        "node_b": "Padang",
+        "n_pairs": 26034,
+        "pearson_r": 0.1983824982571042,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kota_Bharu",
+        "node_b": "Palangkaraya",
+        "n_pairs": 26034,
+        "pearson_r": 0.0009143658442511674,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kota_Bharu",
+        "node_b": "Palembang",
+        "n_pairs": 26034,
+        "pearson_r": 0.04101158774508608,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kota_Bharu",
+        "node_b": "Pekanbaru",
+        "n_pairs": 26032,
+        "pearson_r": 0.31323585921074265,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kota_Bharu",
+        "node_b": "Penang",
+        "n_pairs": 26034,
+        "pearson_r": 0.39619629293354386,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kota_Bharu",
+        "node_b": "Pontianak",
+        "n_pairs": 26033,
+        "pearson_r": 0.09585856614089251,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kota_Bharu",
+        "node_b": "Port_Klang",
+        "n_pairs": 26034,
+        "pearson_r": 0.3089745959334133,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kota_Bharu",
+        "node_b": "Sepang",
+        "n_pairs": 26021,
+        "pearson_r": 0.21037219825999343,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kota_Bharu",
+        "node_b": "Seremban",
+        "n_pairs": 26033,
+        "pearson_r": 0.3438414333470144,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kota_Bharu",
+        "node_b": "Temerloh",
+        "n_pairs": 26033,
+        "pearson_r": 0.4826976054365052,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kuala_Terengganu",
+        "node_b": "Kuantan",
+        "n_pairs": 26034,
+        "pearson_r": 0.6745091401064954,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kuala_Terengganu",
+        "node_b": "Kuching",
+        "n_pairs": 26034,
+        "pearson_r": 0.24835766382632113,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kuala_Terengganu",
+        "node_b": "Malacca",
+        "n_pairs": 26032,
+        "pearson_r": 0.30629629940989334,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kuala_Terengganu",
+        "node_b": "Medan",
+        "n_pairs": 26033,
+        "pearson_r": 0.17882535106502098,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kuala_Terengganu",
+        "node_b": "Padang",
+        "n_pairs": 26034,
+        "pearson_r": 0.1548901269704135,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kuala_Terengganu",
+        "node_b": "Palangkaraya",
+        "n_pairs": 26034,
+        "pearson_r": 0.042088571982575415,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kuala_Terengganu",
+        "node_b": "Palembang",
+        "n_pairs": 26034,
+        "pearson_r": -0.009371473968998663,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kuala_Terengganu",
+        "node_b": "Pekanbaru",
+        "n_pairs": 26032,
+        "pearson_r": 0.2924371670369658,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kuala_Terengganu",
+        "node_b": "Penang",
+        "n_pairs": 26034,
+        "pearson_r": 0.35022035605928337,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kuala_Terengganu",
+        "node_b": "Pontianak",
+        "n_pairs": 26033,
+        "pearson_r": 0.1028887348887824,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kuala_Terengganu",
+        "node_b": "Port_Klang",
+        "n_pairs": 26034,
+        "pearson_r": 0.29972698204163006,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kuala_Terengganu",
+        "node_b": "Sepang",
+        "n_pairs": 26021,
+        "pearson_r": 0.22108794240118892,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kuala_Terengganu",
+        "node_b": "Seremban",
+        "n_pairs": 26033,
+        "pearson_r": 0.22854620737332346,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kuala_Terengganu",
+        "node_b": "Temerloh",
+        "n_pairs": 26033,
+        "pearson_r": 0.49892569738398784,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kuantan",
+        "node_b": "Kuching",
+        "n_pairs": 26034,
+        "pearson_r": 0.31987115212325024,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kuantan",
+        "node_b": "Malacca",
+        "n_pairs": 26032,
+        "pearson_r": 0.4567499927911986,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kuantan",
+        "node_b": "Medan",
+        "n_pairs": 26033,
+        "pearson_r": 0.18203265967870028,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kuantan",
+        "node_b": "Padang",
+        "n_pairs": 26034,
+        "pearson_r": 0.1847188970164598,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kuantan",
+        "node_b": "Palangkaraya",
+        "n_pairs": 26034,
+        "pearson_r": 0.13026319615680815,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kuantan",
+        "node_b": "Palembang",
+        "n_pairs": 26034,
+        "pearson_r": 0.13464397649174367,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kuantan",
+        "node_b": "Pekanbaru",
+        "n_pairs": 26032,
+        "pearson_r": 0.3945003752295044,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kuantan",
+        "node_b": "Penang",
+        "n_pairs": 26034,
+        "pearson_r": 0.34823869936230967,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kuantan",
+        "node_b": "Pontianak",
+        "n_pairs": 26033,
+        "pearson_r": 0.14270018199788992,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kuantan",
+        "node_b": "Port_Klang",
+        "n_pairs": 26034,
+        "pearson_r": 0.3440921713272361,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kuantan",
+        "node_b": "Sepang",
+        "n_pairs": 26021,
+        "pearson_r": 0.2439309928532132,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kuantan",
+        "node_b": "Seremban",
+        "n_pairs": 26033,
+        "pearson_r": 0.43744816973067646,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kuantan",
+        "node_b": "Temerloh",
+        "n_pairs": 26033,
+        "pearson_r": 0.7108621640215306,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kuching",
+        "node_b": "Malacca",
+        "n_pairs": 26032,
+        "pearson_r": 0.2628908592673959,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kuching",
+        "node_b": "Medan",
+        "n_pairs": 26033,
+        "pearson_r": 0.23648974381160215,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kuching",
+        "node_b": "Padang",
+        "n_pairs": 26034,
+        "pearson_r": 0.11739343455859415,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kuching",
+        "node_b": "Palangkaraya",
+        "n_pairs": 26034,
+        "pearson_r": 0.13337228271233684,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kuching",
+        "node_b": "Palembang",
+        "n_pairs": 26034,
+        "pearson_r": 0.19159423756116106,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kuching",
+        "node_b": "Pekanbaru",
+        "n_pairs": 26032,
+        "pearson_r": 0.34569111234331734,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kuching",
+        "node_b": "Penang",
+        "n_pairs": 26034,
+        "pearson_r": 0.16514241634601148,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kuching",
+        "node_b": "Pontianak",
+        "n_pairs": 26033,
+        "pearson_r": 0.24554346625620085,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kuching",
+        "node_b": "Port_Klang",
+        "n_pairs": 26034,
+        "pearson_r": 0.1486503292985651,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kuching",
+        "node_b": "Sepang",
+        "n_pairs": 26021,
+        "pearson_r": 0.20346015526395647,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kuching",
+        "node_b": "Seremban",
+        "n_pairs": 26033,
+        "pearson_r": 0.2949434283370289,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Kuching",
+        "node_b": "Temerloh",
+        "n_pairs": 26033,
+        "pearson_r": 0.3472289324264239,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Malacca",
+        "node_b": "Medan",
+        "n_pairs": 26031,
+        "pearson_r": 0.1537493983898472,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Malacca",
+        "node_b": "Padang",
+        "n_pairs": 26032,
+        "pearson_r": 0.20220723783754616,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Malacca",
+        "node_b": "Palangkaraya",
+        "n_pairs": 26032,
+        "pearson_r": 0.21049008206222403,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Malacca",
+        "node_b": "Palembang",
+        "n_pairs": 26032,
+        "pearson_r": 0.2110946770756611,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Malacca",
+        "node_b": "Pekanbaru",
+        "n_pairs": 26031,
+        "pearson_r": 0.4489637290292504,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Malacca",
+        "node_b": "Penang",
+        "n_pairs": 26032,
+        "pearson_r": 0.28647126558874414,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Malacca",
+        "node_b": "Pontianak",
+        "n_pairs": 26031,
+        "pearson_r": 0.14559594849944532,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Malacca",
+        "node_b": "Port_Klang",
+        "n_pairs": 26032,
+        "pearson_r": 0.3943302373585434,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Malacca",
+        "node_b": "Sepang",
+        "n_pairs": 26019,
+        "pearson_r": 0.39570877822172534,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Malacca",
+        "node_b": "Seremban",
+        "n_pairs": 26031,
+        "pearson_r": 0.5877766739034179,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Malacca",
+        "node_b": "Temerloh",
+        "n_pairs": 26031,
+        "pearson_r": 0.5329562726539737,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Medan",
+        "node_b": "Padang",
+        "n_pairs": 26033,
+        "pearson_r": 0.320081361982888,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Medan",
+        "node_b": "Palangkaraya",
+        "n_pairs": 26033,
+        "pearson_r": -0.003313568259097871,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Medan",
+        "node_b": "Palembang",
+        "n_pairs": 26033,
+        "pearson_r": 0.10541995909828852,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Medan",
+        "node_b": "Pekanbaru",
+        "n_pairs": 26031,
+        "pearson_r": 0.33224476361532795,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Medan",
+        "node_b": "Penang",
+        "n_pairs": 26033,
+        "pearson_r": 0.40509643150548436,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Medan",
+        "node_b": "Pontianak",
+        "n_pairs": 26032,
+        "pearson_r": 0.1312734673774789,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Medan",
+        "node_b": "Port_Klang",
+        "n_pairs": 26033,
+        "pearson_r": 0.33267188488030475,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Medan",
+        "node_b": "Sepang",
+        "n_pairs": 26020,
+        "pearson_r": 0.32727531400056376,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Medan",
+        "node_b": "Seremban",
+        "n_pairs": 26032,
+        "pearson_r": 0.2840485554324528,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Medan",
+        "node_b": "Temerloh",
+        "n_pairs": 26032,
+        "pearson_r": 0.33110551347733147,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Padang",
+        "node_b": "Palangkaraya",
+        "n_pairs": 26034,
+        "pearson_r": 0.14360564102968576,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Padang",
+        "node_b": "Palembang",
+        "n_pairs": 26034,
+        "pearson_r": 0.1590449428714785,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Padang",
+        "node_b": "Pekanbaru",
+        "n_pairs": 26032,
+        "pearson_r": 0.394693012963625,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Padang",
+        "node_b": "Penang",
+        "n_pairs": 26034,
+        "pearson_r": 0.3430656663794718,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Padang",
+        "node_b": "Pontianak",
+        "n_pairs": 26033,
+        "pearson_r": 0.19239738332557985,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Padang",
+        "node_b": "Port_Klang",
+        "n_pairs": 26034,
+        "pearson_r": 0.3684676760619725,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Padang",
+        "node_b": "Sepang",
+        "n_pairs": 26021,
+        "pearson_r": 0.28397713762672644,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Padang",
+        "node_b": "Seremban",
+        "n_pairs": 26033,
+        "pearson_r": 0.2212985788965772,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Padang",
+        "node_b": "Temerloh",
+        "n_pairs": 26033,
+        "pearson_r": 0.24446619604702496,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Palangkaraya",
+        "node_b": "Palembang",
+        "n_pairs": 26034,
+        "pearson_r": 0.5282730835368837,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Palangkaraya",
+        "node_b": "Pekanbaru",
+        "n_pairs": 26032,
+        "pearson_r": 0.22031672072815017,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Palangkaraya",
+        "node_b": "Penang",
+        "n_pairs": 26034,
+        "pearson_r": -0.022984201231942905,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Palangkaraya",
+        "node_b": "Pontianak",
+        "n_pairs": 26033,
+        "pearson_r": 0.16705383397668302,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Palangkaraya",
+        "node_b": "Port_Klang",
+        "n_pairs": 26034,
+        "pearson_r": 0.04401604187587502,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Palangkaraya",
+        "node_b": "Sepang",
+        "n_pairs": 26021,
+        "pearson_r": 0.0999101281344098,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Palangkaraya",
+        "node_b": "Seremban",
+        "n_pairs": 26033,
+        "pearson_r": 0.1599170199880802,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Palangkaraya",
+        "node_b": "Temerloh",
+        "n_pairs": 26033,
+        "pearson_r": 0.1466946404131346,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Palembang",
+        "node_b": "Pekanbaru",
+        "n_pairs": 26032,
+        "pearson_r": 0.27783856928632455,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Palembang",
+        "node_b": "Penang",
+        "n_pairs": 26034,
+        "pearson_r": 0.0025796301940126235,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Palembang",
+        "node_b": "Pontianak",
+        "n_pairs": 26033,
+        "pearson_r": 0.21341096662059295,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Palembang",
+        "node_b": "Port_Klang",
+        "n_pairs": 26034,
+        "pearson_r": 0.0636265669458841,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Palembang",
+        "node_b": "Sepang",
+        "n_pairs": 26021,
+        "pearson_r": 0.1058580982834898,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Palembang",
+        "node_b": "Seremban",
+        "n_pairs": 26033,
+        "pearson_r": 0.28467601063231385,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Palembang",
+        "node_b": "Temerloh",
+        "n_pairs": 26033,
+        "pearson_r": 0.21311231506198525,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Pekanbaru",
+        "node_b": "Penang",
+        "n_pairs": 26032,
+        "pearson_r": 0.2884665065352936,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Pekanbaru",
+        "node_b": "Pontianak",
+        "n_pairs": 26031,
+        "pearson_r": 0.24548895414178631,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Pekanbaru",
+        "node_b": "Port_Klang",
+        "n_pairs": 26032,
+        "pearson_r": 0.40257644568682066,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Pekanbaru",
+        "node_b": "Sepang",
+        "n_pairs": 26019,
+        "pearson_r": 0.42169319604495265,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Pekanbaru",
+        "node_b": "Seremban",
+        "n_pairs": 26031,
+        "pearson_r": 0.5002858585085795,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Pekanbaru",
+        "node_b": "Temerloh",
+        "n_pairs": 26031,
+        "pearson_r": 0.478023986616532,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Penang",
+        "node_b": "Pontianak",
+        "n_pairs": 26033,
+        "pearson_r": 0.0996473832957477,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Penang",
+        "node_b": "Port_Klang",
+        "n_pairs": 26034,
+        "pearson_r": 0.48467561448637747,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Penang",
+        "node_b": "Sepang",
+        "n_pairs": 26021,
+        "pearson_r": 0.3331290911544898,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Penang",
+        "node_b": "Seremban",
+        "n_pairs": 26033,
+        "pearson_r": 0.3029479451347676,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Penang",
+        "node_b": "Temerloh",
+        "n_pairs": 26033,
+        "pearson_r": 0.3986118129018288,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Pontianak",
+        "node_b": "Port_Klang",
+        "n_pairs": 26033,
+        "pearson_r": 0.13912220773899017,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Pontianak",
+        "node_b": "Sepang",
+        "n_pairs": 26020,
+        "pearson_r": 0.107004834808011,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Pontianak",
+        "node_b": "Seremban",
+        "n_pairs": 26032,
+        "pearson_r": 0.19215623572804508,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Pontianak",
+        "node_b": "Temerloh",
+        "n_pairs": 26032,
+        "pearson_r": 0.19168595162764068,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Port_Klang",
+        "node_b": "Sepang",
+        "n_pairs": 26021,
+        "pearson_r": 0.5457342532927538,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Port_Klang",
+        "node_b": "Seremban",
+        "n_pairs": 26033,
+        "pearson_r": 0.36756702001595803,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Port_Klang",
+        "node_b": "Temerloh",
+        "n_pairs": 26033,
+        "pearson_r": 0.4121780972842662,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Sepang",
+        "node_b": "Seremban",
+        "n_pairs": 26021,
+        "pearson_r": 0.5964464086122825,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Sepang",
+        "node_b": "Temerloh",
+        "n_pairs": 26020,
+        "pearson_r": 0.3693151575095429,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      },
+      {
+        "node_a": "Seremban",
+        "node_b": "Temerloh",
+        "n_pairs": 26032,
+        "pearson_r": 0.6812370746293113,
+        "identical_on_overlap": false,
+        "complete_series_identical": false
+      }
+    ],
+    "interpretation": "Distinct series do not establish independent ground observations or independent model errors."
   }
 }
