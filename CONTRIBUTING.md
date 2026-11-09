@@ -18,7 +18,7 @@
 | 号 | 职责 | 代码文件 | 交付产物 |
 |---|---|---|---|
 | **1号**（组长） | 数据工程、气候基线解耦与基线模型 | `src/config.py`、`src/01_data_pipeline.py`、`src/01_baseline_dt.py`、`src/01_verify_data.py`、`src/utils_metrics.py`、`tools/discover_nodes.py` | `data/haze_panel_clean.parquet`、`data/manifest.json`、`data/data_dictionary.json`、`models/baseline_dt.joblib`、`models/metrics_stage1.json`、`models/gate0_report.json`、`models/cleaning_report.json`、`figures/fig_baseline_dt_*.png` |
-| **2号** | EDA 与时空季风传导特征 | `src/02_eda_analysis.py`、`src/02_spatiotemporal_features.py` | `data/feat_spatiotemporal.parquet`、`figures/fig_eda_diurnal_seasonal.png`、`figures/fig_eda_correlation_matrix.png`、`figures/fig_eda_class_imbalance.png`、`figures/fig_eda_wind_rose_pollution.png`、`figures/fig_eda_spatial_crosscorr.png` |
+| **2号** | EDA 与时空季风传导特征 | `src/02_eda_analysis.py`、`src/02_spatiotemporal_features.py` | `data/feat_spatiotemporal.parquet`、`figures/fig_eda_diurnal_seasonal.png`、`figures/fig_eda_correlation_matrix.png`、`figures/fig_eda_class_imbalance.png`、`figures/fig_eda_wind_rose_pollution.png`、`figures/fig_eda_spatial_crosscorr.png`、`models/metrics_stage2_eda.json`、`models/metrics_stage2_features.json`、`models/metrics_stage2_verification.json`、`docs/handover/02_eda_and_spatiotemporal.md`、`reports/sec2_3_and_2_4_1.md` |
 | **3号** | 多尺度趋势粒化与特征选择 | `src/03_granulation_features.py`、`src/03_feature_selection.py` | `data/features_final.parquet`、`models/selected_features.json`、`figures/fig_feature_ablation.png`、`figures/fig_granulation_bands.png` |
 | **4号** | 名义 RF、类权重与提升法 | `src/04_rf_and_boosting.py`、`src/04_complexity_experiments.py` | `models/rf_nominal.joblib`、`models/rf_balanced.joblib`、`models/boosting.joblib`、`models/metrics_stage4.json`、`figures/fig_rf_complexity_curve.png`、`figures/fig_window_sensitivity.png`、`figures/fig_boosting_vs_rf.png` |
 | **5号** | 回归分级与有序随机森林（两种保序范式） | `src/05_reg_to_cls.py`、`src/05_ordinal_rf.py` | `models/rf_regressor.joblib`、`models/ordinal_rf.joblib`、`models/ordinal_probs_val_test.npz`、`models/metrics_stage5.json`、`figures/fig_ordinal_error_distribution.png`、`figures/fig_interval_band.png` |
@@ -125,7 +125,7 @@ git push
 5. **不许用 test 段做任何选择。** 调超参、挑特征、定阈值，统统在 val 上做。
    test 只在最后报一次。用了就是数据泄露，结论作废。
 6. **随机种子固定 42。** 要比较两个模型，至少跑 3 个种子，报均值 ± 标准差。
-7. **主实验统一在 3 个受体节点上训练**（`role == "receptor"`，train 78,100 行）。
+7. **主实验统一在 3 个受体节点上训练**（`role == "receptor"`，面板实测 train 78,102 行；2 号离线完整性筛选后 77,753 行可建模，以 `models/metrics_stage2_features.json` 登记为准）。
    走廊和源区那 23 个节点只作特征输入与泛化对照，不许混进训练集——
    它们 Level 3 占比接近 0，混进去会把高危先验稀释到 3.37%，和 M1 就没法比了。
 8. **调 `TimeSeriesSplit` 之前必须先按 `timestamp` 排序。** 面板是按
@@ -172,7 +172,7 @@ n_high_risk
 | 等级编码 | 0 / 1 / 2 / 3（int8），阈值 (15, 35, 55) µg/m³ |
 | 高危 | `y ∈ {2, 3}` |
 | 风速 | 用 `wind_speed_ms`（m/s），不要用 `wind_speed_kmh` |
-| 时间 | `Asia/Kuala_Lumpur`，`datetime64[ns]` |
+| 时间 | `Asia/Kuala_Lumpur`；面板落盘为 `datetime64[us]`，契约按前缀 `datetime64` 校验 |
 | 空间单元 | `station_id` 指 CAMS 格点，**不是监测站**，别在图表里写 "station/measured" |
 | 图内文字 | 英文（中文字体在服务器上容易变方块） |
 | 报告正文 | 学术英文；`docs/` 和 `CONTRIBUTING.md` 用中文 |
@@ -183,7 +183,7 @@ n_high_risk
 
 合并到 `main` 之前，逐条确认。少一条就先别合。
 
-- [ ] `python src/01_verify_data.py --check` 仍然 **11/11 通过**
+- [ ] `python src/01_verify_data.py --check` **16/16 通过**（含禁词、体积、dtype、行数四道新门禁）
 - [ ] 产物路径和 README 第"目录结构"一节写的**完全一致**（不是差不多）
 - [ ] `models/metrics_*.json` 是脚本生成的，带 `generated_at` 和 `git_commit`
 - [ ] `docs/handover/` 里自己的交接文档写完了，**"已知缺陷"和"我没做的事"两段不能空**
@@ -191,7 +191,7 @@ n_high_risk
 - [ ] `python tools/check_prose.py reports/` 通过（第 9 节，AI 腔自查）
 - [ ] `git diff main --stat` 里没有 `data/raw/`、没有绝对路径（`D:\`、`C:\Users`）、没有密钥
 - [ ] 没有单个文件超过 50 MB
-- [ ] 没有改别人负责的、已经存在的文件
+- [ ] 没有改别人负责的、已经存在的文件。**越权改动 = 直接拒绝合并**，内容再好也不收：先在群里提，由负责人自己改
 
 ### 什么能提交，什么不能
 
@@ -201,7 +201,7 @@ n_high_risk
 | `reports/*.md`、`docs/*.md/json` | `__pycache__/`、`.ipynb_checkpoints/` |
 | `figures/*.png`（单张 < 5 MB） | API key、token、`.env` |
 | `models/*.json`、`*.joblib`（< 20 MB） | 任何绝对路径（换台电脑就废了） |
-| `data/*.parquet`（单个 < 50 MB） | 超过 2 MB 的 notebook 输出 |
+| `data/*.parquet`（单个 ≤ 50 MB，**必须真实入库，禁止 LFS 指针**） | 超过 2 MB 的 notebook 输出 |
 
 仓库总量控制 **200 MB** 以内，当前约 26 MB。
 
