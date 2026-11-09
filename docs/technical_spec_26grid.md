@@ -70,6 +70,8 @@ target 使用精确t+3小时核对，越界、不对齐或源质量不足只加�
 
 ## 6 运行、下游和交付
 
+当前 Agent 2 交接在已有 `feat/02-eda` 分支。成员 3 从该分支取得正式数据和运行说明。历史合并与撤销记录用于追溯，当前交接按 [成员 2 交接文档](handover/02_eda_and_spatiotemporal.md) 的分支入口执行。
+
 Python3.13.9的独立环境使用 `requirements-agent2.lock.txt`；`requirements-agent2.txt`是可读的直接依赖，原 `requirements.txt`保留给全项目。正式Agent2默认只读当前输入路径；其他版本必须显式传 `--input` 并明确未注明风速的单位，不能默默回退旧八站数据。
 
 ```sh
@@ -81,6 +83,6 @@ python tools/verify_agent2.py
 
 成员3当前尚无已提交实现，只验收输入契约，不生成假FIG成果。未来文件名按现行CONTRIBUTING表：`src/03_granulation_features.py`、`src/03_feature_selection.py`，只在训练折拟合、保留正确时间排序与标签purge。
 
-大型特征parquet使用Git LFS；克隆可`git lfs pull`，或用真实清洗输入重建。完整交付ZIP必须带实体数据和逐文件SHA256，不能把LFS指针视为完整数据。`tools/package_agent2.py`从固定提交导出、解压并实际重跑，旁附合并后验收记录。无Git目录时来源由SOURCE_COMMIT.txt明确记录。
+大型特征表使用 Git LFS。现有 02 分支的 Git 检出目录可运行 `git lfs pull`，源码 ZIP 可用真实清洗输入重建。正式交付 ZIP 应包含数据实体、逐文件 SHA256 和该固定 02 提交的解压验收记录。`tools/package_agent2.py` 在 Git 检出目录按指定提交导出并实际重跑。无 Git 目录的完整包使用 `SOURCE_COMMIT.txt` 记录来源。
 
 历史归档、重复候选证据和其他成员预留分支保留；不删除有效输入/模型、不重写共享历史。清理决策及执行记录见 repository_audit_agent2_26grid.md。
