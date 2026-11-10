@@ -524,7 +524,7 @@ def plot_comparison(
 
 
 def save_model(model: Any, path: Path) -> None:
-    joblib.dump(model, path, compress=3)
+    joblib.dump(model, path, compress=("xz", 6))
     limit = 20 * 1024 * 1024
     if path.stat().st_size >= limit:
         raise ValueError(
@@ -551,23 +551,59 @@ def main() -> None:
     x_test = test.loc[:, features].to_numpy(dtype=float)
     y_test = test["target_level_3h"].to_numpy(dtype=int)
 
-    rf_params, rf_trace = search_rf(
-        x_train,
-        y_train,
-        train["timestamp"],
-        x_val,
-        y_val,
-        args.rf_candidates,
-        args.n_jobs,
-    )
-    boost_params, boost_trace = search_boosting(
-        x_train,
-        y_train,
-        train["timestamp"],
-        x_val,
-        y_val,
-        args.boost_candidates,
-    )
+    input_hashes = {
+        "features_final": sha256(args.data),
+        "selected_features": sha256(args.features_json),
+    }
+    code_hash = sha256(Path(__file__))
+    checkpoint_path = args.metrics_json.parent / "metrics_stage4_search.tmp"
+    checkpoint_fingerprint = {
+        "code_sha256": code_hash,
+        "input_sha256": input_hashes,
+        "rf_candidates": args.rf_candidates,
+        "boost_candidates": args.boost_candidates,
+    }
+    checkpoint: dict[str, Any] | None = None
+    if checkpoint_path.exists():
+        candidate = json.loads(checkpoint_path.read_text(encoding="utf-8"))
+        if candidate.get("fingerprint") == checkpoint_fingerprint:
+            checkpoint = candidate
+
+    if checkpoint is None:
+        rf_params, rf_trace = search_rf(
+            x_train,
+            y_train,
+            train["timestamp"],
+            x_val,
+            y_val,
+            args.rf_candidates,
+            args.n_jobs,
+        )
+        boost_params, boost_trace = search_boosting(
+            x_train,
+            y_train,
+            train["timestamp"],
+            x_val,
+            y_val,
+            args.boost_candidates,
+        )
+        checkpoint = {
+            "fingerprint": checkpoint_fingerprint,
+            "selected_rf_params": json_value(rf_params),
+            "selected_boosting_params": json_value(boost_params),
+            "rf_search_trace": rf_trace,
+            "boosting_search_trace": boost_trace,
+        }
+        checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
+        checkpoint_path.write_text(
+            json.dumps(checkpoint, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+    else:
+        print(f"Reusing completed search from {checkpoint_path}")
+        rf_params = dict(checkpoint["selected_rf_params"])
+        boost_params = dict(checkpoint["selected_boosting_params"])
+        rf_trace = list(checkpoint["rf_search_trace"])
+        boost_trace = list(checkpoint["boosting_search_trace"])
 
     seed_runs: list[dict[str, Any]] = []
     seed_models: dict[int, dict[str, Any]] = {}
@@ -609,11 +645,8 @@ def main() -> None:
     payload = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "git_commit": git_commit(),
-        "code_sha256": sha256(Path(__file__)),
-        "input_sha256": {
-            "features_final": sha256(args.data),
-            "selected_features": sha256(args.features_json),
-        },
+        "code_sha256": code_hash,
+        "input_sha256": input_hashes,
         "training_domain": "role == receptor",
         "feature_names": features,
         "rows_by_split": {
@@ -669,6 +702,7 @@ def main() -> None:
         json.dumps(json_value(payload), ensure_ascii=False, indent=2, allow_nan=False),
         encoding="utf-8",
     )
+    checkpoint_path.unlink(missing_ok=True)
     print(f"Wrote {args.metrics_json}")
     for name, result in final_test.items():
         print(name, result)
