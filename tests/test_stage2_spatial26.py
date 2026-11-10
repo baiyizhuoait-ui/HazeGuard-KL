@@ -28,7 +28,7 @@ def train_panel():
 
 
 def test_fixed_sigma_geometry_and_concentration_are_physically_consistent(train_panel):
-    audit = F.spatial_training_diagnostics(train_panel)
+    audit = F.spatial_training_diagnostics(train_panel, sigma_km=15, radius_km=None)
     assert audit["node_count"] == 3 and audit["rows"] == 15
     assert audit["sigma_km"] == 15 and audit["coordinate_pair_count"] == 3
     assert audit["coordinate_pairs_within_sigma"] == 2
@@ -109,7 +109,7 @@ def test_diagnostics_distinguish_missing_history_from_zero_weight_and_exact_hour
     assert audit["zero_weight_rows"] == 1
     lag = audit["advection_availability_by_lag_h"]["1"]
     assert lag == {"positive_weight_rows": 3, "zero_weight_rows": 1,
-                   "missing_history_rows": 1, "coverage_fraction": .6}
+                   "missing_history_rows": 1, "missing_source_input_rows": 0, "coverage_fraction": .6}
     out = F.build_features(sparse)
     issue = out.loc[out.station_id.eq("Center") & out.timestamp.eq(pd.Timestamp("2024-01-01 02:00"))].iloc[0]
     assert pd.isna(issue.upwind_pm25_advection_1h)
@@ -124,7 +124,8 @@ def test_reversed_wind_reverses_usable_neighbors_and_features_keep_contract(trai
     assert forward["by_node"]["West"]["zero_weight_fraction"] == 1
     assert backward["by_node"]["East"]["zero_weight_fraction"] == 1
     assert backward["by_node"]["West"]["zero_weight_fraction"] == 0
-    assert base.shape[1] - train_panel.shape[1] == 56
+    assert base.shape[1] - train_panel.shape[1] == 63
+    assert set(F.NEAR_COLUMNS + F.FAR_COLUMNS).issubset(base)
     pd.testing.assert_frame_equal(base[train_panel.columns], train_panel)
 
 

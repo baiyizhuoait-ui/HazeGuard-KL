@@ -1,7 +1,6 @@
-"""Export a verified commit with full LFS data; extract and rerun the release.
+"""Export a fixed commit with its Parquet parts, then extract and verify it.
 
-Run from the repository root with the tested Agent 2 Python environment.
-No Git history, branches, or source data are changed.
+Run from the repository root with the tested stage 2 Python environment.
 """
 import argparse
 from datetime import datetime, timezone
@@ -9,7 +8,6 @@ import hashlib
 import json
 import os
 from pathlib import Path
-import shutil
 import subprocess
 import sys
 import tempfile
@@ -31,7 +29,6 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--commit", default="HEAD")
     ap.add_argument("--output", type=Path, required=True)
-    ap.add_argument("--feature-data", type=Path, default=ROOT / "data/feat_spatiotemporal.parquet")
     ap.add_argument("--verify-python", type=Path, default=Path(sys.executable))
     args = ap.parse_args()
     package, interpreter = args.output.resolve(), args.verify_python.resolve()
@@ -39,8 +36,7 @@ def main():
         ap.error("output already exists; choose a new release path")
     package.parent.mkdir(parents=True, exist_ok=True)
     commit = subprocess.check_output(["git", "rev-parse", args.commit], cwd=ROOT, text=True).strip()
-    feature_data = args.feature_data.resolve()
-    with tempfile.TemporaryDirectory(prefix="agent2-release-", dir=package.parent) as scratch:
+    with tempfile.TemporaryDirectory(prefix="stage2-release-", dir=package.parent) as scratch:
         scratch = Path(scratch)
         archive, stage = scratch / "source.zip", scratch / "stage"
         subprocess.run(["git", "-c", "filter.lfs.process=", "-c", "filter.lfs.smudge=", "-c", "filter.lfs.required=false",
@@ -50,22 +46,22 @@ def main():
             assert z.testzip() is None
             z.extractall(stage)
         audit = json.loads((stage / "models/metrics_stage2_features.json").read_text(encoding="utf-8"))
-        pointer = (stage / "data/feat_spatiotemporal.parquet").read_bytes()
-        assert len(pointer) < 1024 and audit["output_sha256"].encode() in pointer, "commit LFS pointer/audit mismatch"
-        assert digest(feature_data) == audit["output_sha256"], "full data does not belong to this commit"
-        assert feature_data.stat().st_size == audit["output_bytes"]
-        shutil.copyfile(feature_data, stage / "data/feat_spatiotemporal.parquet")
+        dataset = stage / "data/feat_spatiotemporal.parquet"
+        parts = audit["output_parts"]
+        assert dataset.is_dir() and parts, "expected committed Parquet parts"
+        for part in parts:
+            path = dataset / part["name"]
+            assert path.stat().st_size == part["bytes"] and digest(path) == part["sha256"]
         (stage / "SOURCE_COMMIT.txt").write_text(commit + "\n", encoding="ascii")
         (stage / "DELIVERY.md").write_text(
-            "# HazeGuard KL Agent 2 verified 26 grid release\n\n"
+            "# HazeGuard KL stage 2 verified 26 grid release\n\n"
             f"Source commit: {commit}\n\n"
-            "This is an export of that commit with the full, checksum-verified LFS object. "
-            "No Git directory or API download is required for Agent 2. See docs/technical_spec_26grid.md, "
-            "docs/repository_audit_agent2_26grid.md and docs/handover/02_eda_and_spatiotemporal.md.\n\n"
+            "This export includes all checksum-verified Parquet parts. "
+            "See docs/technical_spec_26grid.md and docs/handover/02_eda_and_spatiotemporal.md.\n\n"
             "Create a Python 3.13 environment, activate it, then run:\n\n```sh\n"
-            "python -m pip install -r requirements-agent2.lock.txt\n"
-            "python tools/verify_agent2.py\npython src/02_spatiotemporal_features.py\n"
-            "python src/02_eda_analysis.py\npython tools/verify_agent2.py\n```\n\n"
+            "python -m pip install -r requirements-stage2.lock.txt\n"
+            "python tools/verify_stage2.py\npython src/02_spatiotemporal_features.py\n"
+            "python src/02_eda_analysis.py\npython tools/verify_stage2.py\n```\n\n"
             "The adjacent verification JSON records actual extraction and regeneration of this exact ZIP. "
             "The repository's generation JSON retains its original generation commit and source hashes. "
             "SOURCE_COMMIT.txt identifies the exported commit. Audit-only future-label flags are never predictors.\n",
@@ -88,8 +84,8 @@ def main():
         assert not (release / ".git").exists()
         env = dict(os.environ, PYTHONIOENCODING="utf-8")
         results = []
-        for command in (["-m", "pip", "check"], ["tools/verify_agent2.py"],
-                        ["src/02_spatiotemporal_features.py"], ["src/02_eda_analysis.py"], ["tools/verify_agent2.py"]):
+        for command in (["-m", "pip", "check"], ["tools/verify_stage2.py"],
+                        ["src/02_spatiotemporal_features.py"], ["src/02_eda_analysis.py"], ["tools/verify_stage2.py"]):
             started = time.monotonic()
             result = subprocess.run([str(interpreter), *command], cwd=release, env=env, text=True,
                                     encoding="utf-8", errors="replace", capture_output=True, timeout=600)
@@ -103,7 +99,7 @@ def main():
         verified = json.loads((release / "models/metrics_stage2_verification.json").read_text(encoding="utf-8"))
         assert verified["all_exit_codes_zero"] and verified["git_commit"] == commit
         rebuilt = {name: digest(release / name) == item["sha256"] for name, item in files.items()
-                   if name == "data/feat_spatiotemporal.parquet" or name.startswith("figures/fig_eda_")}
+                   if name.startswith(("data/feat_spatiotemporal.parquet/", "figures/fig_eda_"))}
         # This release is verified in its locked build environment. A differing
         # platform build needs its own reviewed artifacts and cannot pass silently.
         record = {"generated_at": datetime.now(timezone.utc).isoformat(), "commit": commit,

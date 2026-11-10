@@ -1,6 +1,6 @@
-"""Adversarial checks of Agent 2's availability and physical conventions.
+"""Adversarial checks of stage 2's availability and physical conventions.
 
-Run with: python -m pytest tests/test_agent2.py
+Run with: python -m pytest tests/test_stage2_contract.py
 Fixtures are synthetic and are never used in the reported EDA or parquet.
 """
 import importlib.util
@@ -51,7 +51,7 @@ def select(df, sid, h):
 
 
 def predictors(df):
-    return [c for c in df if c not in panel_original_columns() and not c.startswith("agent2_")]
+    return [c for c in df if c not in panel_original_columns() and not c.startswith("audit_")]
 
 
 def panel_original_columns():
@@ -174,7 +174,7 @@ def test_calm_zero_denominator_and_missing_neighbors(panel):
 
 
 def test_gaussian_weights_use_km_and_normalize_only_valid_neighbors(panel):
-    row = select(F.build_features(panel), "East", 10)
+    row = select(F.build_features(panel, sigma_km=15), "East", 10)
     distance, _, _ = F.geometry([[0,0],[0,.1],[0,.2]])
     weights = 2 * np.exp(-distance[:2,2]**2 / (2*15**2))
     expected = np.dot(weights, [18,28]) / weights.sum()
@@ -205,7 +205,7 @@ def test_interpolated_rows_unavailable_without_changing_original(panel):
     panel.loc[mask, "qc_interpolated"] = 1
     out = F.build_features(panel)
     assert select(out, "West", 9).pm2_5 == 18
-    assert not select(out, "West", 9).agent2_current_source_clean
+    assert not select(out, "West", 9).audit_source_clean
     assert pd.isna(select(out, "West", 10).pm2_5_lag_1)
     assert pd.isna(select(out, "Center", 10).upwind_pm25_advection_1h)
 
@@ -258,6 +258,7 @@ def test_features_cli_from_extracted_source_without_git(panel, tmp_path):
     source = tmp_path / "src"
     source.mkdir()
     shutil.copy2(ROOT / "src/02_spatiotemporal_features.py", source)
+    shutil.copy2(ROOT / "src/stage2_storage.py", source)
     panel.to_parquet(tmp_path / "input.parquet", index=False)
     commit = "b2" * 20
     (tmp_path / "SOURCE_COMMIT.txt").write_text(commit + "\n", encoding="utf-8")
@@ -271,13 +272,13 @@ def test_features_cli_from_extracted_source_without_git(panel, tmp_path):
     assert result.returncode == 0, result.stdout + result.stderr
     audit = json.loads((tmp_path / "audit.json").read_text(encoding="utf-8"))
     assert audit["git_commit"] == commit
-    assert audit["new_column_count"] == 56
-    assert audit["new_predictor_count"] == 50
-    assert sum(audit["feature_family_counts"].values()) == 56
+    assert audit["new_column_count"] == 63
+    assert audit["new_predictor_count"] == 51
+    assert sum(audit["feature_family_counts"].values()) == 63
     assert audit["integrity"]["duplicate_primary_keys"] == 0
     assert audit["integrity"]["original_columns_values_dtypes_and_row_order_preserved"]
     assert audit["integrity"]["non_hourly_consecutive_intervals"] == 0
-    assert all(not c.startswith(("agent2_", "target_")) for c in audit["model_feature_columns"])
+    assert all(not c.startswith(("audit_", "target_")) for c in audit["model_feature_columns"])
     for name, count in audit["nan_counts"].items():
         assert audit["nan_fractions"][name] == count / len(panel)
     pd.testing.assert_frame_equal(pd.read_parquet(tmp_path / "features.parquet")[panel.columns], panel)
@@ -285,20 +286,20 @@ def test_features_cli_from_extracted_source_without_git(panel, tmp_path):
 
 def test_label_split_crossings_exact_horizon_and_thresholds(panel):
     out = F.build_features(panel)
-    assert not select(out, "Center", 34).agent2_target_within_split_3h
-    assert not select(out, "Center", 34).agent2_model_eligible
-    assert not select(out, "Center", 74).agent2_target_safe_3h
-    assert select(out, "Center", 30).agent2_target_safe_3h
+    assert not select(out, "Center", 34).audit_target_within_split_3h
+    assert not select(out, "Center", 34).audit_model_eligible
+    assert not select(out, "Center", 74).audit_target_safe_3h
+    assert select(out, "Center", 30).audit_target_safe_3h
     bad = panel.copy()
     bad.loc[bad.index[30], "target_pm25_3h"] += 1
-    assert not F.build_features(bad).iloc[30].agent2_target_aligned_3h
+    assert not F.build_features(bad).iloc[30].audit_target_aligned_3h
     # Exact class boundaries use left-closed bins.
     for value, level in [(14.999,0),(15.,1),(35.,2),(55.,3)]:
         x = panel.copy()
         idx = x.index[5]
         x.loc[idx, ["target_pm25_3h", "target_level_3h"]] = [value, level]
         x.loc[x.index[8], "pm2_5"] = value
-        assert F.build_features(x).loc[idx, "agent2_target_aligned_3h"]
+        assert F.build_features(x).loc[idx, "audit_target_aligned_3h"]
 
 
 def test_geometry_km_and_source_bearing():
@@ -389,8 +390,7 @@ def test_legacy_v2_input_keeps_raw_units_and_columns(panel):
 
 def test_delivered_parquet_and_figure_contract():
     path = ROOT / "data/feat_spatiotemporal.parquet"
-    if not path.exists() or path.stat().st_size < 1024:
-        pytest.skip("Generate features or run git lfs pull for the full-data integration check")
+    assert path.is_dir(), "The release must contain the ordered feature dataset"
     audit = json.loads((ROOT / "models/metrics_stage2_features.json").read_text(encoding="utf-8"))
     original = pd.read_parquet(ROOT / "data/haze_panel_clean.parquet")
     out = pd.read_parquet(path)
@@ -400,7 +400,7 @@ def test_delivered_parquet_and_figure_contract():
     assert F.digest(ROOT / "data/haze_panel_clean.parquet") == audit["input_sha256"]
     assert set(out.columns) - set(original.columns) == set(audit["new_columns"])
     for c in audit["model_feature_columns"]:
-        assert c in out and not c.startswith(("target_", "agent2_", "b_proto_"))
+        assert c in out and not c.startswith(("target_", "audit_", "b_proto_"))
         assert not np.isinf(out[c]).any()
     from PIL import Image
     slugs = ["diurnal_seasonal", "correlation_matrix", "class_imbalance", "wind_rose_pollution", "spatial_crosscorr"]

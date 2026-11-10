@@ -1,5 +1,6 @@
 """Check 26-cell EDA scope, geometry selection, and descriptive time slices."""
 import importlib.util
+import json
 from pathlib import Path
 
 import numpy as np
@@ -120,3 +121,76 @@ def test_climatology_fit_is_invariant_to_test_concentration():
     after = E.deseasonalized(frame)
     np.testing.assert_allclose(before.iloc[:2], after.iloc[:2])
     assert before.iloc[2] == 30. and after.iloc[2] == 8980.
+
+
+def test_extended_training_lags_find_a_known_regional_lead_across_a_gap():
+    clock = pd.date_range("2025-06-01", periods=120, freq="h")
+    values = np.random.default_rng(58).normal(size=len(clock))
+    source = pd.DataFrame({"station_id": "S", "_time": clock, "pm2_5": values})
+    destination = pd.DataFrame({"station_id": "R", "_time": clock,
+                                "pm2_5": pd.Series(values).shift(24)})
+    frame = pd.concat([source.drop(index=30), destination], ignore_index=True)
+    frame = frame.assign(split="train", _month=frame._time.dt.month, _hour=frame._time.dt.hour)
+    pairs = [{"source": "S", "destination": "R", "category": "regional_source"}]
+    result = E.extended_training_peaks(frame, pairs)
+    index, series, best, in_band = result["records"][0]
+    assert index == 0 and series == "raw"
+    assert best == in_band
+    lag, correlation, sample_count = best
+    assert lag == 24 and correlation == pytest.approx(1) and sample_count == 95
+    frame.loc[frame.index[-1], "split"] = "test"
+    with pytest.raises(ValueError, match="train-only"):
+        E.extended_training_peaks(frame, pairs)
+
+
+def test_published_metrics_fit_budget_and_retain_report_evidence():
+    artifact = ROOT / "models/metrics_stage2_eda.json"
+    assert 0 < artifact.stat().st_size <= 100_000
+    metrics = json.loads(artifact.read_text(encoding="utf-8"))
+    assert metrics["format_version"] == 2
+    assert metrics["diurnal_seasonal"]["seasons"]["SW: Jun–Sep"]["median"] == 26.6
+    assert metrics["correlations"]["pearson"]["target_pm25_3h"]["pm2_5"] == pytest.approx(.73704, abs=1e-5)
+    assert metrics["class_distribution"]["receptor_by_split"]["test"]["counts"]["3"] == 3154
+
+    wind = metrics["wind_rose"]
+    assert wind["sw_monsoon"]["n_noncalm"] == 24_528
+    assert wind["sw_monsoon"]["sw_flow_fraction"] == pytest.approx(.10148, abs=1e-5)
+    assert len(wind["by_node"]) == 26
+    for periods in wind["by_node"].values():
+        assert set(periods) == {"all_months", "sw_monsoon"}
+        for stats in periods.values():
+            counts = np.array(stats["speed_direction_counts"])
+            assert counts.shape == (16, 4) and counts.sum() == stats["n_noncalm"]
+            assert len(stats["sector_mean_pm25"]) == 16
+
+    crosscorr = metrics["crosscorr"]
+    selection = crosscorr["pair_selection"]
+    assert len(selection["candidates"]) == selection["candidate_count"] == 75
+    assert len(selection["selected_pairs"]) == 12
+    lags = crosscorr["lag_hours"]
+    assert lags == list(range(-12, 13))
+    assert len(crosscorr["records"]) == 24
+    for record in crosscorr["records"]:
+        points = record["points"]
+        assert len(points["r"]) == len(points["n_pairs"]) == len(lags)
+        peak = record["peak"]
+        i = lags.index(peak["lag_h"])
+        assert points["r"][i] == peak["r"] and points["n_pairs"][i] == peak["n_pairs"]
+
+    extended = crosscorr["extended_training_peaks"]
+    assert extended["lag_range_hours"] == [-48, 48]
+    assert extended["candidate_bands_hours"] == {"local": [2, 4], "regional": [18, 36]}
+    assert {(i, series) for i, series, *_ in extended["records"]} == {
+        (i, series) for i in range(12) for series in ("raw", "deseasonalized")}
+    for i, _, maximum, band_peak in extended["records"]:
+        group = "regional" if selection["selected_pairs"][i]["category"] == "regional_source" else "local"
+        lower, upper = extended["candidate_bands_hours"][group]
+        assert -48 <= maximum[0] <= 48 and lower <= band_peak[0] <= upper
+        assert maximum[1] >= band_peak[1] and maximum[2] > 25_000 and band_peak[2] > 25_000
+
+    similarity = metrics["spatial_similarity"]
+    assert similarity["pair_count"] == 325
+    assert similarity["max_pair"]["pearson_r"] == pytest.approx(.9086)
+    assert similarity["max_pair"]["n_pairs"] == 26_034
+    assert similarity["identical_on_overlap_pairs"] == []
+    assert len(metrics["figure_sha256"]) == 5

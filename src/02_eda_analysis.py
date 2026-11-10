@@ -15,11 +15,13 @@ import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
-spec = importlib.util.spec_from_file_location("agent2_features", ROOT / "src/02_spatiotemporal_features.py")
+spec = importlib.util.spec_from_file_location("spatiotemporal_features", ROOT / "src/02_spatiotemporal_features.py")
 F = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(F)
 COLORS = ["#167d9a", "#dc7732", "#7356a5", "#4c956c", "#c55867", "#656b75", "#c0a236", "#4c5ac6"]
 LEVEL_COLORS = ["#31858c", "#deb349", "#de8546", "#af4355"]
+CCF_LAG_HOURS = tuple(range(-12, 13))
+MAX_EDA_METRICS_BYTES = 100_000
 
 
 def require_training(df):
@@ -206,6 +208,7 @@ def wind_summary(frame):
             "sector_mean_pm25": [None if pd.isna(x) else float(x) for x in means],
             "sector_count": counts.sum(axis=1).astype(int).tolist(),
             "sector_frequency_percent": freq.sum(axis=1).tolist(),
+            "speed_direction_counts": counts.astype(int).to_numpy().tolist(),
             "speed_direction_frequency_percent": freq.to_numpy().tolist(),
             "speed_bins_ms": ["0.5–2", "2–4", "4–6", ">=6"],
             "sw_flow_sector_degrees": [202.5, 247.5], "sw_flow_count": int(sw_flow.sum()),
@@ -266,7 +269,7 @@ def wind_rose(train, directory):
             "interpretation": "Calendar SW monsoon and wind-from SW sector are separate descriptive quantities; no source attribution."}
 
 
-def lag_correlations(source, destination, lags=range(-12, 13)):
+def lag_correlations(source, destination, lags=CCF_LAG_HOURS):
     """Positive k means source leads: corr(source(t-k), destination(t))."""
     clock = pd.date_range(min(source.index.min(), destination.index.min()),
                           max(source.index.max(), destination.index.max()), freq="h")
@@ -327,6 +330,41 @@ def geometry_pair_candidates(df, local_radius_km=150.0):
             "candidate_count": len(candidates), "candidates": candidates, "selected_pairs": selected}
 
 
+def extended_training_peaks(train, pairs):
+    """Check prespecified lag bands on the same geometry pairs using training hours."""
+    require_training(train)
+    lags = range(-48, 49)
+    bands = {"local": (2, 4), "regional": (18, 36)}
+    subset = train.loc[F.clean_rows(train), ["station_id", "split", "_time", "_month", "_hour", "pm2_5"]].copy()
+    subset["_residual"] = deseasonalized(subset)
+    by_grid = {str(grid): frame.set_index("_time")
+               for grid, frame in subset.groupby("station_id", observed=True)}
+
+    def peak_tuple(points):
+        peak = max(points, key=lambda point: point["r"], default=None)
+        return [peak["lag_h"], peak["r"], peak["n_pairs"]] if peak is not None else None
+
+    records = []
+    for index, pair in enumerate(pairs):
+        group = "regional" if pair["category"] == "regional_source" else "local"
+        lower, upper = bands[group]
+        source, destination = by_grid.get(pair["source"]), by_grid.get(pair["destination"])
+        for column, label in (("pm2_5", "raw"), ("_residual", "deseasonalized")):
+            if source is None or destination is None:
+                records.append([index, label, None, None])
+                continue
+            points = lag_correlations(source[column], destination[column], lags)
+            finite = [point for point in points if point["r"] is not None]
+            in_band = [point for point in finite if lower <= point["lag_h"] <= upper]
+            records.append([index, label, peak_tuple(finite), peak_tuple(in_band)])
+
+    return {"scope": "Clean train rows at both ends of each pair. Peak maximizes signed Pearson r. Positive lag means source leads.",
+            "pair_index": "Zero-based position in pair_selection.selected_pairs.",
+            "lag_range_hours": [lags.start, lags.stop - 1], "candidate_bands_hours": bands,
+            "record_columns": ["pair_index", "series", "max_peak", "candidate_band_peak"],
+            "peak_columns": ["lag_h", "r", "n_pairs"], "records": records}
+
+
 def crosscorr(df, directory):
     selection = geometry_pair_candidates(df)
     pairs = selection["selected_pairs"]
@@ -369,6 +407,7 @@ def crosscorr(df, directory):
     save(fig, directory, "spatial_crosscorr")
     return {"lag_definition": "corr(source(t-k), destination(t)); positive k = source leads",
             "pair_selection": selection, "records": records, "residual_fit": "training month/hour means only",
+            "extended_training_peaks": extended_training_peaks(df.loc[df.split.eq("train")], pairs),
             "interpretation": "Regional pairs provide network context; a ±12h correlation peak is not a validated transport time or an emissions attribution."}
 
 
@@ -399,6 +438,57 @@ def spatial_similarity(train):
             "interpretation": "Distinct series do not establish independent ground observations or independent model errors."}
 
 
+def compact_eda_metrics(metrics):
+    """Store report statistics at their original precision within the JSON size budget."""
+    result = {**metrics, "format_version": 2}
+    wind = metrics["wind_rose"]
+    node_fields = ("n_noncalm", "n_excluded_calm_or_missing", "sector_mean_pm25",
+                   "speed_direction_counts", "sw_flow_count", "sw_flow_fraction", "sw_flow_mean_pm25")
+    result["wind_rose"] = {
+        **wind,
+        "by_node": {node: {period: {field: stats[field] for field in node_fields}
+                           for period, stats in periods.items()}
+                    for node, periods in wind["by_node"].items()},
+        "by_node_encoding": "Use the shared sector and speed bins. Sum each count row for the sector count. Percentages are counts times 100 divided by n_noncalm (zero if no observations).",
+    }
+
+    crosscorr_audit = metrics["crosscorr"]
+    pair_selection = crosscorr_audit["pair_selection"]
+    candidate_columns = ("source", "destination", "distance_km", "eligible_by_geometry")
+    result["crosscorr"] = {
+        **crosscorr_audit,
+        "lag_hours": CCF_LAG_HOURS,
+        "pair_selection": {
+            **pair_selection,
+            "candidate_columns": candidate_columns,
+            "candidates": [[pair[column] for column in candidate_columns]
+                           for pair in pair_selection["candidates"]],
+        },
+        "records": [{**{key: record[key] for key in ("source", "destination", "series", "peak")},
+                     "points": {column: [point[column] for point in record["points"]]
+                                for column in ("r", "n_pairs")}}
+                    for record in crosscorr_audit["records"]],
+        "records_encoding": "Point arrays follow lag_hours. Pair metadata are in pair_selection.selected_pairs.",
+    }
+
+    similarity = metrics["spatial_similarity"]
+    result["spatial_similarity"] = {key: value for key, value in similarity.items() if key != "pairs"}
+    result["spatial_similarity"]["identical_on_overlap_pairs"] = [
+        pair for pair in similarity["pairs"] if pair["identical_on_overlap"]]
+    result["spatial_similarity"]["pair_details"] = (
+        "Full pair records can be recomputed with spatial_similarity on the clean training rows of the input panel.")
+    return result
+
+
+def write_eda_metrics(path, metrics):
+    payload = json.dumps(compact_eda_metrics(metrics), ensure_ascii=False, allow_nan=False,
+                         separators=(",", ":")).encode("utf-8") + b"\n"
+    if len(payload) > MAX_EDA_METRICS_BYTES:
+        raise ValueError(f"EDA metrics require {len(payload):,} bytes. The limit is {MAX_EDA_METRICS_BYTES:,} bytes.")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(payload)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--input", type=Path, default=F.default_input())
@@ -418,7 +508,7 @@ def main():
     clean = df.loc[F.clean_rows(df)].copy()
     train = clean[clean.split.eq("train")]
     audited = F.label_audit(df)
-    corr_train = df.loc[df.split.eq("train") & F.clean_rows(df) & audited.agent2_target_safe_3h]
+    corr_train = df.loc[df.split.eq("train") & F.clean_rows(df) & audited.audit_target_safe_3h]
     metrics = {"generated_at": datetime.now(timezone.utc).isoformat(), "git_commit": F.git_revision(),
                "source_sha256": {"eda": F.digest(Path(__file__)),
                                   "features": F.digest(ROOT / "src/02_spatiotemporal_features.py")},
@@ -434,8 +524,7 @@ def main():
         f"fig_eda_{slug}.png": F.digest(args.figures / f"fig_eda_{slug}.png")
         for slug in ("diurnal_seasonal", "correlation_matrix", "class_imbalance",
                      "wind_rose_pollution", "spatial_crosscorr")}
-    args.metrics.parent.mkdir(parents=True, exist_ok=True)
-    args.metrics.write_text(json.dumps(metrics, indent=2, ensure_ascii=False, allow_nan=False) + "\n", encoding="utf-8")
+    write_eda_metrics(args.metrics, metrics)
     print("Wrote five 300 dpi figures and reproducible EDA statistics")
 
 

@@ -1,4 +1,4 @@
-# Tested standalone Agent 2 environment, Python 3.13.9.
+# Tested standalone stage 2 environment, Python 3.13.9.
 # Keeps the upstream full-project requirements.txt unchanged.
 numpy==2.3.5
 pandas==2.3.3

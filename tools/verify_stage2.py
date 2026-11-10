@@ -1,4 +1,4 @@
-"""Verify actual Agent 2 data, figures and tests in a clone or an extracted ZIP."""
+"""Verify the stage 2 dataset, figures and tests in a clone or extracted ZIP."""
 from datetime import datetime, timezone
 import hashlib
 import importlib.metadata
@@ -32,13 +32,16 @@ def main():
     # A developer integration-test skip is never sufficient release evidence.
     import pandas as pd
     path = ROOT / "data/feat_spatiotemporal.parquet"
-    if not path.is_file() or path.stat().st_size < 1024:
-        raise RuntimeError("Full feature parquet required; LFS pointers are not release data. Run both 02 scripts.")
+    if not path.is_dir():
+        raise RuntimeError("Expected the complete staged Parquet dataset. Run both 02 scripts.")
     audit = json.loads((ROOT / "models/metrics_stage2_features.json").read_text(encoding="utf-8"))
     eda_audit = json.loads((ROOT / "models/metrics_stage2_eda.json").read_text(encoding="utf-8"))
+    for key, value in features.feature_artifact(path).items():
+        assert audit[key] == value, key
+    assert (ROOT / "models/metrics_stage2_eda.json").stat().st_size <= 100_000
     original = pd.read_parquet(ROOT / "data/haze_panel_clean.parquet")
     data = pd.read_parquet(path)
-    pd.testing.assert_frame_equal(data[original.columns], original)
+    pd.testing.assert_frame_equal(data[original.columns], original, check_exact=True)
     assert features.digest(path) == audit["output_sha256"]
     assert features.digest(ROOT / "data/haze_panel_clean.parquet") == audit["input_sha256"]
     assert not data.duplicated(["station_id", "timestamp"]).any()
@@ -69,7 +72,7 @@ def main():
                             for s, g in original.groupby("split", observed=True)},
     }
     for column in audit["model_feature_columns"]:
-        assert column in data and not column.startswith(("target_", "agent2_", "b_proto_"))
+        assert column in data and not column.startswith(("target_", "audit_", "b_proto_"))
     figure_info = {}
     for slug in ("diurnal_seasonal", "correlation_matrix", "class_imbalance", "wind_rose_pollution", "spatial_crosscorr"):
         figure = ROOT / f"figures/fig_eda_{slug}.png"
@@ -79,13 +82,13 @@ def main():
         [sys.executable, "src/01_verify_data.py", "--check"],
         [sys.executable, "-m", "pytest", "tests/", "-q", "-rs"],
         [sys.executable, "tools/check_prose.py", "reports/"],
-        [sys.executable, "-m", "compileall", "-q", "src/02_eda_analysis.py", "src/02_spatiotemporal_features.py", "tests/", "tools/verify_agent2.py", "tools/package_agent2.py"],
+        [sys.executable, "-m", "compileall", "-q", "src/02_eda_analysis.py", "src/02_spatiotemporal_features.py", "src/stage2_storage.py", "tests/", "tools/verify_stage2.py", "tools/package_stage2.py"],
     ]
     git_available = (ROOT / ".git").exists()
     if git_available:
         commands.append(["git", "diff", "--check", "HEAD", "--", "src/02_eda_analysis.py",
                          "src/02_spatiotemporal_features.py", "tests/",
-                         "tools/", "README.md", "requirements-agent2.txt", "reports/", "docs/", ".gitignore", "CONTRIBUTING.md"])
+                         "tools/", "requirements-stage2.txt", "reports/", "docs/"])
     results = []
     def portable_log(value):
         for prefix, replacement in ((sys.prefix, "<python-env>"), (str(ROOT.parent), "<workspace>"),
@@ -99,7 +102,8 @@ def main():
         results.append({"command": label, "exit_code": result.returncode,
                         "stdout": portable_log(result.stdout), "stderr": portable_log(result.stderr)})
         print(f"{'PASS' if result.returncode == 0 else 'FAIL'} {' '.join(label)}")
-    sources = ["src/02_eda_analysis.py", "src/02_spatiotemporal_features.py", "tools/verify_agent2.py", "tools/package_agent2.py"]
+    sources = ["src/02_eda_analysis.py", "src/02_spatiotemporal_features.py", "src/stage2_storage.py",
+               "tools/verify_stage2.py", "tools/package_stage2.py"]
     sources += [p.relative_to(ROOT).as_posix() for p in sorted((ROOT / "tests").glob("test_*.py"))]
     output = {
         "generated_at": datetime.now(timezone.utc).isoformat(), "git_commit": features.git_revision(),
@@ -110,7 +114,7 @@ def main():
         "full_data_preflight_passed": True, "input_profile": input_profile, "figures": figure_info,
         "git_diff_applicable": git_available,
         "checks": results, "all_exit_codes_zero": all(x["exit_code"] == 0 for x in results),
-        "limitations": ["Agent 2 is tested with requirements-agent2.lock.txt; the upstream full-project pins are a separate environment.",
+        "limitations": ["Stage 2 is tested with requirements-stage2.lock.txt in a separate environment.",
                          "No downstream model performance, operational availability or ground-observation validation is claimed."]}
     (ROOT / "models/metrics_stage2_verification.json").write_text(
         json.dumps(output, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
