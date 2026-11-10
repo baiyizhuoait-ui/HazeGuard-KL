@@ -351,8 +351,15 @@ def search_rf(
             f"cv={row['cv_mean_macro_f1']:.4f}, val={row['val_macro_f1']:.4f}"
         )
 
+    # Unbounded trees can exceed the repository's 20 MB model-file limit even
+    # after maximum lossless compression.  Select the best validation result
+    # among bounded-depth candidates so M2 and M3 can keep identical RF
+    # hyperparameters while remaining valid repository artifacts.
+    deployment_eligible = [
+        row for row in trace if row["params"].get("max_depth") is not None
+    ]
     best = max(
-        trace,
+        deployment_eligible,
         key=lambda row: (
             row["val_macro_f1"],
             row["cv_mean_macro_f1"],
@@ -657,7 +664,9 @@ def main() -> None:
         "random_seeds": list(SEEDS),
         "selection_rule": (
             "TimeSeriesSplit(5) on unique train timestamps; validation Macro-F1 "
-            "selects the final configuration; test is evaluated after selection"
+            "selects the final configuration; RF selection is restricted to "
+            "bounded-depth candidates to satisfy the repository's <20 MB model "
+            "artifact limit; test is evaluated after selection"
         ),
         "rf_parameter_space": RF_SPACE,
         "boosting_parameter_space": BOOST_SPACE,
