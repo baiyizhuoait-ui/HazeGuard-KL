@@ -19,7 +19,7 @@
 |---|---|---|---|
 | **1号**（组长） | 数据工程、气候基线解耦与基线模型 | `src/config.py`、`src/01_data_pipeline.py`、`src/01_baseline_dt.py`、`src/01_verify_data.py`、`src/utils_metrics.py`、`tools/discover_nodes.py` | `data/haze_panel_clean.parquet`、`data/manifest.json`、`data/data_dictionary.json`、`models/baseline_dt.joblib`、`models/metrics_stage1.json`、`models/gate0_report.json`、`models/cleaning_report.json`、`figures/fig_baseline_dt_*.png` |
 | **2号** | EDA 与时空季风传导特征 | `src/02_eda_analysis.py`、`src/02_spatiotemporal_features.py` | `data/feat_spatiotemporal.parquet`、`figures/fig_eda_diurnal_seasonal.png`、`figures/fig_eda_correlation_matrix.png`、`figures/fig_eda_class_imbalance.png`、`figures/fig_eda_wind_rose_pollution.png`、`figures/fig_eda_spatial_crosscorr.png`、`models/metrics_stage2_eda.json`、`models/metrics_stage2_features.json`、`models/metrics_stage2_verification.json`、`docs/handover/02_eda_and_spatiotemporal.md`、`reports/sec2_3_and_2_4_1.md` |
-| **3号** | 多尺度趋势粒化与特征选择 | `src/03_granulation_features.py`、`src/03_feature_selection.py` | `data/features_final.parquet`、`models/selected_features.json`、`figures/fig_feature_ablation.png`、`figures/fig_granulation_bands.png` |
+| **3号** | 多尺度趋势粒化与特征选择 | `src/03_granulation_features.py`、`src/03_feature_selection.py` | `data/features_final.parquet`、`models/selected_features.json`、`models/metrics_stage3.json`、`figures/fig_feature_ablation.png`、`figures/fig_granulation_bands.png`、`docs/handover/03_granulation_and_selection.md`、`reports/sec2_4_2_and_2_5.md` |
 | **4号** | 名义 RF、类权重与提升法 | `src/04_rf_and_boosting.py`、`src/04_complexity_experiments.py` | `models/rf_nominal.joblib`、`models/rf_balanced.joblib`、`models/boosting.joblib`、`models/metrics_stage4.json`、`figures/fig_rf_complexity_curve.png`、`figures/fig_window_sensitivity.png`、`figures/fig_boosting_vs_rf.png` |
 | **5号** | 回归分级与有序随机森林（两种保序范式） | `src/05_reg_to_cls.py`、`src/05_ordinal_rf.py` | `models/rf_regressor.joblib`、`models/ordinal_rf.joblib`、`models/ordinal_probs_val_test.npz`、`models/metrics_stage5.json`、`figures/fig_ordinal_error_distribution.png`、`figures/fig_interval_band.png` |
 | **6号** | 代价敏感阈值、可解释性与泛化评估 | `src/06_cost_thresholds.py`、`src/06_interpretability.py`、`src/06_generalization_study.py` | `models/cost_thresholds.json`、`models/all_models_benchmark.csv`、`models/loso_results.csv`、`models/seasonal_metrics.csv`、`figures/fig_perm_importance.png`、`figures/fig_pdp_wind_humidity.png`、`figures/fig_roc_high_risk.png`、`figures/fig_confusion_matrices_comparison.png` |
@@ -98,7 +98,7 @@ git push
 01（已完成）→ 02 → 03 → 04 / 05（这两条可以真并行）→ 06 → 07
 ```
 
-03 想提前开工是可以的：先写 `src/03_fuzzy_granulation.py`，用 01 的清洗表单独跑 FIG 特征，
+03 想提前开工是可以的：先写 `src/03_granulation_features.py`，用 01 的清洗表单独跑窗口粒化特征，
 等 02 合并后再做合并和消融。但不要写着"并行"结果去读一个还不存在的文件。
 
 ### 保护 main
@@ -140,7 +140,7 @@ git push
 ### 文件
 
 ```
-src/NN_<english_slug>.py          例：03_fuzzy_granulation.py
+src/NN_<english_slug>.py          例：03_granulation_features.py
 models/metrics_stage<N>.json      例：metrics_stage4.json
 models/<model_key>.joblib         model_key: rf_nominal / rf_balanced / rf_regressor / ordinal_rf / boosting
 models/<name>.npz                 概率矩阵，键名统一 val_probs / test_probs / val_y / test_y
@@ -239,14 +239,14 @@ n_high_risk
 好的例子：
 
 ```
-feat(03): FIG 粒化与 Top-25 特征选择
+feat(03): 多尺度趋势粒化与 Top-25 特征选择
 
-- 窗口粒化特征只在 train 上拟合归一化参数，未触碰 val/test
-- 窗口斜率与区间宽度纳入候选特征
-- 消融：Raw → +Lag → +Spatial → +FIG，val Macro-F1 0.662 → 0.701 → 0.734 → 0.762
+- 窗口粒化只在 train 上拟合归一化参数，未触碰 val/test
+- 窗口斜率、区间宽度与中枢值纳入候选特征
+- 消融：Raw → +Lag → +Spatial → +Granulation（数值填 models/metrics_stage3.json 的实测值，别照抄本行）
 
 影响：features_final.parquet 新增 12 列，未改名未删列
-已知缺陷：c=8 时原型 6 只占 1.8% 样本，见 handover/03_fig.md 第 4 节
+已知缺陷：窗口特征在静风段高度共线，见 docs/handover/03_granulation_and_selection.md 第 4 节
 ```
 
 ---

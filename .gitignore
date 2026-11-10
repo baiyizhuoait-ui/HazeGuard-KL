@@ -7,6 +7,9 @@ __pycache__/
 # 原始 API 缓存（可由 01_data_pipeline.py 重新生成）
 data/raw/
 
+# 03 号粒化脚本的中间表（派生数据，不交付）
+data/feat_granulation.parquet
+
 # 中间产物
 *.tmp
 *.log

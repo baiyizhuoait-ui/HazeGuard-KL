@@ -130,11 +130,13 @@ if "role" in frame.columns:
         raise ValueError("no receptor rows found; check data/…parquet")
 
 # 与契约登记值对账（数字来自 src/config.py 的 PANEL_CONTRACT）
+# 注意：核对的是"可建模行数"，不是面板原始行数。
+# 2 号按 audit_model_eligible 筛掉了 349 / 81 / 81 行，面板 78,102 与可建模 77,753 都对。
 n_train = int((frame["split"] == "train").sum())
-expected = C.PANEL_CONTRACT["receptor_train_rows"]
-if abs(n_train - expected) > 200:          # 容忍 03 离线筛选的正常损耗
+expected = C.PANEL_CONTRACT["receptor_train_eligible_rows"]   # 77,753
+if n_train != expected:                     # 要求完全相等，不再用 ±200 容差
     raise ValueError(
-        f"receptor train rows = {n_train}, contract expects ~{expected}; "
+        f"receptor train rows = {n_train}, contract expects {expected}; "
         "if this is intentional, ask 1号 to register the change first")
 ```
 
@@ -216,3 +218,12 @@ if abs(n_train - expected) > 200:          # 容忍 03 离线筛选的正常损�
 | 报告数字差 89 行 | `models/cleaning_report.json` vs `reports/sec1_data_and_baseline.md`（已修） |
 | agent 命名分布 | `feat/02-eda` 文件树 + 特征表列名 |
 | 课程三条提交要求 | 课程 PDF §D（README.txt / 20MB / Rubric 随报告提交） |
+
+---
+
+## 修订记录
+
+| 版本 | 日期 | 变更 | 依据 |
+|---|---|---|---|
+| v1.0 | 2026-11-10 | 初版：2 号 5 项、4 号 5 项 | 外部评审 + 组内复查 |
+| v1.1 | 2026-11-10 | Q4-2 的对账基准从面板行数（78,102，±200 容差）改为可建模行数（77,753，要求完全相等）。原因：2 号按 `audit_model_eligible` 筛掉 349 行，原容差会误报 | 3 号反馈 + `models/metrics_stage2_features.json → eligibility_by_receptor_split` 实测 |

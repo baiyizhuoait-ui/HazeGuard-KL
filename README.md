@@ -163,7 +163,7 @@ M5 把顺序交给回归的连续性，M6 把顺序写进三个累积二分类�
 |---|---|---|---|
 | 01 数据工程与基线 | 1号（组长） | ✅ 完成 | `haze_panel_clean.parquet`、M1 基线 |
 | 02 EDA 与时空传导特征 | 2号 | ⬜ 待开工 | `feat_spatiotemporal.parquet`、5 张 EDA 图 |
-| 03 趋势粒化与特征选择 | 3号 | ⬜ 待 02 | `features_final.parquet`、`selected_features.json` |
+| 03 趋势粒化与特征选择 | 3号 | 🟡 已交付，待 02 合并后并线 | `features_final.parquet`、`selected_features.json` |
 | 04 名义 RF / 类权重 / 提升 | 4号 | ⬜ 待 03 | M2 / M3 / M4 |
 | 05 两种保序范式 | 5号 | ⬜ 待 03 | M5 / M6、区间带、跳级误差分布 |
 | 06 代价敏感与可解释性 | 6号 | ⬜ 待 05 | M7、置换重要性、PDP、ROC、泛化实验 |
