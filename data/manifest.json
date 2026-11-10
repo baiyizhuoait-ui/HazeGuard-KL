@@ -1,7 +1,7 @@
 {
   "dataset": "haze_panel_clean",
-  "generated_at": "2026-11-07T17:58:11",
-  "git_commit": "b2b91c0",
+  "generated_at": "2026-11-10T00:21:50",
+  "git_commit": "2cd57c5",
   "path": "data/haze_panel_clean.parquet",
   "sha256": "97b5db123352861b6cd41224daf1ce278c90d6d528031b9bdc2744317a5ead93",
   "bytes": 25057369,
@@ -100,8 +100,8 @@
     }
   },
   "verification": {
-    "passed": 11,
-    "total": 11,
+    "passed": 16,
+    "total": 16,
     "all_passed": true,
     "results": [
       {
@@ -153,6 +153,31 @@
         "check": "质量标记列齐全",
         "pass": true,
         "detail": "{'qc_pm25_gt_pm10': 303, 'qc_censored': 4, 'qc_calm_wind': 48621, 'qc_interpolated': 356}"
+      },
+      {
+        "check": "契约：面板行数/列数/节点数",
+        "pass": true,
+        "detail": "966,677×35，26 节点"
+      },
+      {
+        "check": "契约：受体三段行数",
+        "pass": true,
+        "detail": "train/val/test = 78,102/16,737/16,728"
+      },
+      {
+        "check": "dtype：timestamp 为 datetime64",
+        "pass": true,
+        "detail": "实际 datetime64[us]"
+      },
+      {
+        "check": "体积：data/*.parquet ≤ 50MB 且非 LFS 指针",
+        "pass": true,
+        "detail": "全部合规"
+      },
+      {
+        "check": "禁词：交付物无 agent/智能体 字样",
+        "pass": true,
+        "detail": "干净"
       },
       {
         "check": "关键列无 NaN",

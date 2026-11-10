@@ -172,6 +172,74 @@ def main() -> int:
     counts = {c: int(df[c].sum()) for c in qc_cols} if qc_ok else {}
     results.append(check("质量标记列齐全", qc_ok, str(counts)))
 
+    # ---- 9b. 交付契约：行数 / dtype / 体积 / LFS / 禁词 ------------------
+    pc = C.PANEL_CONTRACT
+    row_ok = (len(df) == pc["panel_rows"] and len(df.columns) == pc["panel_cols"]
+              and df["station_id"].nunique() == pc["n_nodes"])
+    results.append(check("契约：面板行数/列数/节点数", row_ok,
+                         f"{len(df):,}×{len(df.columns)}，{df['station_id'].nunique()} 节点"
+                         + ("" if row_ok else f"，契约登记 {pc['panel_rows']:,}×{pc['panel_cols']}")))
+
+    rec = df[df["role"] == "receptor"]
+    rec_counts = {k: int((rec["split"] == k).sum()) for k in ("train", "val", "test")}
+    rec_ok = all(rec_counts[k] == pc[f"receptor_{k}_rows"] for k in rec_counts)
+    results.append(check("契约：受体三段行数", rec_ok,
+                         f"train/val/test = {rec_counts['train']:,}/{rec_counts['val']:,}/{rec_counts['test']:,}"
+                         + ("" if rec_ok else f"，契约 {pc['receptor_train_rows']:,}/{pc['receptor_val_rows']:,}/{pc['receptor_test_rows']:,}")))
+
+    dt_ok = str(df["timestamp"].dtype).startswith(pc["timestamp_dtype_prefix"])
+    results.append(check("dtype：timestamp 为 datetime64", dt_ok,
+                         f"实际 {df['timestamp'].dtype}"))
+
+    size_bad, lfs_bad = [], []
+    ddir = C.DATA_DIR
+    for f in sorted(os.listdir(ddir)):
+        fp = os.path.join(ddir, f)
+        if not os.path.isfile(fp) or not f.endswith(".parquet"):
+            continue
+        mb = os.path.getsize(fp) / 1048576
+        if mb > pc["max_parquet_mb"]:
+            size_bad.append(f"{f} {mb:.1f}MB")
+        with open(fp, "rb") as fh:
+            head = fh.read(24)
+        if head.startswith(b"version https://git-lfs"):
+            lfs_bad.append(f)
+    results.append(check("体积：data/*.parquet ≤ 50MB 且非 LFS 指针",
+                         not size_bad and not lfs_bad,
+                         ("超限 " + ", ".join(size_bad) if size_bad else "")
+                         + ("LFS指针 " + ", ".join(lfs_bad) if lfs_bad else "")
+                         or "全部合规"))
+
+    banned = [t.lower() for t in pc["banned_terms"]]
+    # 执行工具自身（守卫定义里必然出现禁词原文）与政策文档豁免
+    whitelist = {"CONTRIBUTING.md", "syllabus_coverage.md",
+                 "01_verify_data.py", "config.py"}
+    scan_roots = ["src", "reports", "tools", "docs/handover"]
+    word_hits = []
+    for root in scan_roots:
+        if not os.path.isdir(root):
+            continue
+        for dirpath, _, files in os.walk(root):
+            for f in files:
+                fp = os.path.join(dirpath, f)
+                if f in whitelist or any(w in f for w in ("quality_notice",)):
+                    continue
+                if not f.endswith((".py", ".md", ".json", ".txt")):
+                    continue
+                try:
+                    t = open(fp, encoding="utf-8").read()
+                except UnicodeDecodeError:
+                    continue
+                for term in banned:
+                    if term in t.lower():
+                        word_hits.append(f"{fp} 含 '{term}'")
+    for f in sorted(os.listdir(ddir)):
+        if f.endswith(".parquet"):
+            cols = [c.lower() for c in df.columns]
+            word_hits += [f"列名含 '{t}': {c}" for c in cols for t in banned if t in c]
+    results.append(check("禁词：交付物无 agent/智能体 字样", not word_hits,
+                         "、".join(word_hits[:4]) if word_hits else "干净"))
+
     # ---- 10. 无基础设施性 NaN ----
     key = ["pm2_5", "target_pm25_3h", "target_level_3h", "b_proto_pm25"]
     nan_key = {k: int(df[k].isna().sum()) for k in key}

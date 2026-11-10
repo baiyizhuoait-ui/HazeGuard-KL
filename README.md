@@ -2,8 +2,6 @@
 
 **大吉隆坡跨境烟霾 3 小时短临风险预警系统**
 
-当前以项目组确认的 **26格点方案** 为准；统一约定见 [26格点技术契约](docs/technical_spec_26grid.md)，本轮审计与安全清理决策见 [仓库审查记录](docs/repository_audit_agent2_26grid.md)。机器可读节点注册表仍为 `src/config.py`，未更换数据方案。
-
 AIT201 Applied Machine Learning · 2026/09 · 小组项目
 
 ---
@@ -33,7 +31,7 @@ AIT201 Applied Machine Learning · 2026/09 · 小组项目
 
 ## 我们要做的东西
 
-**输入**：某格点过去若干小时的逐小时模式估计（污染物 + 气象）。
+**输入**：某站点过去若干小时的逐小时观测（污染物 + 气象）。
 **输出**：
 
 1. `target_pm25_3h` — 三小时后的 PM2.5 浓度（回归）
@@ -61,7 +59,7 @@ AIT201 Applied Machine Learning · 2026/09 · 小组项目
 | 数据 | 接口 | 分辨率 | 变量 |
 |---|---|---|---|
 | 空气质量 | Open-Meteo `air-quality-api`（CAMS 全球大气成分产品） | 0.4°（约 45 km） | PM2.5、PM10、NO₂、SO₂、O₃、CO |
-| 气象 | Open-Meteo `archive-api`（历史气象模式/再分析产品） | 依所选产品；本次未保存逐响应模型元数据 | 气温、相对湿度、风速、风向、降水 |
+| 气象 | Open-Meteo `archive-api`（历史气象模式/再分析） | 未逐响应核实产品身份 | 气温、相对湿度、风速、风向、降水 |
 
 时间范围 **2022-08-01 → 2026-10-31**（51 个月，逐小时），时区 `Asia/Kuala_Lumpur`。
 两个接口都免费、无需密钥，任何人 clone 下来都能重跑。
@@ -90,7 +88,8 @@ AIT201 Applied Machine Learning · 2026/09 · 小组项目
 | **走廊 Corridor** | 10 | 既是目标也是上风向源 | 半岛各城（Seremban、Malacca、Johor Bahru、Kuantan、Temerloh、Kota Bharu、Kuala Terengganu、Penang、Alor Setar、Ipoh） |
 | **源区 Source** | 13 | 仅作上风向特征输入 | 苏门答腊 8（Banda_Aceh…Bengkulu）+ 加里曼丹 5（Pontianak…Bintulu） |
 
-气象数据在这些采样点位存在差异，因此可以计算风矢量空间统计。具体气象产品未逐响应核实，特征的预测价值仍需训练/验证内消融，不能仅由数值不同推断。
+气象数据在这些采样点位上数值互不相同，所以风矢量类特征有区分度；
+但"更有信息量"要等 2 号做完消融才能下结论，不能由"数值不同"直接推出。
 
 ### 数据规模
 
@@ -98,11 +97,15 @@ AIT201 Applied Machine Learning · 2026/09 · 小组项目
 - 切分：train 676,884 / val 145,054 / test 144,739（逐节点按时间 70/15/15，**绝不 shuffle**）
 - 全部字段口径见 `data/data_dictionary.json`，完整性清单见 `data/manifest.json`
 
-### 测试集中的高浓度模式片段与类别变化
+### 测试集里有一段持续的高浓度时期
 
 2026 年 8–10 月，`KL_City` 单月 Level 3 占比达 **46.9% / 51.0%**，PM2.5 的 95 分位是 **151.8 µg/m³**。
 
-这些是当前模式序列中的高浓度片段，尚未通过地面监测或火点资料独立证实事件来源。它意味着**测试集的类别分布发生变化**（Level 3：18.85% vs 11.13%），不能直接与其他同分布任务的成绩比较，也不能仅凭该片段认定跨境烟霾归因。
+要说明白：这是**模式序列里的高浓度片段**，我们还没有用地面监测或火点资料独立证实它的来源，
+所以在报告里不说"这就是某次烟霾事件"。能确定的是两点：
+它让高危召回率是在难得的高浓度样本上测的，而不是背景噪声；
+它也意味着**测试集比训练集更难**（Level 3：18.85% vs 11.13%），
+所以别拿我们的测试数字去和别人的同分布结果直接比。
 
 ---
 
@@ -159,8 +162,8 @@ M5 把顺序交给回归的连续性，M6 把顺序写进三个累积二分类�
 | 模块 | 负责人 | 状态 | 主要产物 |
 |---|---|---|---|
 | 01 数据工程与基线 | 1号（组长） | ✅ 完成 | `haze_panel_clean.parquet`、M1 基线 |
-| 02 EDA 与时空传导特征 | 2号 | ✅ 已实现并验证 | `feat_spatiotemporal.parquet`、5 张 EDA 图、测试与交接文档 |
-| 03 趋势粒化与特征选择 | 3号 | ⬜ 02 输入已就绪，03 尚未提交 | `features_final.parquet`、`selected_features.json` |
+| 02 EDA 与时空传导特征 | 2号 | ⬜ 待开工 | `feat_spatiotemporal.parquet`、5 张 EDA 图 |
+| 03 趋势粒化与特征选择 | 3号 | ⬜ 待 02 | `features_final.parquet`、`selected_features.json` |
 | 04 名义 RF / 类权重 / 提升 | 4号 | ⬜ 待 03 | M2 / M3 / M4 |
 | 05 两种保序范式 | 5号 | ⬜ 待 03 | M5 / M6、区间带、跳级误差分布 |
 | 06 代价敏感与可解释性 | 6号 | ⬜ 待 05 | M7、置换重要性、PDP、ROC、泛化实验 |
@@ -185,29 +188,6 @@ python src/01_data_pipeline.py     # 采集+清洗+切分+基线（首次约 3 �
 python src/01_baseline_dt.py       # M1 基线（约 10 秒）
 ```
 
-### Agent 2 独立运行与成员 3 入口
-
-Agent 2 以现有 `data/haze_panel_clean.parquet` 为只读输入，输出 966,677 行 × 91 列，完整保留原 35 列。新增 56 列中，50 列是预测输入，6 列是离线审计标记。正式采用26个CAMS格点序列、3个受体；采样坐标和实际序列均需校验，不能将这些格点称为地面监测站。
-
-```bash
-python -m venv .venv
-# Windows: .venv\Scripts\activate
-# Linux/macOS: source .venv/bin/activate
-pip install -r requirements-agent2.lock.txt
-git lfs pull  # 克隆仓库时获取大文件；完整交付 ZIP 已含实体数据
-python src/02_spatiotemporal_features.py
-python src/02_eda_analysis.py
-python tools/verify_agent2.py
-```
-
-验证器会运行整个 `tests/`。五图覆盖受体日内与季风统计、目标相关性、26格点及时间区间等级分布、全年/SW季风风场差异，以及按坐标和角色预先选对的局部/区域互相关。训练集空间权重诊断保存在 feature JSON 的 `spatial_training_diagnostics`：保留15km基线并披露无邻居和单源主导，不用测试成绩选择距离尺度。
-
-无需重新抓取 API，也无需 Git 目录即可从完整 ZIP 重跑。普通 GitHub 源码 ZIP 的 parquet 可能只是 LFS 指针，不能将其视为完整数据；缺少 LFS 工具时，从上述真实清洗数据运行两个 `02_*.py` 即可重建。特征与五图均有 SHA256 和实际运行统计，见 `models/metrics_stage2_*.json`。
-
-成员 3 读取 `data/feat_spatiotemporal.parquet`，只按 `models/metrics_stage2_features.json` 的 `model_feature_columns` 取预测列。`agent2_*` 包含未来标签核对结果，只能用于离线样本审计，不能输入模型或控制线上发出预测。主训练域仍为 `role == 'receptor'`，训练折内处理缺失值并重新拟合所有学习型变换。完整示例和数据限制见 [02 交接文档](docs/handover/02_eda_and_spatiotemporal.md)。
-
-四个风险等级是项目实验分组，不是官方小时级 AQI 健康标准。上风向特征描述方向加权统计关系，不能单独证明跨境污染传输。
-
 `01_data_pipeline.py` 会把 API 响应缓存到 `data/raw/`，第二次跑秒出。
 加 `--force-refresh` 可强制重新拉取。
 
@@ -221,12 +201,9 @@ python tools/verify_agent2.py
 │   ├── 01_data_pipeline.py       采集 → 清洗 → 目标 → 切分 → 基线 → QC → Gate 0
 │   ├── 01_baseline_dt.py         M1 基线模型
 │   ├── 01_verify_data.py         完整性校验 + 生成 manifest（11 项）
-│   ├── 02_eda_analysis.py        五张26格点EDA图及训练相似度审计
-│   ├── 02_spatiotemporal_features.py  精确小时历史、风场及动态上风向统计
 │   └── utils_metrics.py          六指标唯一实现
 ├── data/
 │   ├── haze_panel_clean.parquet  966,677 × 35
-│   ├── feat_spatiotemporal.parquet 966,677 × 91（Git LFS）
 │   ├── manifest.json             SHA256 + 校验结果
 │   └── data_dictionary.json      字段口径
 ├── models/
@@ -234,19 +211,12 @@ python tools/verify_agent2.py
 │   ├── metrics_stage1.json     六指标 + 超参 + 分节点结果
 │   ├── gate0_report.json         数据可行性四项闸门
 │   └── cleaning_report.json      清洗计数（可追溯）
-│   # metrics_stage2_{eda,features,verification}.json 为02统计和验收记录
 ├── figures/                      混淆矩阵、特征重要性
 ├── reports/                      报告章节（Markdown，英文）
 ├── docs/
 │   ├── node_discovery.json       格点去重证据
-│   ├── technical_spec_26grid.md   当前统一技术契约
-│   ├── repository_audit_agent2_26grid.md  分类、清理计划和分支记录
 │   └── handover/                 交接文档
 ├── tools/discover_nodes.py       格点发现脚本
-├── tools/verify_agent2.py        完整数据、全部测试和26格点契约验收
-├── tools/package_agent2.py       固定提交导出及ZIP解压重跑
-├── tests/test_agent2*.py          时间/风场/空间/防泄漏/交付测试
-├── requirements-agent2.lock.txt  02已验证完整依赖锁
 ├── CONTRIBUTING.md               协作规范（分工、分支、合并规矩）
 └── README.md
 ```
@@ -322,7 +292,7 @@ M0 没有任何学习：直接把 t 时刻的等级当成 t+3h 的等级。
 
 ## 致谢与数据引用
 
-- 空气质量与气象数据：Open-Meteo（CC BY 4.0），底层为 Copernicus CAMS 与历史气象产品；后者具体模型未逐响应核实
+- 空气质量与气象数据：Open-Meteo（CC BY 4.0），底层为 Copernicus CAMS 与 ECMWF ERA5
 - 课程：AIT201 Applied Machine Learning，厦门大学马来西亚分校
 
 ---

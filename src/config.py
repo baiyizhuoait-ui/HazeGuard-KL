@@ -145,3 +145,19 @@ FIGURE_DIR = "figures"
 REPORT_DIR = "reports"
 
 RANDOM_STATE = 42
+
+# ---------------------------------------------------------------------------
+# 面板契约登记（任何数值变化必须先在 CONTRIBUTING 登记，再改代码）
+# verify_data.py 会逐项断言；不一致 = 交付被拒绝
+# ---------------------------------------------------------------------------
+PANEL_CONTRACT = {
+    "panel_rows": 966_677,
+    "panel_cols": 35,
+    "n_nodes": 26,
+    "receptor_train_rows": 78_102,
+    "receptor_val_rows": 16_737,
+    "receptor_test_rows": 16_728,
+    "timestamp_dtype_prefix": "datetime64",
+    "max_parquet_mb": 50.0,
+    "banned_terms": ["agent", "智能体"],
+}
