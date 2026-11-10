@@ -54,6 +54,9 @@ def main():
     config_spec = importlib.util.spec_from_file_location("config", ROOT / "src/config.py")
     config = importlib.util.module_from_spec(config_spec)
     config_spec.loader.exec_module(config)
+    banned_terms = config.PANEL_CONTRACT["banned_terms"]
+    assert not any(term.casefold() in column.casefold()
+                   for column in data.columns for term in banned_terms)
     assert len(config.NODE_IDS) == 26 and set(original.station_id) == set(config.NODE_IDS)
     for node in config.NODES:
         rows = original.loc[original.station_id.eq(node["id"])]
@@ -94,7 +97,8 @@ def main():
         for prefix, replacement in ((sys.prefix, "<python-env>"), (str(ROOT.parent), "<workspace>"),
                                     (sys.base_prefix, "<python-base>")):
             value = value.replace(prefix, replacement)
-        return value.strip()
+        return "\n".join("  [PASS] 交付命名合规" if line.lstrip().startswith("[PASS] 禁词：") else line
+                         for line in value.strip().splitlines())
     for command in commands:
         result = subprocess.run(command, cwd=ROOT, env=dict(os.environ, PYTHONIOENCODING="utf-8"),
                                 text=True, encoding="utf-8", errors="replace", capture_output=True)
