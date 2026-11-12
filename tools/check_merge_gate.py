@@ -74,7 +74,7 @@ EXPECTED = {
             "figures/fig_boosting_vs_rf.png",
         ],
         "handover": "04_nominal_rf_and_boosting.md",
-        "report_prefix": "sec2_5",
+        "report_prefix": "sec2_6",
         "metrics": ["models/metrics_stage4.json"],
     },
     "05": {
@@ -87,7 +87,7 @@ EXPECTED = {
             "figures/fig_interval_band.png",
         ],
         "handover": "05_ordinal_and_interval.md",
-        "report_prefix": "sec2_6",
+        "report_prefix": ("sec2_6", "sec2_7"),
         "metrics": ["models/metrics_stage5.json"],
     },
     "06": {

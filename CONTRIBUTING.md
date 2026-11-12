@@ -27,10 +27,23 @@
 | **1号**（组长） | 数据工程、气候基线解耦与基线模型 | `src/config.py`、`src/01_data_pipeline.py`、`src/01_baseline_dt.py`、`src/01_verify_data.py`、`src/utils_metrics.py`、`tools/discover_nodes.py` | `data/haze_panel_clean.parquet`、`data/manifest.json`、`data/data_dictionary.json`、`models/baseline_dt.joblib`、`models/metrics_stage1.json`、`models/gate0_report.json`、`models/cleaning_report.json`、`figures/fig_baseline_dt_*.png` |
 | **2号** | EDA 与时空季风传导特征 | `src/02_eda_analysis.py`、`src/02_spatiotemporal_features.py` | `data/feat_spatiotemporal.parquet`、`figures/fig_eda_diurnal_seasonal.png`、`figures/fig_eda_correlation_matrix.png`、`figures/fig_eda_class_imbalance.png`、`figures/fig_eda_wind_rose_pollution.png`、`figures/fig_eda_spatial_crosscorr.png`、`models/metrics_stage2_eda.json`、`models/metrics_stage2_features.json`、`models/metrics_stage2_verification.json`、`docs/handover/02_eda_and_spatiotemporal.md`、`reports/sec2_3_and_2_4_1.md` |
 | **3号** | 多尺度趋势粒化与特征选择 | `src/03_granulation_features.py`、`src/03_feature_selection.py` | `data/features_final.parquet`、`models/selected_features.json`、`models/metrics_stage3.json`、`figures/fig_feature_ablation.png`、`figures/fig_granulation_bands.png`、`docs/handover/03_granulation_and_selection.md`、`reports/sec2_4_2_and_2_5.md` |
-| **4号** | 名义 RF、类权重与提升法 | `src/04_rf_and_boosting.py`、`src/04_complexity_experiments.py` | `models/rf_nominal.joblib`、`models/rf_balanced.joblib`、`models/boosting.joblib`、`models/metrics_stage4.json`、`figures/fig_rf_complexity_curve.png`、`figures/fig_window_sensitivity.png`、`figures/fig_boosting_vs_rf.png` |
-| **5号** | 回归分级与有序随机森林（两种保序范式） | `src/05_reg_to_cls.py`、`src/05_ordinal_rf.py` | `models/rf_regressor.joblib`、`models/ordinal_rf.joblib`、`models/ordinal_probs_val_test.npz`、`models/metrics_stage5.json`、`figures/fig_ordinal_error_distribution.png`、`figures/fig_interval_band.png` |
+| **4号** | 名义 RF、类权重与提升法 | `src/04_rf_and_boosting.py`、`src/04_complexity_experiments.py` | `models/rf_nominal.joblib`、`models/rf_balanced.joblib`、`models/boosting.joblib`、`models/metrics_stage4.json`、`figures/fig_rf_complexity_curve.png`、`figures/fig_window_sensitivity.png`、`figures/fig_boosting_vs_rf.png`、`docs/handover/04_nominal_rf_and_boosting.md`、`reports/sec2_6_models.md` |
+| **5号** | 回归分级与有序随机森林（两种保序范式） | `src/05_reg_to_cls.py`、`src/05_ordinal_rf.py` | `models/rf_regressor.joblib`、`models/ordinal_rf.joblib`、`models/ordinal_probs_val_test.npz`、`models/metrics_stage5.json`、`figures/fig_ordinal_error_distribution.png`、`figures/fig_interval_band.png`、`docs/handover/05_ordinal_and_interval.md`、`reports/sec2_6_and_2_7.md` |
 | **6号** | 代价敏感阈值、可解释性与泛化评估 | `src/06_cost_thresholds.py`、`src/06_interpretability.py`、`src/06_generalization_study.py` | `models/cost_thresholds.json`、`models/all_models_benchmark.csv`、`models/loso_results.csv`、`models/seasonal_metrics.csv`、`figures/fig_perm_importance.png`、`figures/fig_pdp_wind_humidity.png`、`figures/fig_roc_high_risk.png`、`figures/fig_confusion_matrices_comparison.png` |
 | **7号** | 交互系统与示范报告总成 | `app.py`、`src/07_compile_report.py` | `reports/HazeGuard_KL_Demonstration_Report.md`、`requirements.txt`（定稿）、`README.md`（定稿） |
+
+### 报告章节归属（避免两人写同一节）
+
+| 章节 | 内容 | 谁 | 文件 |
+|---|---|---|---|
+| §1 | Introduction | 1号 | `reports/sec1_data_and_baseline.md` |
+| §2.1 / §2.2 | 数据与质控、基线相减与时序切分 | 1号 | 同上 |
+| §2.3 / §2.4.1 | EDA、滞后滚动与上风向平流特征 | 2号 | `reports/sec2_3_and_2_4_1.md` |
+| §2.4.2 / §2.5 | 窗口粒化、特征选择 | 3号 | `reports/sec2_4_2_and_2_5.md` |
+| §2.6 | 分类模型 M2 / M3 / M4 | 4号 | `reports/sec2_6_models.md` |
+| §2.7 / §2.8 | 有序分解与区间 | 5号 | `reports/sec2_6_and_2_7.md`（文件名沿用，内容以标题为准） |
+| §3 | 代价敏感、可解释性与泛化 | 6号 | `reports/sec3_cost_and_explain.md` |
+| §4 | 系统与示范 | 7号 | `reports/HazeGuard_KL_Demonstration_Report.md` |
 
 每个人还要交两样东西，不写就算没做完：
 
