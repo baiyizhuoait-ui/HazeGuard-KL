@@ -157,6 +157,20 @@ def audit(branch: str) -> tuple[list[tuple[str, bool, str]], str]:
     if not paths:
         return [("分支存在", False, "远程分支不存在或为空")], "FAIL"
 
+    # 0 已合入？（合过之后分支自然"落后"，那不是失败）
+    merged = subprocess.run(
+        ["git", "merge-base", "--is-ancestor", f"origin/{branch}", "origin/main"]
+    ).returncode == 0
+    if merged:
+        # 区分"已合并"与"空分支恰好指向旧 main"：看 main 上有没有这个模块的产物
+        main_paths = tree("main")
+        spec = EXPECTED[mod]
+        landed = all(p in main_paths or any(x.startswith(p + "/") for x in main_paths)
+                     for p in spec["files"])
+        if landed:
+            return [("已合入 main", True, "全部产物都在 main 上，此分支可删")], "MERGED"
+        return [("未开工", True, "分支指向旧 main，尚无自己的提交")], "UNSTARTED"
+
     # 1 落后 main
     behind = int(git("rev-list", "--count", f"origin/{branch}..origin/main").strip() or 0)
     rows.append(("落后 main", behind == 0,
@@ -255,7 +269,7 @@ def main() -> int:
         print(f"\n{'=' * 62}\n{br}   [{verdict}]\n{'=' * 62}")
         for name, ok, note in rows:
             print(f"  {'PASS' if ok else 'FAIL'}  {name:16s} {note}")
-        if verdict != "PASS":
+        if verdict == "FAIL":
             overall = "FAIL"
 
     print(f"\n总判定：{overall}")
