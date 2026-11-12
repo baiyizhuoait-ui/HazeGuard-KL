@@ -211,9 +211,9 @@ def main() -> int:
                          or "全部合规"))
 
     banned = [t.lower() for t in pc["banned_terms"]]
-    # 执行工具自身（守卫定义里必然出现禁词原文）与政策文档豁免
+    # 执行工具自身（守卫与闸门脚本的定义里必然出现禁词原文）与政策文档豁免
     whitelist = {"CONTRIBUTING.md", "syllabus_coverage.md",
-                 "01_verify_data.py", "config.py"}
+                 "01_verify_data.py", "config.py", "check_merge_gate.py"}
     scan_roots = ["src", "reports", "tools", "docs/handover"]
     word_hits = []
     for root in scan_roots:
