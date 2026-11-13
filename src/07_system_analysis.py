@@ -49,6 +49,8 @@ INDEX_WINDOW_H = 24
 INDEX_MIN_HOURS = 18
 INDEX_SEARCH_H = 48
 TREND_BAND = 10.0                     # µg/m³ change over the horizon that counts as a move
+MAJOR = float(LEVEL_THRESHOLDS[2])    # an episode is "major" when its peak reaches level 3
+DEFAULT_SEAM_HOURS = (8, 20)          # CAMS run boundaries in local time, see QN-002
 RULE_COLUMNS = {
     "M5_val_tuned": "pred_m5_tuned",
     "M5_fixed": "pred_m5_fixed",
@@ -77,6 +79,10 @@ DEFINITIONS = {
     "index_note": "The running mean stands in for an index built on a daily average. It uses "
                   "the same CAMS series and the project's own 35 µg/m³ boundary. It is not the "
                   "official Malaysian API.",
+    "run_boundary": "Onsets are split by whether the onset hour is a CAMS run boundary in "
+                    "local time. The hours are read from models/seam_report.json "
+                    "(seam_hours_local) when that file exists, otherwise 08:00 and 20:00.",
+    "major": f"An episode is major when its peak observed PM2.5 reaches {MAJOR:g} (level 3).",
     "calibration": "Ten equal-width bins of the M6 cumulative probability P(level >= k). "
                    "ECE is the sample-weighted mean absolute gap between mean predicted "
                    "probability and observed frequency.",
@@ -233,6 +239,46 @@ def quartiles(values) -> dict | None:
             "mean": round(float(values.mean()), 3)}
 
 
+def seam_hours() -> list[int]:
+    path = MODELS / "seam_report.json"
+    if path.exists():
+        hours = json.loads(path.read_text(encoding="utf-8")).get("seam_hours_local")
+        if hours:
+            return [int(h) for h in hours]
+    return list(DEFAULT_SEAM_HOURS)
+
+
+def group_stats(events: list[dict]) -> dict:
+    """Lead-time record of one subset of onsets, for every decision rule."""
+    out = {"n_onsets": len(events), "rules": {}}
+    for rule in RULE_COLUMNS:
+        leads = [e["model_lead_h"][rule] for e in events]
+        n = len(leads)
+        out["rules"][rule] = {
+            "share_alert_before_onset": round(sum(v is not None and v > 0 for v in leads) / n, 4)
+            if n else None,
+            "share_full_horizon": round(sum(v == HORIZON_H for v in leads) / n, 4) if n else None,
+            "missed": sum(v is None for v in leads),
+        }
+    return out
+
+
+def onset_breakdown(events: list[dict], boundary_hours: list[int]) -> dict:
+    hour_of = [pd.Timestamp(e["onset"]).hour for e in events]
+    at_boundary = [e for e, h in zip(events, hour_of) if h in boundary_hours]
+    elsewhere = [e for e, h in zip(events, hour_of) if h not in boundary_hours]
+    major = [e for e in events if e["peak_pm25"] >= MAJOR]
+    minor = [e for e in events if e["peak_pm25"] < MAJOR]
+    return {
+        "run_boundary_hours_local": boundary_hours,
+        "onsets_by_hour": {str(h): hour_of.count(h) for h in range(24)},
+        "at_run_boundary": group_stats(at_boundary),
+        "other_hours": group_stats(elsewhere),
+        "major": group_stats(major),
+        "minor": group_stats(minor),
+    }
+
+
 def summarise_events(events: list[dict], precision: dict) -> dict:
     compared = [e for e in events if not e["index_already_elevated"]]
     lags = [e["index_lag_h"] for e in compared if e["index_lag_h"] is not None]
@@ -281,7 +327,9 @@ def early_warning(frame: pd.DataFrame) -> dict:
                 precision[rule]["alerts"] += stats["alerts"]
                 precision[rule]["confirmed"] += stats["confirmed"]
         events.sort(key=lambda e: (e["onset"], e["station_id"]))
-        out[split] = {"summary": summarise_events(events, precision), "events": events}
+        out[split] = {"summary": summarise_events(events, precision),
+                      "breakdown": onset_breakdown(events, seam_hours()),
+                      "events": events}
     return out
 
 
@@ -382,6 +430,8 @@ def main() -> int:
             "stage5_predictions": MODELS / "stage5_predictions.npz",
             "cost_thresholds": MODELS / "cost_thresholds.json",
             "features_final": DATA / "features_final.parquet",
+            **({"seam_report": MODELS / "seam_report.json"}
+               if (MODELS / "seam_report.json").exists() else {}),
         }.items()},
         "rows_by_split": {k: int(v) for k, v in frame["split"].value_counts().items()},
         "note": "Descriptive statistics of saved predictions. No model, threshold or feature "
@@ -400,6 +450,11 @@ def main() -> int:
               f"index lag {summary['index_lag_h']}")
         print(f"        M5 tuned lead counts {rule['lead_counts']}, "
               f"advantage {rule['advantage_h']}, alert precision {rule['alert_precision']}")
+        split_up = result["early_warning"][split]["breakdown"]
+        for name in ("at_run_boundary", "other_hours", "major"):
+            block = split_up[name]
+            print(f"        {name}: {block['n_onsets']} onsets, M5 tuned "
+                  f"{block['rules']['M5_val_tuned']}")
         cal = result["calibration"][split]["level_ge_2"]
         print(f"        P(level>=2): ECE {cal['ece']}, Brier {cal['brier']}")
         err = result["error_anatomy"][split]

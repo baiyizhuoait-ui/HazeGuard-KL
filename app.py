@@ -294,10 +294,27 @@ def window_rows(station: pd.DataFrame, when: pd.Timestamp, hours: int) -> pd.Dat
     return station[(station["timestamp"] >= start) & (station["timestamp"] <= when)]
 
 
+def run_boundary_hours() -> list[int]:
+    """Local hours at which two CAMS forecast runs are joined (see models/seam_report.json)."""
+    seam = load_json_or_none("seam_report.json")
+    hours = (seam or {}).get("seam_hours_local") or [8, 20]
+    return [int(h) for h in hours]
+
+
 def fig_timeline(win: pd.DataFrame, when: pd.Timestamp, show_band: bool,
                  show_mean: bool = False):
     """Observed PM2.5 against the forecast that was issued three hours earlier."""
     fig, ax = _figure(9.6, 3.7)
+    boundaries = run_boundary_hours()
+    if len(win):
+        span = pd.date_range(win["timestamp"].min().floor("h"),
+                             win["valid_time"].max().ceil("h"), freq="h")
+        marks = [t for t in span if t.hour in boundaries]
+        for i, mark in enumerate(marks):
+            ax.axvline(mark, color=AXIS, linewidth=0.9, linestyle=(0, (1, 3)), zorder=0,
+                       label=("CAMS run boundary ("
+                              + ", ".join(f"{h:02d}:00" for h in boundaries) + ")")
+                       if i == 0 else None)
     values = [win["reg"].max(), win["q95"].max() if show_band else np.nan,
               win["pm2_5"].max(), win["target_pm25_3h"].max()]
     ymax = float(np.nanmax(values)) * 1.12 if np.isfinite(np.nanmax(values)) else 60.0
@@ -325,7 +342,7 @@ def fig_timeline(win: pd.DataFrame, when: pd.Timestamp, show_band: bool,
     ax.set_ylabel("PM2.5 (µg/m³)", fontsize=9, color=INK_2)
     # legend sits above the plot so it can never cover the first hours of the curve
     ax.legend(loc="lower left", bbox_to_anchor=(0.0, 1.04), fontsize=8, frameon=False,
-              ncol=4, borderaxespad=0.0, columnspacing=1.4, handlelength=1.8)
+              ncol=3, borderaxespad=0.0, columnspacing=1.4, handlelength=1.8)
     fig.autofmt_xdate(rotation=0, ha="center")
     fig.tight_layout()
     return fig
@@ -515,6 +532,29 @@ def fig_lead_counts(counts: dict):
     return fig
 
 
+def fig_onsets_by_hour(by_hour: dict, boundaries: list[int]):
+    """High-risk onsets by local hour; run-boundary hours carry their own colour and legend."""
+    hours = list(range(24))
+    values = [int(by_hour.get(str(h), 0)) for h in hours]
+    colours = [ORANGE if h in boundaries else BLUE for h in hours]
+    fig, ax = _figure(9.6, 2.9)
+    ax.bar(hours, values, color=colours, width=0.7)
+    for hour, value in zip(hours, values):
+        if value and (hour in boundaries or value >= 0.5 * max(values)):
+            ax.annotate(str(value), xy=(hour, value), xytext=(0, 3),
+                        textcoords="offset points", ha="center", fontsize=8, color=INK)
+    ax.set_xticks(hours)
+    ax.set_xticklabels([f"{h:02d}" for h in hours], fontsize=8, color=INK_2)
+    ax.set_xlabel("Local hour of the onset", fontsize=9, color=INK_2)
+    ax.set_ylabel("High-risk onsets", fontsize=9, color=INK_2)
+    ax.set_ylim(0, max(values + [1]) * 1.15)
+    ax.legend(handles=[Patch(color=ORANGE, label="CAMS run-boundary hour"),
+                       Patch(color=BLUE, label="Other hours")],
+              loc="upper left", fontsize=8, frameon=False)
+    fig.tight_layout()
+    return fig
+
+
 def fig_reliability(blocks: dict):
     """Observed frequency against mean predicted probability, one line per split."""
     fig, ax = _figure(4.6, 4.2)
@@ -652,6 +692,33 @@ def early_warning_section(stage7: dict | None, rule: str) -> None:
         f"high-risk boundary, the mean never reached it within 48 h for "
         f"{summary['index_never_within_search']}. The 24 h mean is a stand-in for a "
         "daily-average index, not the official API.")
+    breakdown = stage7["early_warning"]["test"].get("breakdown")
+    if breakdown:
+        boundaries = breakdown["run_boundary_hours_local"]
+        st.markdown("**When the onsets happen, and how the record splits**")
+        show(fig_onsets_by_hour(breakdown["onsets_by_hour"], boundaries))
+        names = {"at_run_boundary": "Onset at a run-boundary hour",
+                 "other_hours": "Onset at any other hour",
+                 "major": "Major episodes (peak reaches level 3)",
+                 "minor": "Minor episodes"}
+        rows = []
+        for key, label in names.items():
+            block = breakdown[key]
+            mine_here = block["rules"][rule]
+            rows.append({"Onsets": label, "Count": block["n_onsets"],
+                         "Alert before onset": mine_here["share_alert_before_onset"],
+                         "Full horizon": mine_here["share_full_horizon"],
+                         "Missed": mine_here["missed"]})
+        st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+        seam = load_json_or_none("seam_report.json")
+        note = ("Two CAMS forecast runs are joined at "
+                + " and ".join(f"{h:02d}:00" for h in boundaries) + " local time.")
+        if seam and "raw_seam_ratio" in seam:
+            note += (f" At {seam.get('station', 'the reference node').replace('_', ' ')} the "
+                     f"hour-to-hour PM2.5 change at those hours is {seam['raw_seam_ratio']} times "
+                     "the change at other hours (models/seam_report.json).")
+        st.caption(note)
+
     with st.expander("All decision rules and definitions"):
         rows = []
         for key, block in summary["rules"].items():
@@ -664,8 +731,10 @@ def early_warning_section(stage7: dict | None, rule: str) -> None:
                          "Alert onsets": block["alert_onsets"],
                          "Confirmed": block["alert_precision"]})
         st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
-        for name in ("onset", "model_lead_h", "index_lag_h", "advantage_h", "alert_precision"):
-            st.caption(f"**{name}**: {stage7['definitions'][name]}")
+        for name in ("onset", "model_lead_h", "index_lag_h", "advantage_h", "alert_precision",
+                     "run_boundary", "major"):
+            if name in stage7["definitions"]:
+                st.caption(f"**{name}**: {stage7['definitions'][name]}")
 
 
 def tab_risk(station: pd.DataFrame, when: pd.Timestamp, rule: str, ref: dict,
