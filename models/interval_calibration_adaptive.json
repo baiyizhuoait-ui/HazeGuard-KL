@@ -1,0 +1,216 @@
+{
+  "method": "tree-spread-normalized absolute residual",
+  "nominal_coverage": 0.9,
+  "scale_floor": 1.0,
+  "scale_multiplier": 1.5452243600022562,
+  "n_calibration": 16656,
+  "order_statistic_rank": 14992,
+  "unit": "ug/m3",
+  "formula": "scale=max((q95-q05)/2,scale_floor); width=scale_multiplier*scale; interval=[max(0,q50-width),q50+width]",
+  "frozen_utc": "2026-11-13T14:03:59.352490+00:00",
+  "input_sha256": {
+    "features_final": "64285f40e81c72ab4872d282d52be68401078e8c33dec50134d93e7877d2f55b",
+    "selected_features": "2d11fd961aedd1fc57ab3036038bfc1d67e0e797cb40fc3e1b2362b568c80d61"
+  },
+  "source_sha256": "0a40a3abd1d6a78d1d02b50c4b8a7e620d7700012e2203a81457e37063cd3f60",
+  "predictions_sha256": "1e39eded352d9597eff4c4a85bb49cdca63dbeea32eb9def9c9ad5828826a2c7",
+  "selection_evidence": {
+    "created_utc": "2026-11-13T14:01:59.145794+00:00",
+    "nominal_coverage": 0.9,
+    "input_sha256": {
+      "features_final": "64285f40e81c72ab4872d282d52be68401078e8c33dec50134d93e7877d2f55b",
+      "selected_features": "2d11fd961aedd1fc57ab3036038bfc1d67e0e797cb40fc3e1b2362b568c80d61"
+    },
+    "study_source_sha256": "3d98015de89f9e09ed14144d7f644d46f7f39560dae415e418da0281468b394b",
+    "evaluated_split": "validation only: three forward blocks after first quarter warmup",
+    "selection_rule": "lowest aggregated mean interval score among four static calibrated methods",
+    "selected_static_method": "spread_normalized",
+    "test_accessed_for_scoring": false,
+    "scale_floor_ug_m3": 1.0,
+    "rolling_window_days": 30,
+    "blocks": [
+      {
+        "start": "2025-09-20T22:00:00.000000",
+        "end": "2025-11-17T17:00:00.000000",
+        "calibration_n": 4155,
+        "holdout_n": 4164,
+        "methods": {
+          "raw_tree_band": {
+            "PICP": 0.7084534101825168,
+            "MPIW": 15.016163525678733,
+            "mean_interval_score": 36.05373150230264,
+            "n": 4164
+          },
+          "pooled_absolute": {
+            "PICP": 0.9111431316042267,
+            "MPIW": 26.21435168378955,
+            "mean_interval_score": 40.98859536300314,
+            "n": 4164
+          },
+          "spread_normalized": {
+            "PICP": 0.9073006724303554,
+            "MPIW": 22.957036846624188,
+            "mean_interval_score": 30.286172697991443,
+            "n": 4164
+          },
+          "tree_band_expansion": {
+            "PICP": 0.9116234390009607,
+            "MPIW": 22.295890197924667,
+            "mean_interval_score": 31.37461174897668,
+            "n": 4164
+          },
+          "node_absolute": {
+            "PICP": 0.920268972142171,
+            "MPIW": 26.45019072794088,
+            "mean_interval_score": 38.05148774367345,
+            "n": 4164
+          },
+          "rolling_30d_node_absolute": {
+            "PICP": 0.9106628242074928,
+            "MPIW": 25.957520163856515,
+            "mean_interval_score": 37.74692190529276,
+            "n": 4164
+          }
+        }
+      },
+      {
+        "start": "2025-11-17T18:00:00.000000",
+        "end": "2026-01-14T13:00:00.000000",
+        "calibration_n": 8319,
+        "holdout_n": 4164,
+        "methods": {
+          "raw_tree_band": {
+            "PICP": 0.7031700288184438,
+            "MPIW": 14.904261371145706,
+            "mean_interval_score": 36.33416990347642,
+            "n": 4164
+          },
+          "pooled_absolute": {
+            "PICP": 0.909702209414025,
+            "MPIW": 25.714827263029743,
+            "mean_interval_score": 41.40673485364077,
+            "n": 4164
+          },
+          "spread_normalized": {
+            "PICP": 0.8914505283381364,
+            "MPIW": 22.49402706106676,
+            "mean_interval_score": 29.96098911562013,
+            "n": 4164
+          },
+          "tree_band_expansion": {
+            "PICP": 0.9017771373679154,
+            "MPIW": 21.648535599939876,
+            "mean_interval_score": 30.98425078178325,
+            "n": 4164
+          },
+          "node_absolute": {
+            "PICP": 0.8986551392891451,
+            "MPIW": 25.56735056732839,
+            "mean_interval_score": 38.73891650593986,
+            "n": 4164
+          },
+          "rolling_30d_node_absolute": {
+            "PICP": 0.883525456292027,
+            "MPIW": 24.053252481146803,
+            "mean_interval_score": 39.24415480585607,
+            "n": 4164
+          }
+        }
+      },
+      {
+        "start": "2026-01-14T14:00:00.000000",
+        "end": "2026-03-13T09:00:00.000000",
+        "calibration_n": 12483,
+        "holdout_n": 4164,
+        "methods": {
+          "raw_tree_band": {
+            "PICP": 0.718059558117195,
+            "MPIW": 19.291397015222778,
+            "mean_interval_score": 51.536131144483896,
+            "n": 4164
+          },
+          "pooled_absolute": {
+            "PICP": 0.8566282420749279,
+            "MPIW": 25.998116029891396,
+            "mean_interval_score": 56.267458019665014,
+            "n": 4164
+          },
+          "spread_normalized": {
+            "PICP": 0.8854466858789626,
+            "MPIW": 29.45387249595434,
+            "mean_interval_score": 45.51503270683423,
+            "n": 4164
+          },
+          "tree_band_expansion": {
+            "PICP": 0.8753602305475504,
+            "MPIW": 25.997054909959623,
+            "mean_interval_score": 45.45177361401115,
+            "n": 4164
+          },
+          "node_absolute": {
+            "PICP": 0.8470220941402498,
+            "MPIW": 25.968255356236025,
+            "mean_interval_score": 53.4941224148972,
+            "n": 4164
+          },
+          "rolling_30d_node_absolute": {
+            "PICP": 0.8981748318924111,
+            "MPIW": 31.944930571613593,
+            "mean_interval_score": 52.65601623650158,
+            "n": 4164
+          }
+        }
+      }
+    ],
+    "overall": {
+      "raw_tree_band": {
+        "PICP": 0.7098943323727186,
+        "MPIW": 16.403940637349073,
+        "mean_interval_score": 41.30801085008765,
+        "n": 12492
+      },
+      "pooled_absolute": {
+        "PICP": 0.8924911943643932,
+        "MPIW": 25.975764992236897,
+        "mean_interval_score": 46.220929412102976,
+        "n": 12492
+      },
+      "node_absolute": {
+        "PICP": 0.8886487351905219,
+        "MPIW": 25.995265550501763,
+        "mean_interval_score": 43.428175554836834,
+        "n": 12492
+      },
+      "spread_normalized": {
+        "PICP": 0.8947326288824848,
+        "MPIW": 24.968312134548427,
+        "mean_interval_score": 35.25406484014861,
+        "n": 12492
+      },
+      "tree_band_expansion": {
+        "PICP": 0.8962536023054755,
+        "MPIW": 23.313826902608056,
+        "mean_interval_score": 35.936878714923694,
+        "n": 12492
+      },
+      "rolling_30d_node_absolute": {
+        "PICP": 0.8974543707973103,
+        "MPIW": 27.318567738872304,
+        "mean_interval_score": 43.21569764921681,
+        "n": 12492
+      }
+    },
+    "limitations": [
+      "Exploratory post-selection validation; original RF selection used this validation period.",
+      "Rolling evaluation assumes each target is available after 3h; actual upstream latency must be verified.",
+      "Rolling uses outcomes revealed during evaluation; static methods use only each block's initial history.",
+      "No guarantee of 90% future or per-node coverage; no model weights or production artifacts changed."
+    ]
+  },
+  "limitations": [
+    "Post-hoc extension: original test results were already known.",
+    "Candidate selection used only validation forward blocks; test does not choose method or parameters.",
+    "Validation was also used for original model selection; calibration is not independent.",
+    "Time-series dependence and shift prevent an unconditional 90% future coverage claim."
+  ]
+}

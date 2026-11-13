@@ -1,0 +1,65 @@
+{
+  "method": "tree-spread-normalized absolute residual",
+  "nominal_coverage": 0.9,
+  "scale_multiplier": 1.5452243600022562,
+  "scale_floor": 1.0,
+  "calibration_sha256": "6409c819ce49a86124fd8b136afdadfef8bda475c11eef9b83c3a8925ace8197",
+  "limitations": [
+    "Post-hoc extension: original test results were already known.",
+    "Candidate selection used only validation forward blocks; test does not choose method or parameters.",
+    "Validation was also used for original model selection; calibration is not independent.",
+    "Time-series dependence and shift prevent an unconditional 90% future coverage claim."
+  ],
+  "new_model_fits": 0,
+  "new_model_test_predictions": 0,
+  "unit": "ug/m3",
+  "val": {
+    "overall": {
+      "PICP": 0.9000960614793467,
+      "MPIW": 25.44245539284957,
+      "n_samples": 16656
+    },
+    "by_node": {
+      "KL_City": {
+        "PICP": 0.8773414985590778,
+        "MPIW": 31.510332581972815,
+        "n_samples": 5552
+      },
+      "Port_Klang": {
+        "PICP": 0.9239913544668588,
+        "MPIW": 16.554344957486716,
+        "n_samples": 5552
+      },
+      "Sepang": {
+        "PICP": 0.8989553314121037,
+        "MPIW": 28.262688639089184,
+        "n_samples": 5552
+      }
+    }
+  },
+  "test": {
+    "overall": {
+      "PICP": 0.8797380909473178,
+      "MPIW": 32.11199106121323,
+      "n_samples": 16647
+    },
+    "by_node": {
+      "KL_City": {
+        "PICP": 0.8477203099657596,
+        "MPIW": 38.753827934630436,
+        "n_samples": 5549
+      },
+      "Port_Klang": {
+        "PICP": 0.9118760136961614,
+        "MPIW": 24.069344560079045,
+        "n_samples": 5549
+      },
+      "Sepang": {
+        "PICP": 0.8796179491800324,
+        "MPIW": 33.51280068893021,
+        "n_samples": 5549
+      }
+    }
+  },
+  "intervals_sha256": "9ce21b2fbaf29c5e63b6e14be45a2c88a0fc1a6c8dd647f8a5388ca0b89b37ca"
+}
