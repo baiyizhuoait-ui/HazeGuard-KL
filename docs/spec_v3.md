@@ -344,9 +344,13 @@ python tools/check_merge_gate.py --all        # 体检所有 feat/* 分支
 python tools/check_merge_gate.py feat/03-granulation
 ```
 
-它检查九项，任何一项 FAIL 就不该点合并：落后 main 的提交数、交付物齐全、越权改动、
-禁词、体积与 LFS、交接文档、报告章节、指标文件是否带 `generated_at`/`git_commit`、
-test 使用次数是否超过 1。**全过再提 PR，提 PR 时把这段输出贴上来。**
+它检查十项，任何一项 FAIL 就不该点合并：落后 main 的提交数、交付物齐全、越权改动、
+禁词、体积与 LFS、交接文档、报告章节、**报告文字（复用 check_prose 的规则）**、
+指标文件是否带 `generated_at`/`git_commit`、test 使用次数是否超过 1。
+**全过再提 PR，提 PR 时把这段输出贴上来。**
+
+第十项是 6 号交付后才加的：他的报告里有一个 `Importantly,`，这是典型的大模型过渡词，
+原来的闸门只查 `verify_data`，没查文字，所以漏过去了。现在合并前就能拦住。
 
 ### 7.3 每次合并前跑三条
 

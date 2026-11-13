@@ -25,6 +25,7 @@ import argparse
 import re
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 PROTECTED = {
@@ -139,6 +140,25 @@ def blob(branch: str, path: str, limit: int = 2_000_000) -> bytes:
     return r.stdout[:limit]
 
 
+def prose_check(branch: str, paths: dict[str, int]) -> tuple[bool, str]:
+    """对本分支的 reports/*.md 跑 check_prose，返回 (是否通过, 说明)。"""
+    reps = [p for p in paths if p.startswith("reports/") and p.endswith(".md")]
+    if not reps:
+        return False, "分支里没有报告文件"
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from check_prose import check_file  # 同目录，复用同一套规则
+
+    bad = []
+    with tempfile.TemporaryDirectory() as td:
+        for p in reps:
+            fp = Path(td) / Path(p).name
+            fp.write_bytes(blob(branch, p))
+            fails = check_file(str(fp))["fails"]
+            if fails:
+                bad.append(f"{Path(p).name} — " + "；".join(fails))
+    return (not bad), ("干净" if not bad else " | ".join(bad))
+
+
 def module_of(branch: str) -> str | None:
     m = re.match(r"(?:feat|fix)/(\d{2})-", branch)
     return m.group(1) if m else None
@@ -224,6 +244,10 @@ def audit(branch: str) -> tuple[list[tuple[str, bool, str]], str]:
         rp = [p for p in paths if p.startswith("reports/") and p.endswith(".md")
               and Path(p).name.startswith(spec["report_prefix"])]
         rows.append(("报告章节", bool(rp), rp[0] if rp else f"缺 reports/{spec['report_prefix']}*.md"))
+
+    # 7b 报告文字（课程 C.2：AI 生成文本零分）
+    ok_prose, note_prose = prose_check(branch, paths)
+    rows.append(("报告文字", ok_prose, note_prose))
 
     # 8 指标文件
     for mp in spec["metrics"]:
