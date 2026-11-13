@@ -12,8 +12,8 @@
   RFE 按单元淘汰（单元重要性 = 两列之和），最后恰好 25 列。不成对的旧版 Top-25 也照算，作消融对照。
 消融：同一默认 RF、3 个种子，在 val 上评估六项指标（src/utils_metrics.py），附 M0 持续性；
   ① 原始 → ② + 滞后/滚动 → ③ + 空间（近场与远场）→ ④ + 粒化 →
-  ⑤ 旧版 Top-25（不成对）→ ⑥ ⑤ + 缺的那半个周期项 → ⑦ ⑤ + 邻域 50 列 → ⑧ ⑤ + 两者 →
-  ⑨ ⑤ + 最近 3 格点均值（对照）→ ⑩ 成对 Top-25（交付）→ ⑪ ⑩ + 邻域 50 列。
+  ⑤ 旧版 Top-25（不成对）→ ⑥ ⑤ + 缺的那半个周期项 → ⑦ ⑤ + 最近 3 格点均值（压缩版，对照）→ ⑧ ⑤ + 两者 →
+  ⑨ 成对 Top-25（交付）→ ⑩ ⑨ + 邻域 50 列 → ⑪ ⑤ + 邻域 50 列 → ⑫ ⑤ + 周期项 + 邻域 50 列。
 邻域特征（QN-002 Q3-2，只用于消融，不进候选、不进最终表）：对另外 25 个格点（不含自身），按大圆距离
   从近到远排成 nbr01..nbr25，各取 t 时刻 PM2.5 和该格点的 pm2_5_change_3h，共 50 列，不平均、不加权；
   插值/缺失小时记 NaN（同 2 号屏蔽规则），不填补，交给随机森林的原生缺失值处理。
@@ -349,11 +349,12 @@ def main():
                   "4 + Granulation": raw + temporal + spatial + gran_unique,
                   f"5 Top-{TOP_K} unpaired (previous)": selected_v1,
                   f"6 Previous + {half}": selected_v1 + halves,
-                  f"7 Previous + {len(nbr_cols)} neighbour columns": selected_v1 + nbr_cols,
-                  f"8 Previous + {half} + {len(nbr_cols)} neighbour columns": selected_v1 + halves + nbr_cols,
-                  "9 Previous + nearest-3 mean (control)": selected_v1 + [NBR],
-                  f"10 Top-{TOP_K} paired (delivered)": selected,
-                  f"11 Delivered + {len(nbr_cols)} neighbour columns": selected + nbr_cols}
+                  "7 Previous + nearest-3 mean (compressed, control)": selected_v1 + [NBR],
+                  f"8 Previous + {half} + nearest-3 mean (compressed)": selected_v1 + halves + [NBR],
+                  f"9 Top-{TOP_K} paired (delivered)": selected,
+                  f"10 Delivered + {len(nbr_cols)} neighbour columns": selected + nbr_cols,
+                  f"11 Previous + {len(nbr_cols)} neighbour columns": selected_v1 + nbr_cols,
+                  f"12 Previous + {half} + {len(nbr_cols)} neighbour columns": selected_v1 + halves + nbr_cols}
     groups = {}
     for name, cols in group_cols.items():
         groups[name] = ablate(tr, va, cols, evaluate_predictions)
@@ -417,18 +418,19 @@ def main():
                "ablation": groups, "metrics_persistence_M0_val": m0,
                "neighbour_feature": {
                    "main": {"columns": nbr_cols, "n_columns": len(nbr_cols),
-                            "used_in": "ablation rows 7, 8 and 11 only; not a selection candidate, not in features_final",
+                            "used_in": "ablation rows 10, 11 and 12 only; not a selection candidate, not in features_final",
                             "definition": "for each receptor, all other grid cells (self excluded) ordered by great-circle "
                                           "distance, nbr01 = nearest; per cell two raw values at hour t: pm2_5 and the "
                                           "stage 2 column pm2_5_change_3h (x(t) - x(t-3)); no averaging, no upwind weights",
                             "missing_rule": "hours flagged qc_interpolated or is_missing are NaN (stage 2 masking rule, "
-                                            "interpolation may use future endpoints); not filled, the random forest "
-                                            "handles missing values natively"},
+                                            "interpolation may use future endpoints); the column is kept, the value is "
+                                            "not interpolated in time and not set to 0; the random forest handles NaN "
+                                            "natively at each split"},
                    "layout_check": {"definition": f"same raw values with one fixed column per grid cell "
                                                   f"({len(cell_cols)} columns, the receptor's own cell left NaN), "
                                                   "added to the previous Top-25; not plotted",
                                     "result": layout_check},
-                   "control": {"column": NBR, "used_in": "ablation row 9 only",
+                   "control": {"column": NBR, "used_in": "ablation rows 7 and 8 (compressed version)",
                                "definition": f"simple mean of nbr01..nbr{NBR_K:02d}_pm2_5 (the {NBR_K} nearest cells)",
                                "missing_rule": "mean of the available values; if none, the cell's own pm2_5 at t"},
                    "neighbours_by_receptor": nbr_info, "row_counts_eligible_receptor": nbr_counts},
