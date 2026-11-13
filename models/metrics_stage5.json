@@ -1,0 +1,3624 @@
+{
+  "generated_at": "2026-11-11T15:36:51.978839+00:00",
+  "git_commit": "7dfe3e825d7aef851db60680eb9eb0a636b03e46",
+  "code_sha256": {
+    "05_reg_to_cls.py": "c0e934661f597375c03707597b5c38895a73846fbf9d5957fb8703c9b9dcc272",
+    "05_ordinal_rf.py": "20177a9bf1d515be0c50ba63ce0c62e4f1d9534d626ffafa2d917fa47e39c24d",
+    "ordinal_forest.py": "3cc5d01097421cfb9ab05235cd525c6ce45830f91c30645b0510f6d32699db76",
+    "utils_metrics.py": "b0bcc02975ba7d23ad1d503bba40c2d4c86a0cdffa835613d71a4da5e95749f3",
+    "config.py": "362b8e51c41d5f31af2ed83fdaf82caeb493f802f3ff313f6e0b5ba0b44e9e7c"
+  },
+  "input_sha256": {
+    "features_final": "64285f40e81c72ab4872d282d52be68401078e8c33dec50134d93e7877d2f55b",
+    "selected_features": "2d11fd961aedd1fc57ab3036038bfc1d67e0e797cb40fc3e1b2362b568c80d61"
+  },
+  "environment": {
+    "python": "3.12.14",
+    "numpy": "2.4.6",
+    "pandas": "3.0.3",
+    "sklearn": "1.9.0",
+    "joblib": "1.5.3",
+    "matplotlib": "3.11.0"
+  },
+  "training_domain": "role == receptor",
+  "feature_names": [
+    "pm2_5",
+    "pm10",
+    "pm2_5_mean_3h",
+    "hour_sin",
+    "pm2_5_lag_1",
+    "no2",
+    "pm2_5_change_3h",
+    "pm10_lag_1",
+    "so2",
+    "no2_lag_12",
+    "spatial_pm25_gradient",
+    "pm2_5_slope_6h",
+    "gran_slope_12h",
+    "gran_low_12h",
+    "relative_humidity_2m_lag_3",
+    "gran_low_6h",
+    "pm2_5_mean_6h",
+    "gran_up_6h",
+    "no2_lag_6",
+    "o3",
+    "temperature_2m",
+    "no2_lag_2",
+    "co",
+    "no2_lag_24",
+    "far_source_pm25_mean_24h"
+  ],
+  "rows_by_split": {
+    "train": 77753,
+    "val": 16656,
+    "test": 16647
+  },
+  "random_seeds": [
+    42,
+    43,
+    44
+  ],
+  "selection_rule": "val Macro_F1, then lower MAOE, then CV Macro_F1, then shallower tree; no test selection",
+  "cv": {
+    "n_splits": 5,
+    "unit": "unique timestamp; nodes kept together",
+    "purge_rule": "max(train timestamp)+3h < min(validation timestamp)",
+    "upstream_selection_limitation": "Top-25 fixed upstream using all train labels; internal CV is not fully nested",
+    "folds": [
+      {
+        "train_rows": 12815,
+        "validation_rows": 12921,
+        "train_end": "2023-02-01 21:00:00",
+        "validation_start": "2023-02-02 01:00:00"
+      },
+      {
+        "train_rows": 25736,
+        "validation_rows": 13002,
+        "train_end": "2023-08-01 11:00:00",
+        "validation_start": "2023-08-01 15:00:00"
+      },
+      {
+        "train_rows": 38738,
+        "validation_rows": 13002,
+        "train_end": "2024-01-29 01:00:00",
+        "validation_start": "2024-01-29 05:00:00"
+      },
+      {
+        "train_rows": 51740,
+        "validation_rows": 13002,
+        "train_end": "2024-07-27 15:00:00",
+        "validation_start": "2024-07-27 19:00:00"
+      },
+      {
+        "train_rows": 64742,
+        "validation_rows": 13002,
+        "train_end": "2025-01-24 05:00:00",
+        "validation_start": "2025-01-24 09:00:00"
+      }
+    ]
+  },
+  "parameter_candidates": [
+    {
+      "n_estimators": 100,
+      "max_depth": 14,
+      "min_samples_leaf": 20,
+      "max_features": 0.5
+    },
+    {
+      "n_estimators": 100,
+      "max_depth": 10,
+      "min_samples_leaf": 20,
+      "max_features": 0.5
+    },
+    {
+      "n_estimators": 100,
+      "max_depth": 14,
+      "min_samples_leaf": 10,
+      "max_features": 0.5
+    }
+  ],
+  "regression_search_trace": [
+    {
+      "params": {
+        "n_estimators": 100,
+        "max_depth": 14,
+        "min_samples_leaf": 20,
+        "max_features": 0.5
+      },
+      "cv_fold_metrics": [
+        {
+          "Macro_F1": 0.6726,
+          "Balanced_Accuracy": 0.6497,
+          "High_Risk_Recall": 0.8015,
+          "MAOE": 0.2922,
+          "Severe_Jumping_Error_Rate": 0.0088,
+          "Avg_Asymmetric_Cost": 0.764,
+          "n_samples": 12921,
+          "n_high_risk": 4962,
+          "diag_High_Risk_Exact_Recall": 0.5979,
+          "diag_Level3_Recall": 0.5937
+        },
+        {
+          "Macro_F1": 0.6723,
+          "Balanced_Accuracy": 0.6592,
+          "High_Risk_Recall": 0.8153,
+          "MAOE": 0.3106,
+          "Severe_Jumping_Error_Rate": 0.0098,
+          "Avg_Asymmetric_Cost": 0.6737,
+          "n_samples": 13002,
+          "n_high_risk": 3709,
+          "diag_High_Risk_Exact_Recall": 0.6029,
+          "diag_Level3_Recall": 0.625
+        },
+        {
+          "Macro_F1": 0.6841,
+          "Balanced_Accuracy": 0.6672,
+          "High_Risk_Recall": 0.7952,
+          "MAOE": 0.2991,
+          "Severe_Jumping_Error_Rate": 0.0133,
+          "Avg_Asymmetric_Cost": 0.7295,
+          "n_samples": 13002,
+          "n_high_risk": 4819,
+          "diag_High_Risk_Exact_Recall": 0.6074,
+          "diag_Level3_Recall": 0.696
+        },
+        {
+          "Macro_F1": 0.6854,
+          "Balanced_Accuracy": 0.6619,
+          "High_Risk_Recall": 0.7563,
+          "MAOE": 0.2637,
+          "Severe_Jumping_Error_Rate": 0.0064,
+          "Avg_Asymmetric_Cost": 0.6208,
+          "n_samples": 13002,
+          "n_high_risk": 3078,
+          "diag_High_Risk_Exact_Recall": 0.5513,
+          "diag_Level3_Recall": 0.5331
+        },
+        {
+          "Macro_F1": 0.6715,
+          "Balanced_Accuracy": 0.6398,
+          "High_Risk_Recall": 0.7293,
+          "MAOE": 0.2838,
+          "Severe_Jumping_Error_Rate": 0.0078,
+          "Avg_Asymmetric_Cost": 0.7832,
+          "n_samples": 13002,
+          "n_high_risk": 4182,
+          "diag_High_Risk_Exact_Recall": 0.527,
+          "diag_Level3_Recall": 0.558
+        }
+      ],
+      "cv_mean_macro_f1": 0.67718,
+      "validation_metrics_seed42": {
+        "Macro_F1": 0.7155,
+        "Balanced_Accuracy": 0.697,
+        "High_Risk_Recall": 0.8055,
+        "MAOE": 0.2569,
+        "Severe_Jumping_Error_Rate": 0.0068,
+        "Avg_Asymmetric_Cost": 0.5985,
+        "n_samples": 16656,
+        "n_high_risk": 4842,
+        "diag_High_Risk_Exact_Recall": 0.6206,
+        "diag_Level3_Recall": 0.6568
+      },
+      "elapsed_seconds": 30.923
+    },
+    {
+      "params": {
+        "n_estimators": 100,
+        "max_depth": 10,
+        "min_samples_leaf": 20,
+        "max_features": 0.5
+      },
+      "cv_fold_metrics": [
+        {
+          "Macro_F1": 0.6727,
+          "Balanced_Accuracy": 0.6495,
+          "High_Risk_Recall": 0.8077,
+          "MAOE": 0.2919,
+          "Severe_Jumping_Error_Rate": 0.0081,
+          "Avg_Asymmetric_Cost": 0.7573,
+          "n_samples": 12921,
+          "n_high_risk": 4962,
+          "diag_High_Risk_Exact_Recall": 0.6044,
+          "diag_Level3_Recall": 0.5908
+        },
+        {
+          "Macro_F1": 0.6685,
+          "Balanced_Accuracy": 0.6555,
+          "High_Risk_Recall": 0.8156,
+          "MAOE": 0.3148,
+          "Severe_Jumping_Error_Rate": 0.0098,
+          "Avg_Asymmetric_Cost": 0.6856,
+          "n_samples": 13002,
+          "n_high_risk": 3709,
+          "diag_High_Risk_Exact_Recall": 0.6012,
+          "diag_Level3_Recall": 0.6118
+        },
+        {
+          "Macro_F1": 0.6784,
+          "Balanced_Accuracy": 0.6606,
+          "High_Risk_Recall": 0.7933,
+          "MAOE": 0.304,
+          "Severe_Jumping_Error_Rate": 0.0132,
+          "Avg_Asymmetric_Cost": 0.739,
+          "n_samples": 13002,
+          "n_high_risk": 4819,
+          "diag_High_Risk_Exact_Recall": 0.6039,
+          "diag_Level3_Recall": 0.691
+        },
+        {
+          "Macro_F1": 0.6834,
+          "Balanced_Accuracy": 0.6597,
+          "High_Risk_Recall": 0.7622,
+          "MAOE": 0.267,
+          "Severe_Jumping_Error_Rate": 0.0068,
+          "Avg_Asymmetric_Cost": 0.6204,
+          "n_samples": 13002,
+          "n_high_risk": 3078,
+          "diag_High_Risk_Exact_Recall": 0.5578,
+          "diag_Level3_Recall": 0.5293
+        },
+        {
+          "Macro_F1": 0.661,
+          "Balanced_Accuracy": 0.628,
+          "High_Risk_Recall": 0.7183,
+          "MAOE": 0.2911,
+          "Severe_Jumping_Error_Rate": 0.0076,
+          "Avg_Asymmetric_Cost": 0.8128,
+          "n_samples": 13002,
+          "n_high_risk": 4182,
+          "diag_High_Risk_Exact_Recall": 0.51,
+          "diag_Level3_Recall": 0.5337
+        }
+      ],
+      "cv_mean_macro_f1": 0.6728000000000001,
+      "validation_metrics_seed42": {
+        "Macro_F1": 0.7066,
+        "Balanced_Accuracy": 0.6865,
+        "High_Risk_Recall": 0.7902,
+        "MAOE": 0.2651,
+        "Severe_Jumping_Error_Rate": 0.0069,
+        "Avg_Asymmetric_Cost": 0.6257,
+        "n_samples": 16656,
+        "n_high_risk": 4842,
+        "diag_High_Risk_Exact_Recall": 0.6047,
+        "diag_Level3_Recall": 0.6465
+      },
+      "elapsed_seconds": 25.829
+    },
+    {
+      "params": {
+        "n_estimators": 100,
+        "max_depth": 14,
+        "min_samples_leaf": 10,
+        "max_features": 0.5
+      },
+      "cv_fold_metrics": [
+        {
+          "Macro_F1": 0.6788,
+          "Balanced_Accuracy": 0.6567,
+          "High_Risk_Recall": 0.8009,
+          "MAOE": 0.2867,
+          "Severe_Jumping_Error_Rate": 0.0086,
+          "Avg_Asymmetric_Cost": 0.7468,
+          "n_samples": 12921,
+          "n_high_risk": 4962,
+          "diag_High_Risk_Exact_Recall": 0.6044,
+          "diag_Level3_Recall": 0.6167
+        },
+        {
+          "Macro_F1": 0.6736,
+          "Balanced_Accuracy": 0.6611,
+          "High_Risk_Recall": 0.8169,
+          "MAOE": 0.3093,
+          "Severe_Jumping_Error_Rate": 0.0095,
+          "Avg_Asymmetric_Cost": 0.6627,
+          "n_samples": 13002,
+          "n_high_risk": 3709,
+          "diag_High_Risk_Exact_Recall": 0.6053,
+          "diag_Level3_Recall": 0.6396
+        },
+        {
+          "Macro_F1": 0.6884,
+          "Balanced_Accuracy": 0.672,
+          "High_Risk_Recall": 0.7987,
+          "MAOE": 0.2945,
+          "Severe_Jumping_Error_Rate": 0.013,
+          "Avg_Asymmetric_Cost": 0.7196,
+          "n_samples": 13002,
+          "n_high_risk": 4819,
+          "diag_High_Risk_Exact_Recall": 0.6105,
+          "diag_Level3_Recall": 0.6982
+        },
+        {
+          "Macro_F1": 0.6869,
+          "Balanced_Accuracy": 0.6641,
+          "High_Risk_Recall": 0.7645,
+          "MAOE": 0.2623,
+          "Severe_Jumping_Error_Rate": 0.0063,
+          "Avg_Asymmetric_Cost": 0.6089,
+          "n_samples": 13002,
+          "n_high_risk": 3078,
+          "diag_High_Risk_Exact_Recall": 0.5572,
+          "diag_Level3_Recall": 0.5416
+        },
+        {
+          "Macro_F1": 0.6734,
+          "Balanced_Accuracy": 0.6442,
+          "High_Risk_Recall": 0.7487,
+          "MAOE": 0.2826,
+          "Severe_Jumping_Error_Rate": 0.0073,
+          "Avg_Asymmetric_Cost": 0.7582,
+          "n_samples": 13002,
+          "n_high_risk": 4182,
+          "diag_High_Risk_Exact_Recall": 0.5416,
+          "diag_Level3_Recall": 0.5691
+        }
+      ],
+      "cv_mean_macro_f1": 0.68022,
+      "validation_metrics_seed42": {
+        "Macro_F1": 0.716,
+        "Balanced_Accuracy": 0.6991,
+        "High_Risk_Recall": 0.8092,
+        "MAOE": 0.2568,
+        "Severe_Jumping_Error_Rate": 0.007,
+        "Avg_Asymmetric_Cost": 0.5929,
+        "n_samples": 16656,
+        "n_high_risk": 4842,
+        "diag_High_Risk_Exact_Recall": 0.6225,
+        "diag_Level3_Recall": 0.663
+      },
+      "elapsed_seconds": 32.051
+    }
+  ],
+  "ordinal_search_trace": [
+    {
+      "params": {
+        "n_estimators": 100,
+        "max_depth": 14,
+        "min_samples_leaf": 20,
+        "max_features": 0.5
+      },
+      "cv_fold_metrics": [
+        {
+          "Macro_F1": 0.6116,
+          "Balanced_Accuracy": 0.6881,
+          "High_Risk_Recall": 0.8452,
+          "MAOE": 0.3963,
+          "Severe_Jumping_Error_Rate": 0.0378,
+          "Avg_Asymmetric_Cost": 0.7289,
+          "n_samples": 12921,
+          "n_high_risk": 4962,
+          "diag_High_Risk_Exact_Recall": 0.555,
+          "diag_Level3_Recall": 0.8997
+        },
+        {
+          "Macro_F1": 0.5978,
+          "Balanced_Accuracy": 0.6552,
+          "High_Risk_Recall": 0.8274,
+          "MAOE": 0.3939,
+          "Severe_Jumping_Error_Rate": 0.0342,
+          "Avg_Asymmetric_Cost": 0.7393,
+          "n_samples": 13002,
+          "n_high_risk": 3709,
+          "diag_High_Risk_Exact_Recall": 0.5204,
+          "diag_Level3_Recall": 0.9062
+        },
+        {
+          "Macro_F1": 0.6307,
+          "Balanced_Accuracy": 0.6914,
+          "High_Risk_Recall": 0.8157,
+          "MAOE": 0.3752,
+          "Severe_Jumping_Error_Rate": 0.0324,
+          "Avg_Asymmetric_Cost": 0.756,
+          "n_samples": 13002,
+          "n_high_risk": 4819,
+          "diag_High_Risk_Exact_Recall": 0.5584,
+          "diag_Level3_Recall": 0.8942
+        },
+        {
+          "Macro_F1": 0.6108,
+          "Balanced_Accuracy": 0.6802,
+          "High_Risk_Recall": 0.7885,
+          "MAOE": 0.3585,
+          "Severe_Jumping_Error_Rate": 0.0271,
+          "Avg_Asymmetric_Cost": 0.7107,
+          "n_samples": 13002,
+          "n_high_risk": 3078,
+          "diag_High_Risk_Exact_Recall": 0.4984,
+          "diag_Level3_Recall": 0.9149
+        },
+        {
+          "Macro_F1": 0.6327,
+          "Balanced_Accuracy": 0.6863,
+          "High_Risk_Recall": 0.7539,
+          "MAOE": 0.3467,
+          "Severe_Jumping_Error_Rate": 0.0251,
+          "Avg_Asymmetric_Cost": 0.7653,
+          "n_samples": 13002,
+          "n_high_risk": 4182,
+          "diag_High_Risk_Exact_Recall": 0.5127,
+          "diag_Level3_Recall": 0.8782
+        }
+      ],
+      "cv_mean_macro_f1": 0.6167199999999999,
+      "validation_metrics_seed42": {
+        "Macro_F1": 0.671,
+        "Balanced_Accuracy": 0.7272,
+        "High_Risk_Recall": 0.8517,
+        "MAOE": 0.3271,
+        "Severe_Jumping_Error_Rate": 0.0269,
+        "Avg_Asymmetric_Cost": 0.6177,
+        "n_samples": 16656,
+        "n_high_risk": 4842,
+        "diag_High_Risk_Exact_Recall": 0.6109,
+        "diag_Level3_Recall": 0.9155
+      },
+      "elapsed_seconds": 90.883
+    },
+    {
+      "params": {
+        "n_estimators": 100,
+        "max_depth": 10,
+        "min_samples_leaf": 20,
+        "max_features": 0.5
+      },
+      "cv_fold_metrics": [
+        {
+          "Macro_F1": 0.6089,
+          "Balanced_Accuracy": 0.6869,
+          "High_Risk_Recall": 0.847,
+          "MAOE": 0.4013,
+          "Severe_Jumping_Error_Rate": 0.039,
+          "Avg_Asymmetric_Cost": 0.7324,
+          "n_samples": 12921,
+          "n_high_risk": 4962,
+          "diag_High_Risk_Exact_Recall": 0.5578,
+          "diag_Level3_Recall": 0.9032
+        },
+        {
+          "Macro_F1": 0.592,
+          "Balanced_Accuracy": 0.6513,
+          "High_Risk_Recall": 0.832,
+          "MAOE": 0.4015,
+          "Severe_Jumping_Error_Rate": 0.0343,
+          "Avg_Asymmetric_Cost": 0.7513,
+          "n_samples": 13002,
+          "n_high_risk": 3709,
+          "diag_High_Risk_Exact_Recall": 0.5193,
+          "diag_Level3_Recall": 0.9056
+        },
+        {
+          "Macro_F1": 0.619,
+          "Balanced_Accuracy": 0.6861,
+          "High_Risk_Recall": 0.8184,
+          "MAOE": 0.3893,
+          "Severe_Jumping_Error_Rate": 0.0334,
+          "Avg_Asymmetric_Cost": 0.7766,
+          "n_samples": 13002,
+          "n_high_risk": 4819,
+          "diag_High_Risk_Exact_Recall": 0.5524,
+          "diag_Level3_Recall": 0.8965
+        },
+        {
+          "Macro_F1": 0.5976,
+          "Balanced_Accuracy": 0.6729,
+          "High_Risk_Recall": 0.796,
+          "MAOE": 0.3762,
+          "Severe_Jumping_Error_Rate": 0.0301,
+          "Avg_Asymmetric_Cost": 0.7417,
+          "n_samples": 13002,
+          "n_high_risk": 3078,
+          "diag_High_Risk_Exact_Recall": 0.4938,
+          "diag_Level3_Recall": 0.9178
+        },
+        {
+          "Macro_F1": 0.6282,
+          "Balanced_Accuracy": 0.6865,
+          "High_Risk_Recall": 0.7606,
+          "MAOE": 0.3561,
+          "Severe_Jumping_Error_Rate": 0.0262,
+          "Avg_Asymmetric_Cost": 0.7804,
+          "n_samples": 13002,
+          "n_high_risk": 4182,
+          "diag_High_Risk_Exact_Recall": 0.5189,
+          "diag_Level3_Recall": 0.8828
+        }
+      ],
+      "cv_mean_macro_f1": 0.60914,
+      "validation_metrics_seed42": {
+        "Macro_F1": 0.6562,
+        "Balanced_Accuracy": 0.719,
+        "High_Risk_Recall": 0.8556,
+        "MAOE": 0.346,
+        "Severe_Jumping_Error_Rate": 0.0297,
+        "Avg_Asymmetric_Cost": 0.6458,
+        "n_samples": 16656,
+        "n_high_risk": 4842,
+        "diag_High_Risk_Exact_Recall": 0.6033,
+        "diag_Level3_Recall": 0.92
+      },
+      "elapsed_seconds": 81.09
+    },
+    {
+      "params": {
+        "n_estimators": 100,
+        "max_depth": 14,
+        "min_samples_leaf": 10,
+        "max_features": 0.5
+      },
+      "cv_fold_metrics": [
+        {
+          "Macro_F1": 0.6426,
+          "Balanced_Accuracy": 0.6917,
+          "High_Risk_Recall": 0.8146,
+          "MAOE": 0.351,
+          "Severe_Jumping_Error_Rate": 0.0267,
+          "Avg_Asymmetric_Cost": 0.7205,
+          "n_samples": 12921,
+          "n_high_risk": 4962,
+          "diag_High_Risk_Exact_Recall": 0.5651,
+          "diag_Level3_Recall": 0.8467
+        },
+        {
+          "Macro_F1": 0.628,
+          "Balanced_Accuracy": 0.6682,
+          "High_Risk_Recall": 0.814,
+          "MAOE": 0.3598,
+          "Severe_Jumping_Error_Rate": 0.0268,
+          "Avg_Asymmetric_Cost": 0.6976,
+          "n_samples": 13002,
+          "n_high_risk": 3709,
+          "diag_High_Risk_Exact_Recall": 0.5406,
+          "diag_Level3_Recall": 0.8729
+        },
+        {
+          "Macro_F1": 0.6561,
+          "Balanced_Accuracy": 0.7007,
+          "High_Risk_Recall": 0.8083,
+          "MAOE": 0.3456,
+          "Severe_Jumping_Error_Rate": 0.0264,
+          "Avg_Asymmetric_Cost": 0.7304,
+          "n_samples": 13002,
+          "n_high_risk": 4819,
+          "diag_High_Risk_Exact_Recall": 0.5796,
+          "diag_Level3_Recall": 0.866
+        },
+        {
+          "Macro_F1": 0.6366,
+          "Balanced_Accuracy": 0.6905,
+          "High_Risk_Recall": 0.7791,
+          "MAOE": 0.3255,
+          "Severe_Jumping_Error_Rate": 0.0225,
+          "Avg_Asymmetric_Cost": 0.6535,
+          "n_samples": 13002,
+          "n_high_risk": 3078,
+          "diag_High_Risk_Exact_Recall": 0.5084,
+          "diag_Level3_Recall": 0.8866
+        },
+        {
+          "Macro_F1": 0.6514,
+          "Balanced_Accuracy": 0.6877,
+          "High_Risk_Recall": 0.7372,
+          "MAOE": 0.3233,
+          "Severe_Jumping_Error_Rate": 0.0196,
+          "Avg_Asymmetric_Cost": 0.751,
+          "n_samples": 13002,
+          "n_high_risk": 4182,
+          "diag_High_Risk_Exact_Recall": 0.5179,
+          "diag_Level3_Recall": 0.8415
+        }
+      ],
+      "cv_mean_macro_f1": 0.64294,
+      "validation_metrics_seed42": {
+        "Macro_F1": 0.6892,
+        "Balanced_Accuracy": 0.7332,
+        "High_Risk_Recall": 0.8447,
+        "MAOE": 0.3026,
+        "Severe_Jumping_Error_Rate": 0.0216,
+        "Avg_Asymmetric_Cost": 0.5873,
+        "n_samples": 16656,
+        "n_high_risk": 4842,
+        "diag_High_Risk_Exact_Recall": 0.6194,
+        "diag_Level3_Recall": 0.8875
+      },
+      "elapsed_seconds": 94.822
+    }
+  ],
+  "m5_threshold_search": {
+    "selection_split": "val",
+    "seed": 42,
+    "selected_thresholds": [
+      17.0,
+      33.0,
+      55.0
+    ],
+    "trace": [
+      {
+        "thresholds": [
+          11.0,
+          31.0,
+          51.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6524,
+          "Balanced_Accuracy": 0.6578,
+          "High_Risk_Recall": 0.9071,
+          "MAOE": 0.3214,
+          "Severe_Jumping_Error_Rate": 0.0085,
+          "Avg_Asymmetric_Cost": 0.5068,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.7109,
+          "diag_Level3_Recall": 0.7767
+        },
+        "distance_from_fixed": 12
+      },
+      {
+        "thresholds": [
+          11.0,
+          31.0,
+          53.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6529,
+          "Balanced_Accuracy": 0.6526,
+          "High_Risk_Recall": 0.9071,
+          "MAOE": 0.3194,
+          "Severe_Jumping_Error_Rate": 0.007,
+          "Avg_Asymmetric_Cost": 0.5259,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.7125,
+          "diag_Level3_Recall": 0.723
+        },
+        "distance_from_fixed": 10
+      },
+      {
+        "thresholds": [
+          11.0,
+          31.0,
+          55.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6527,
+          "Balanced_Accuracy": 0.6468,
+          "High_Risk_Recall": 0.9071,
+          "MAOE": 0.3177,
+          "Severe_Jumping_Error_Rate": 0.0058,
+          "Avg_Asymmetric_Cost": 0.5482,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.7144,
+          "diag_Level3_Recall": 0.663
+        },
+        "distance_from_fixed": 8
+      },
+      {
+        "thresholds": [
+          11.0,
+          31.0,
+          57.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6501,
+          "Balanced_Accuracy": 0.6395,
+          "High_Risk_Recall": 0.9071,
+          "MAOE": 0.3167,
+          "Severe_Jumping_Error_Rate": 0.0042,
+          "Avg_Asymmetric_Cost": 0.5706,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.7121,
+          "diag_Level3_Recall": 0.6037
+        },
+        "distance_from_fixed": 10
+      },
+      {
+        "thresholds": [
+          11.0,
+          31.0,
+          59.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6441,
+          "Balanced_Accuracy": 0.6305,
+          "High_Risk_Recall": 0.9071,
+          "MAOE": 0.3181,
+          "Severe_Jumping_Error_Rate": 0.0037,
+          "Avg_Asymmetric_Cost": 0.5962,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.7055,
+          "diag_Level3_Recall": 0.5448
+        },
+        "distance_from_fixed": 12
+      },
+      {
+        "thresholds": [
+          11.0,
+          33.0,
+          51.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6554,
+          "Balanced_Accuracy": 0.6531,
+          "High_Risk_Recall": 0.8612,
+          "MAOE": 0.3095,
+          "Severe_Jumping_Error_Rate": 0.0087,
+          "Avg_Asymmetric_Cost": 0.5351,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6673,
+          "diag_Level3_Recall": 0.7767
+        },
+        "distance_from_fixed": 10
+      },
+      {
+        "thresholds": [
+          11.0,
+          33.0,
+          53.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6562,
+          "Balanced_Accuracy": 0.648,
+          "High_Risk_Recall": 0.8612,
+          "MAOE": 0.3075,
+          "Severe_Jumping_Error_Rate": 0.0072,
+          "Avg_Asymmetric_Cost": 0.5542,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6689,
+          "diag_Level3_Recall": 0.723
+        },
+        "distance_from_fixed": 8
+      },
+      {
+        "thresholds": [
+          11.0,
+          33.0,
+          55.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6563,
+          "Balanced_Accuracy": 0.6422,
+          "High_Risk_Recall": 0.8612,
+          "MAOE": 0.3058,
+          "Severe_Jumping_Error_Rate": 0.006,
+          "Avg_Asymmetric_Cost": 0.5765,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6708,
+          "diag_Level3_Recall": 0.663
+        },
+        "distance_from_fixed": 6
+      },
+      {
+        "thresholds": [
+          11.0,
+          33.0,
+          57.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6539,
+          "Balanced_Accuracy": 0.6349,
+          "High_Risk_Recall": 0.8612,
+          "MAOE": 0.3048,
+          "Severe_Jumping_Error_Rate": 0.0044,
+          "Avg_Asymmetric_Cost": 0.5989,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6685,
+          "diag_Level3_Recall": 0.6037
+        },
+        "distance_from_fixed": 8
+      },
+      {
+        "thresholds": [
+          11.0,
+          33.0,
+          59.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6479,
+          "Balanced_Accuracy": 0.6259,
+          "High_Risk_Recall": 0.8612,
+          "MAOE": 0.3062,
+          "Severe_Jumping_Error_Rate": 0.0038,
+          "Avg_Asymmetric_Cost": 0.6245,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6619,
+          "diag_Level3_Recall": 0.5448
+        },
+        "distance_from_fixed": 10
+      },
+      {
+        "thresholds": [
+          11.0,
+          35.0,
+          51.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6516,
+          "Balanced_Accuracy": 0.6434,
+          "High_Risk_Recall": 0.8092,
+          "MAOE": 0.3063,
+          "Severe_Jumping_Error_Rate": 0.0096,
+          "Avg_Asymmetric_Cost": 0.5782,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.619,
+          "diag_Level3_Recall": 0.7767
+        },
+        "distance_from_fixed": 8
+      },
+      {
+        "thresholds": [
+          11.0,
+          35.0,
+          53.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6529,
+          "Balanced_Accuracy": 0.6382,
+          "High_Risk_Recall": 0.8092,
+          "MAOE": 0.3043,
+          "Severe_Jumping_Error_Rate": 0.0081,
+          "Avg_Asymmetric_Cost": 0.5973,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6206,
+          "diag_Level3_Recall": 0.723
+        },
+        "distance_from_fixed": 6
+      },
+      {
+        "thresholds": [
+          11.0,
+          35.0,
+          55.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6535,
+          "Balanced_Accuracy": 0.6324,
+          "High_Risk_Recall": 0.8092,
+          "MAOE": 0.3025,
+          "Severe_Jumping_Error_Rate": 0.0069,
+          "Avg_Asymmetric_Cost": 0.6195,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6225,
+          "diag_Level3_Recall": 0.663
+        },
+        "distance_from_fixed": 4
+      },
+      {
+        "thresholds": [
+          11.0,
+          35.0,
+          57.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6514,
+          "Balanced_Accuracy": 0.6251,
+          "High_Risk_Recall": 0.8092,
+          "MAOE": 0.3016,
+          "Severe_Jumping_Error_Rate": 0.0053,
+          "Avg_Asymmetric_Cost": 0.6419,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6202,
+          "diag_Level3_Recall": 0.6037
+        },
+        "distance_from_fixed": 6
+      },
+      {
+        "thresholds": [
+          11.0,
+          35.0,
+          59.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6456,
+          "Balanced_Accuracy": 0.6161,
+          "High_Risk_Recall": 0.8092,
+          "MAOE": 0.303,
+          "Severe_Jumping_Error_Rate": 0.0047,
+          "Avg_Asymmetric_Cost": 0.6675,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6136,
+          "diag_Level3_Recall": 0.5448
+        },
+        "distance_from_fixed": 8
+      },
+      {
+        "thresholds": [
+          11.0,
+          37.0,
+          51.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6393,
+          "Balanced_Accuracy": 0.6271,
+          "High_Risk_Recall": 0.747,
+          "MAOE": 0.3097,
+          "Severe_Jumping_Error_Rate": 0.0098,
+          "Avg_Asymmetric_Cost": 0.636,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5591,
+          "diag_Level3_Recall": 0.7767
+        },
+        "distance_from_fixed": 10
+      },
+      {
+        "thresholds": [
+          11.0,
+          37.0,
+          53.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6414,
+          "Balanced_Accuracy": 0.6219,
+          "High_Risk_Recall": 0.747,
+          "MAOE": 0.3077,
+          "Severe_Jumping_Error_Rate": 0.0083,
+          "Avg_Asymmetric_Cost": 0.6551,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5607,
+          "diag_Level3_Recall": 0.723
+        },
+        "distance_from_fixed": 8
+      },
+      {
+        "thresholds": [
+          11.0,
+          37.0,
+          55.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6428,
+          "Balanced_Accuracy": 0.6161,
+          "High_Risk_Recall": 0.747,
+          "MAOE": 0.306,
+          "Severe_Jumping_Error_Rate": 0.0071,
+          "Avg_Asymmetric_Cost": 0.6774,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5626,
+          "diag_Level3_Recall": 0.663
+        },
+        "distance_from_fixed": 6
+      },
+      {
+        "thresholds": [
+          11.0,
+          37.0,
+          57.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6413,
+          "Balanced_Accuracy": 0.6088,
+          "High_Risk_Recall": 0.747,
+          "MAOE": 0.305,
+          "Severe_Jumping_Error_Rate": 0.0055,
+          "Avg_Asymmetric_Cost": 0.6998,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5603,
+          "diag_Level3_Recall": 0.6037
+        },
+        "distance_from_fixed": 8
+      },
+      {
+        "thresholds": [
+          11.0,
+          37.0,
+          59.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.636,
+          "Balanced_Accuracy": 0.5998,
+          "High_Risk_Recall": 0.747,
+          "MAOE": 0.3064,
+          "Severe_Jumping_Error_Rate": 0.005,
+          "Avg_Asymmetric_Cost": 0.7254,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5537,
+          "diag_Level3_Recall": 0.5448
+        },
+        "distance_from_fixed": 10
+      },
+      {
+        "thresholds": [
+          11.0,
+          39.0,
+          51.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6228,
+          "Balanced_Accuracy": 0.6101,
+          "High_Risk_Recall": 0.6881,
+          "MAOE": 0.3171,
+          "Severe_Jumping_Error_Rate": 0.0107,
+          "Avg_Asymmetric_Cost": 0.6957,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5035,
+          "diag_Level3_Recall": 0.7767
+        },
+        "distance_from_fixed": 12
+      },
+      {
+        "thresholds": [
+          11.0,
+          39.0,
+          53.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.626,
+          "Balanced_Accuracy": 0.605,
+          "High_Risk_Recall": 0.6881,
+          "MAOE": 0.3151,
+          "Severe_Jumping_Error_Rate": 0.0092,
+          "Avg_Asymmetric_Cost": 0.7148,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5052,
+          "diag_Level3_Recall": 0.723
+        },
+        "distance_from_fixed": 10
+      },
+      {
+        "thresholds": [
+          11.0,
+          39.0,
+          55.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6285,
+          "Balanced_Accuracy": 0.5992,
+          "High_Risk_Recall": 0.6881,
+          "MAOE": 0.3134,
+          "Severe_Jumping_Error_Rate": 0.008,
+          "Avg_Asymmetric_Cost": 0.7371,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.507,
+          "diag_Level3_Recall": 0.663
+        },
+        "distance_from_fixed": 8
+      },
+      {
+        "thresholds": [
+          11.0,
+          39.0,
+          57.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6278,
+          "Balanced_Accuracy": 0.5919,
+          "High_Risk_Recall": 0.6881,
+          "MAOE": 0.3124,
+          "Severe_Jumping_Error_Rate": 0.0064,
+          "Avg_Asymmetric_Cost": 0.7595,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5048,
+          "diag_Level3_Recall": 0.6037
+        },
+        "distance_from_fixed": 10
+      },
+      {
+        "thresholds": [
+          11.0,
+          39.0,
+          59.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.623,
+          "Balanced_Accuracy": 0.5829,
+          "High_Risk_Recall": 0.6881,
+          "MAOE": 0.3138,
+          "Severe_Jumping_Error_Rate": 0.0059,
+          "Avg_Asymmetric_Cost": 0.7851,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.4981,
+          "diag_Level3_Recall": 0.5448
+        },
+        "distance_from_fixed": 12
+      },
+      {
+        "thresholds": [
+          13.0,
+          31.0,
+          51.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6861,
+          "Balanced_Accuracy": 0.6888,
+          "High_Risk_Recall": 0.9071,
+          "MAOE": 0.2977,
+          "Severe_Jumping_Error_Rate": 0.0086,
+          "Avg_Asymmetric_Cost": 0.4878,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.7109,
+          "diag_Level3_Recall": 0.7767
+        },
+        "distance_from_fixed": 10
+      },
+      {
+        "thresholds": [
+          13.0,
+          31.0,
+          53.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6865,
+          "Balanced_Accuracy": 0.6836,
+          "High_Risk_Recall": 0.9071,
+          "MAOE": 0.2957,
+          "Severe_Jumping_Error_Rate": 0.0071,
+          "Avg_Asymmetric_Cost": 0.5069,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.7125,
+          "diag_Level3_Recall": 0.723
+        },
+        "distance_from_fixed": 8
+      },
+      {
+        "thresholds": [
+          13.0,
+          31.0,
+          55.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6863,
+          "Balanced_Accuracy": 0.6778,
+          "High_Risk_Recall": 0.9071,
+          "MAOE": 0.2939,
+          "Severe_Jumping_Error_Rate": 0.0059,
+          "Avg_Asymmetric_Cost": 0.5292,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.7144,
+          "diag_Level3_Recall": 0.663
+        },
+        "distance_from_fixed": 6
+      },
+      {
+        "thresholds": [
+          13.0,
+          31.0,
+          57.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6837,
+          "Balanced_Accuracy": 0.6705,
+          "High_Risk_Recall": 0.9071,
+          "MAOE": 0.293,
+          "Severe_Jumping_Error_Rate": 0.0043,
+          "Avg_Asymmetric_Cost": 0.5516,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.7121,
+          "diag_Level3_Recall": 0.6037
+        },
+        "distance_from_fixed": 8
+      },
+      {
+        "thresholds": [
+          13.0,
+          31.0,
+          59.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6777,
+          "Balanced_Accuracy": 0.6615,
+          "High_Risk_Recall": 0.9071,
+          "MAOE": 0.2944,
+          "Severe_Jumping_Error_Rate": 0.0037,
+          "Avg_Asymmetric_Cost": 0.5771,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.7055,
+          "diag_Level3_Recall": 0.5448
+        },
+        "distance_from_fixed": 10
+      },
+      {
+        "thresholds": [
+          13.0,
+          33.0,
+          51.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.689,
+          "Balanced_Accuracy": 0.6842,
+          "High_Risk_Recall": 0.8612,
+          "MAOE": 0.2858,
+          "Severe_Jumping_Error_Rate": 0.0088,
+          "Avg_Asymmetric_Cost": 0.5161,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6673,
+          "diag_Level3_Recall": 0.7767
+        },
+        "distance_from_fixed": 8
+      },
+      {
+        "thresholds": [
+          13.0,
+          33.0,
+          53.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6898,
+          "Balanced_Accuracy": 0.679,
+          "High_Risk_Recall": 0.8612,
+          "MAOE": 0.2838,
+          "Severe_Jumping_Error_Rate": 0.0073,
+          "Avg_Asymmetric_Cost": 0.5352,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6689,
+          "diag_Level3_Recall": 0.723
+        },
+        "distance_from_fixed": 6
+      },
+      {
+        "thresholds": [
+          13.0,
+          33.0,
+          55.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6899,
+          "Balanced_Accuracy": 0.6732,
+          "High_Risk_Recall": 0.8612,
+          "MAOE": 0.2821,
+          "Severe_Jumping_Error_Rate": 0.0061,
+          "Avg_Asymmetric_Cost": 0.5575,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6708,
+          "diag_Level3_Recall": 0.663
+        },
+        "distance_from_fixed": 4
+      },
+      {
+        "thresholds": [
+          13.0,
+          33.0,
+          57.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6875,
+          "Balanced_Accuracy": 0.6659,
+          "High_Risk_Recall": 0.8612,
+          "MAOE": 0.2811,
+          "Severe_Jumping_Error_Rate": 0.0044,
+          "Avg_Asymmetric_Cost": 0.5799,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6685,
+          "diag_Level3_Recall": 0.6037
+        },
+        "distance_from_fixed": 6
+      },
+      {
+        "thresholds": [
+          13.0,
+          33.0,
+          59.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6815,
+          "Balanced_Accuracy": 0.6569,
+          "High_Risk_Recall": 0.8612,
+          "MAOE": 0.2825,
+          "Severe_Jumping_Error_Rate": 0.0039,
+          "Avg_Asymmetric_Cost": 0.6054,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6619,
+          "diag_Level3_Recall": 0.5448
+        },
+        "distance_from_fixed": 8
+      },
+      {
+        "thresholds": [
+          13.0,
+          35.0,
+          51.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6852,
+          "Balanced_Accuracy": 0.6744,
+          "High_Risk_Recall": 0.8092,
+          "MAOE": 0.2825,
+          "Severe_Jumping_Error_Rate": 0.0097,
+          "Avg_Asymmetric_Cost": 0.5591,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.619,
+          "diag_Level3_Recall": 0.7767
+        },
+        "distance_from_fixed": 6
+      },
+      {
+        "thresholds": [
+          13.0,
+          35.0,
+          53.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6865,
+          "Balanced_Accuracy": 0.6692,
+          "High_Risk_Recall": 0.8092,
+          "MAOE": 0.2806,
+          "Severe_Jumping_Error_Rate": 0.0082,
+          "Avg_Asymmetric_Cost": 0.5782,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6206,
+          "diag_Level3_Recall": 0.723
+        },
+        "distance_from_fixed": 4
+      },
+      {
+        "thresholds": [
+          13.0,
+          35.0,
+          55.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.687,
+          "Balanced_Accuracy": 0.6634,
+          "High_Risk_Recall": 0.8092,
+          "MAOE": 0.2788,
+          "Severe_Jumping_Error_Rate": 0.007,
+          "Avg_Asymmetric_Cost": 0.6005,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6225,
+          "diag_Level3_Recall": 0.663
+        },
+        "distance_from_fixed": 2
+      },
+      {
+        "thresholds": [
+          13.0,
+          35.0,
+          57.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6849,
+          "Balanced_Accuracy": 0.6561,
+          "High_Risk_Recall": 0.8092,
+          "MAOE": 0.2779,
+          "Severe_Jumping_Error_Rate": 0.0053,
+          "Avg_Asymmetric_Cost": 0.6229,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6202,
+          "diag_Level3_Recall": 0.6037
+        },
+        "distance_from_fixed": 4
+      },
+      {
+        "thresholds": [
+          13.0,
+          35.0,
+          59.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6792,
+          "Balanced_Accuracy": 0.6471,
+          "High_Risk_Recall": 0.8092,
+          "MAOE": 0.2792,
+          "Severe_Jumping_Error_Rate": 0.0048,
+          "Avg_Asymmetric_Cost": 0.6485,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6136,
+          "diag_Level3_Recall": 0.5448
+        },
+        "distance_from_fixed": 6
+      },
+      {
+        "thresholds": [
+          13.0,
+          37.0,
+          51.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6727,
+          "Balanced_Accuracy": 0.6581,
+          "High_Risk_Recall": 0.747,
+          "MAOE": 0.286,
+          "Severe_Jumping_Error_Rate": 0.0099,
+          "Avg_Asymmetric_Cost": 0.617,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5591,
+          "diag_Level3_Recall": 0.7767
+        },
+        "distance_from_fixed": 8
+      },
+      {
+        "thresholds": [
+          13.0,
+          37.0,
+          53.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6748,
+          "Balanced_Accuracy": 0.6529,
+          "High_Risk_Recall": 0.747,
+          "MAOE": 0.284,
+          "Severe_Jumping_Error_Rate": 0.0084,
+          "Avg_Asymmetric_Cost": 0.6361,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5607,
+          "diag_Level3_Recall": 0.723
+        },
+        "distance_from_fixed": 6
+      },
+      {
+        "thresholds": [
+          13.0,
+          37.0,
+          55.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6763,
+          "Balanced_Accuracy": 0.6471,
+          "High_Risk_Recall": 0.747,
+          "MAOE": 0.2822,
+          "Severe_Jumping_Error_Rate": 0.0072,
+          "Avg_Asymmetric_Cost": 0.6584,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5626,
+          "diag_Level3_Recall": 0.663
+        },
+        "distance_from_fixed": 4
+      },
+      {
+        "thresholds": [
+          13.0,
+          37.0,
+          57.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6748,
+          "Balanced_Accuracy": 0.6398,
+          "High_Risk_Recall": 0.747,
+          "MAOE": 0.2813,
+          "Severe_Jumping_Error_Rate": 0.0056,
+          "Avg_Asymmetric_Cost": 0.6808,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5603,
+          "diag_Level3_Recall": 0.6037
+        },
+        "distance_from_fixed": 6
+      },
+      {
+        "thresholds": [
+          13.0,
+          37.0,
+          59.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6695,
+          "Balanced_Accuracy": 0.6309,
+          "High_Risk_Recall": 0.747,
+          "MAOE": 0.2827,
+          "Severe_Jumping_Error_Rate": 0.005,
+          "Avg_Asymmetric_Cost": 0.7064,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5537,
+          "diag_Level3_Recall": 0.5448
+        },
+        "distance_from_fixed": 8
+      },
+      {
+        "thresholds": [
+          13.0,
+          39.0,
+          51.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6562,
+          "Balanced_Accuracy": 0.6412,
+          "High_Risk_Recall": 0.6881,
+          "MAOE": 0.2934,
+          "Severe_Jumping_Error_Rate": 0.0108,
+          "Avg_Asymmetric_Cost": 0.6767,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5035,
+          "diag_Level3_Recall": 0.7767
+        },
+        "distance_from_fixed": 10
+      },
+      {
+        "thresholds": [
+          13.0,
+          39.0,
+          53.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6593,
+          "Balanced_Accuracy": 0.636,
+          "High_Risk_Recall": 0.6881,
+          "MAOE": 0.2914,
+          "Severe_Jumping_Error_Rate": 0.0093,
+          "Avg_Asymmetric_Cost": 0.6958,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5052,
+          "diag_Level3_Recall": 0.723
+        },
+        "distance_from_fixed": 8
+      },
+      {
+        "thresholds": [
+          13.0,
+          39.0,
+          55.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6618,
+          "Balanced_Accuracy": 0.6302,
+          "High_Risk_Recall": 0.6881,
+          "MAOE": 0.2897,
+          "Severe_Jumping_Error_Rate": 0.0081,
+          "Avg_Asymmetric_Cost": 0.7181,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.507,
+          "diag_Level3_Recall": 0.663
+        },
+        "distance_from_fixed": 6
+      },
+      {
+        "thresholds": [
+          13.0,
+          39.0,
+          57.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6611,
+          "Balanced_Accuracy": 0.6229,
+          "High_Risk_Recall": 0.6881,
+          "MAOE": 0.2887,
+          "Severe_Jumping_Error_Rate": 0.0065,
+          "Avg_Asymmetric_Cost": 0.7405,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5048,
+          "diag_Level3_Recall": 0.6037
+        },
+        "distance_from_fixed": 8
+      },
+      {
+        "thresholds": [
+          13.0,
+          39.0,
+          59.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6564,
+          "Balanced_Accuracy": 0.6139,
+          "High_Risk_Recall": 0.6881,
+          "MAOE": 0.2901,
+          "Severe_Jumping_Error_Rate": 0.0059,
+          "Avg_Asymmetric_Cost": 0.766,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.4981,
+          "diag_Level3_Recall": 0.5448
+        },
+        "distance_from_fixed": 10
+      },
+      {
+        "thresholds": [
+          15.0,
+          31.0,
+          51.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.7149,
+          "Balanced_Accuracy": 0.7244,
+          "High_Risk_Recall": 0.9071,
+          "MAOE": 0.2756,
+          "Severe_Jumping_Error_Rate": 0.0086,
+          "Avg_Asymmetric_Cost": 0.4802,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.7109,
+          "diag_Level3_Recall": 0.7767
+        },
+        "distance_from_fixed": 8
+      },
+      {
+        "thresholds": [
+          15.0,
+          31.0,
+          53.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.7153,
+          "Balanced_Accuracy": 0.7192,
+          "High_Risk_Recall": 0.9071,
+          "MAOE": 0.2737,
+          "Severe_Jumping_Error_Rate": 0.0071,
+          "Avg_Asymmetric_Cost": 0.4993,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.7125,
+          "diag_Level3_Recall": 0.723
+        },
+        "distance_from_fixed": 6
+      },
+      {
+        "thresholds": [
+          15.0,
+          31.0,
+          55.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.7151,
+          "Balanced_Accuracy": 0.7135,
+          "High_Risk_Recall": 0.9071,
+          "MAOE": 0.2719,
+          "Severe_Jumping_Error_Rate": 0.0059,
+          "Avg_Asymmetric_Cost": 0.5216,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.7144,
+          "diag_Level3_Recall": 0.663
+        },
+        "distance_from_fixed": 4
+      },
+      {
+        "thresholds": [
+          15.0,
+          31.0,
+          57.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.7125,
+          "Balanced_Accuracy": 0.7061,
+          "High_Risk_Recall": 0.9071,
+          "MAOE": 0.271,
+          "Severe_Jumping_Error_Rate": 0.0043,
+          "Avg_Asymmetric_Cost": 0.5439,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.7121,
+          "diag_Level3_Recall": 0.6037
+        },
+        "distance_from_fixed": 6
+      },
+      {
+        "thresholds": [
+          15.0,
+          31.0,
+          59.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.7065,
+          "Balanced_Accuracy": 0.6972,
+          "High_Risk_Recall": 0.9071,
+          "MAOE": 0.2723,
+          "Severe_Jumping_Error_Rate": 0.0037,
+          "Avg_Asymmetric_Cost": 0.5695,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.7055,
+          "diag_Level3_Recall": 0.5448
+        },
+        "distance_from_fixed": 8
+      },
+      {
+        "thresholds": [
+          15.0,
+          33.0,
+          51.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.718,
+          "Balanced_Accuracy": 0.7198,
+          "High_Risk_Recall": 0.8612,
+          "MAOE": 0.2637,
+          "Severe_Jumping_Error_Rate": 0.0088,
+          "Avg_Asymmetric_Cost": 0.5085,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6673,
+          "diag_Level3_Recall": 0.7767
+        },
+        "distance_from_fixed": 6
+      },
+      {
+        "thresholds": [
+          15.0,
+          33.0,
+          53.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.7187,
+          "Balanced_Accuracy": 0.7146,
+          "High_Risk_Recall": 0.8612,
+          "MAOE": 0.2618,
+          "Severe_Jumping_Error_Rate": 0.0073,
+          "Avg_Asymmetric_Cost": 0.5276,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6689,
+          "diag_Level3_Recall": 0.723
+        },
+        "distance_from_fixed": 4
+      },
+      {
+        "thresholds": [
+          15.0,
+          33.0,
+          55.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.7188,
+          "Balanced_Accuracy": 0.7089,
+          "High_Risk_Recall": 0.8612,
+          "MAOE": 0.26,
+          "Severe_Jumping_Error_Rate": 0.0061,
+          "Avg_Asymmetric_Cost": 0.5498,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6708,
+          "diag_Level3_Recall": 0.663
+        },
+        "distance_from_fixed": 2
+      },
+      {
+        "thresholds": [
+          15.0,
+          33.0,
+          57.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.7164,
+          "Balanced_Accuracy": 0.7015,
+          "High_Risk_Recall": 0.8612,
+          "MAOE": 0.2591,
+          "Severe_Jumping_Error_Rate": 0.0044,
+          "Avg_Asymmetric_Cost": 0.5722,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6685,
+          "diag_Level3_Recall": 0.6037
+        },
+        "distance_from_fixed": 4
+      },
+      {
+        "thresholds": [
+          15.0,
+          33.0,
+          59.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.7105,
+          "Balanced_Accuracy": 0.6926,
+          "High_Risk_Recall": 0.8612,
+          "MAOE": 0.2604,
+          "Severe_Jumping_Error_Rate": 0.0039,
+          "Avg_Asymmetric_Cost": 0.5978,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6619,
+          "diag_Level3_Recall": 0.5448
+        },
+        "distance_from_fixed": 6
+      },
+      {
+        "thresholds": [
+          15.0,
+          35.0,
+          51.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.7142,
+          "Balanced_Accuracy": 0.71,
+          "High_Risk_Recall": 0.8092,
+          "MAOE": 0.2605,
+          "Severe_Jumping_Error_Rate": 0.0097,
+          "Avg_Asymmetric_Cost": 0.5515,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.619,
+          "diag_Level3_Recall": 0.7767
+        },
+        "distance_from_fixed": 4
+      },
+      {
+        "thresholds": [
+          15.0,
+          35.0,
+          53.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.7154,
+          "Balanced_Accuracy": 0.7049,
+          "High_Risk_Recall": 0.8092,
+          "MAOE": 0.2585,
+          "Severe_Jumping_Error_Rate": 0.0082,
+          "Avg_Asymmetric_Cost": 0.5706,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6206,
+          "diag_Level3_Recall": 0.723
+        },
+        "distance_from_fixed": 2
+      },
+      {
+        "thresholds": [
+          15.0,
+          35.0,
+          55.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.716,
+          "Balanced_Accuracy": 0.6991,
+          "High_Risk_Recall": 0.8092,
+          "MAOE": 0.2568,
+          "Severe_Jumping_Error_Rate": 0.007,
+          "Avg_Asymmetric_Cost": 0.5929,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6225,
+          "diag_Level3_Recall": 0.663
+        },
+        "distance_from_fixed": 0
+      },
+      {
+        "thresholds": [
+          15.0,
+          35.0,
+          57.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.7139,
+          "Balanced_Accuracy": 0.6918,
+          "High_Risk_Recall": 0.8092,
+          "MAOE": 0.2558,
+          "Severe_Jumping_Error_Rate": 0.0053,
+          "Avg_Asymmetric_Cost": 0.6153,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6202,
+          "diag_Level3_Recall": 0.6037
+        },
+        "distance_from_fixed": 2
+      },
+      {
+        "thresholds": [
+          15.0,
+          35.0,
+          59.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.7082,
+          "Balanced_Accuracy": 0.6828,
+          "High_Risk_Recall": 0.8092,
+          "MAOE": 0.2572,
+          "Severe_Jumping_Error_Rate": 0.0048,
+          "Avg_Asymmetric_Cost": 0.6409,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6136,
+          "diag_Level3_Recall": 0.5448
+        },
+        "distance_from_fixed": 4
+      },
+      {
+        "thresholds": [
+          15.0,
+          37.0,
+          51.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.7016,
+          "Balanced_Accuracy": 0.6937,
+          "High_Risk_Recall": 0.747,
+          "MAOE": 0.2639,
+          "Severe_Jumping_Error_Rate": 0.0099,
+          "Avg_Asymmetric_Cost": 0.6094,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5591,
+          "diag_Level3_Recall": 0.7767
+        },
+        "distance_from_fixed": 6
+      },
+      {
+        "thresholds": [
+          15.0,
+          37.0,
+          53.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.7037,
+          "Balanced_Accuracy": 0.6886,
+          "High_Risk_Recall": 0.747,
+          "MAOE": 0.2619,
+          "Severe_Jumping_Error_Rate": 0.0084,
+          "Avg_Asymmetric_Cost": 0.6285,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5607,
+          "diag_Level3_Recall": 0.723
+        },
+        "distance_from_fixed": 4
+      },
+      {
+        "thresholds": [
+          15.0,
+          37.0,
+          55.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.7051,
+          "Balanced_Accuracy": 0.6828,
+          "High_Risk_Recall": 0.747,
+          "MAOE": 0.2602,
+          "Severe_Jumping_Error_Rate": 0.0072,
+          "Avg_Asymmetric_Cost": 0.6508,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5626,
+          "diag_Level3_Recall": 0.663
+        },
+        "distance_from_fixed": 2
+      },
+      {
+        "thresholds": [
+          15.0,
+          37.0,
+          57.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.7037,
+          "Balanced_Accuracy": 0.6755,
+          "High_Risk_Recall": 0.747,
+          "MAOE": 0.2592,
+          "Severe_Jumping_Error_Rate": 0.0056,
+          "Avg_Asymmetric_Cost": 0.6732,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5603,
+          "diag_Level3_Recall": 0.6037
+        },
+        "distance_from_fixed": 4
+      },
+      {
+        "thresholds": [
+          15.0,
+          37.0,
+          59.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6984,
+          "Balanced_Accuracy": 0.6665,
+          "High_Risk_Recall": 0.747,
+          "MAOE": 0.2606,
+          "Severe_Jumping_Error_Rate": 0.005,
+          "Avg_Asymmetric_Cost": 0.6987,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5537,
+          "diag_Level3_Recall": 0.5448
+        },
+        "distance_from_fixed": 6
+      },
+      {
+        "thresholds": [
+          15.0,
+          39.0,
+          51.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.685,
+          "Balanced_Accuracy": 0.6768,
+          "High_Risk_Recall": 0.6881,
+          "MAOE": 0.2714,
+          "Severe_Jumping_Error_Rate": 0.0108,
+          "Avg_Asymmetric_Cost": 0.6691,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5035,
+          "diag_Level3_Recall": 0.7767
+        },
+        "distance_from_fixed": 8
+      },
+      {
+        "thresholds": [
+          15.0,
+          39.0,
+          53.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6881,
+          "Balanced_Accuracy": 0.6716,
+          "High_Risk_Recall": 0.6881,
+          "MAOE": 0.2694,
+          "Severe_Jumping_Error_Rate": 0.0093,
+          "Avg_Asymmetric_Cost": 0.6882,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5052,
+          "diag_Level3_Recall": 0.723
+        },
+        "distance_from_fixed": 6
+      },
+      {
+        "thresholds": [
+          15.0,
+          39.0,
+          55.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6906,
+          "Balanced_Accuracy": 0.6659,
+          "High_Risk_Recall": 0.6881,
+          "MAOE": 0.2677,
+          "Severe_Jumping_Error_Rate": 0.0081,
+          "Avg_Asymmetric_Cost": 0.7104,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.507,
+          "diag_Level3_Recall": 0.663
+        },
+        "distance_from_fixed": 4
+      },
+      {
+        "thresholds": [
+          15.0,
+          39.0,
+          57.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6899,
+          "Balanced_Accuracy": 0.6585,
+          "High_Risk_Recall": 0.6881,
+          "MAOE": 0.2667,
+          "Severe_Jumping_Error_Rate": 0.0065,
+          "Avg_Asymmetric_Cost": 0.7328,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5048,
+          "diag_Level3_Recall": 0.6037
+        },
+        "distance_from_fixed": 6
+      },
+      {
+        "thresholds": [
+          15.0,
+          39.0,
+          59.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6852,
+          "Balanced_Accuracy": 0.6496,
+          "High_Risk_Recall": 0.6881,
+          "MAOE": 0.2681,
+          "Severe_Jumping_Error_Rate": 0.0059,
+          "Avg_Asymmetric_Cost": 0.7584,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.4981,
+          "diag_Level3_Recall": 0.5448
+        },
+        "distance_from_fixed": 8
+      },
+      {
+        "thresholds": [
+          17.0,
+          31.0,
+          51.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.717,
+          "Balanced_Accuracy": 0.7414,
+          "High_Risk_Recall": 0.9071,
+          "MAOE": 0.2784,
+          "Severe_Jumping_Error_Rate": 0.0088,
+          "Avg_Asymmetric_Cost": 0.5131,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.7109,
+          "diag_Level3_Recall": 0.7767
+        },
+        "distance_from_fixed": 10
+      },
+      {
+        "thresholds": [
+          17.0,
+          31.0,
+          53.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.7175,
+          "Balanced_Accuracy": 0.7362,
+          "High_Risk_Recall": 0.9071,
+          "MAOE": 0.2764,
+          "Severe_Jumping_Error_Rate": 0.0073,
+          "Avg_Asymmetric_Cost": 0.5322,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.7125,
+          "diag_Level3_Recall": 0.723
+        },
+        "distance_from_fixed": 8
+      },
+      {
+        "thresholds": [
+          17.0,
+          31.0,
+          55.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.7173,
+          "Balanced_Accuracy": 0.7304,
+          "High_Risk_Recall": 0.9071,
+          "MAOE": 0.2747,
+          "Severe_Jumping_Error_Rate": 0.0061,
+          "Avg_Asymmetric_Cost": 0.5545,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.7144,
+          "diag_Level3_Recall": 0.663
+        },
+        "distance_from_fixed": 6
+      },
+      {
+        "thresholds": [
+          17.0,
+          31.0,
+          57.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.7147,
+          "Balanced_Accuracy": 0.7231,
+          "High_Risk_Recall": 0.9071,
+          "MAOE": 0.2737,
+          "Severe_Jumping_Error_Rate": 0.0044,
+          "Avg_Asymmetric_Cost": 0.5769,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.7121,
+          "diag_Level3_Recall": 0.6037
+        },
+        "distance_from_fixed": 8
+      },
+      {
+        "thresholds": [
+          17.0,
+          31.0,
+          59.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.7087,
+          "Balanced_Accuracy": 0.7141,
+          "High_Risk_Recall": 0.9071,
+          "MAOE": 0.2751,
+          "Severe_Jumping_Error_Rate": 0.0039,
+          "Avg_Asymmetric_Cost": 0.6025,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.7055,
+          "diag_Level3_Recall": 0.5448
+        },
+        "distance_from_fixed": 10
+      },
+      {
+        "thresholds": [
+          17.0,
+          33.0,
+          51.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.7206,
+          "Balanced_Accuracy": 0.7367,
+          "High_Risk_Recall": 0.8612,
+          "MAOE": 0.2665,
+          "Severe_Jumping_Error_Rate": 0.0089,
+          "Avg_Asymmetric_Cost": 0.5414,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6673,
+          "diag_Level3_Recall": 0.7767
+        },
+        "distance_from_fixed": 8
+      },
+      {
+        "thresholds": [
+          17.0,
+          33.0,
+          53.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.7214,
+          "Balanced_Accuracy": 0.7316,
+          "High_Risk_Recall": 0.8612,
+          "MAOE": 0.2645,
+          "Severe_Jumping_Error_Rate": 0.0074,
+          "Avg_Asymmetric_Cost": 0.5605,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6689,
+          "diag_Level3_Recall": 0.723
+        },
+        "distance_from_fixed": 6
+      },
+      {
+        "thresholds": [
+          17.0,
+          33.0,
+          55.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.7214,
+          "Balanced_Accuracy": 0.7258,
+          "High_Risk_Recall": 0.8612,
+          "MAOE": 0.2628,
+          "Severe_Jumping_Error_Rate": 0.0062,
+          "Avg_Asymmetric_Cost": 0.5828,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6708,
+          "diag_Level3_Recall": 0.663
+        },
+        "distance_from_fixed": 4
+      },
+      {
+        "thresholds": [
+          17.0,
+          33.0,
+          57.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.719,
+          "Balanced_Accuracy": 0.7185,
+          "High_Risk_Recall": 0.8612,
+          "MAOE": 0.2618,
+          "Severe_Jumping_Error_Rate": 0.0046,
+          "Avg_Asymmetric_Cost": 0.6052,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6685,
+          "diag_Level3_Recall": 0.6037
+        },
+        "distance_from_fixed": 6
+      },
+      {
+        "thresholds": [
+          17.0,
+          33.0,
+          59.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.7131,
+          "Balanced_Accuracy": 0.7095,
+          "High_Risk_Recall": 0.8612,
+          "MAOE": 0.2632,
+          "Severe_Jumping_Error_Rate": 0.0041,
+          "Avg_Asymmetric_Cost": 0.6308,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6619,
+          "diag_Level3_Recall": 0.5448
+        },
+        "distance_from_fixed": 8
+      },
+      {
+        "thresholds": [
+          17.0,
+          35.0,
+          51.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.717,
+          "Balanced_Accuracy": 0.727,
+          "High_Risk_Recall": 0.8092,
+          "MAOE": 0.2633,
+          "Severe_Jumping_Error_Rate": 0.0098,
+          "Avg_Asymmetric_Cost": 0.5845,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.619,
+          "diag_Level3_Recall": 0.7767
+        },
+        "distance_from_fixed": 6
+      },
+      {
+        "thresholds": [
+          17.0,
+          35.0,
+          53.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.7183,
+          "Balanced_Accuracy": 0.7218,
+          "High_Risk_Recall": 0.8092,
+          "MAOE": 0.2613,
+          "Severe_Jumping_Error_Rate": 0.0083,
+          "Avg_Asymmetric_Cost": 0.6036,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6206,
+          "diag_Level3_Recall": 0.723
+        },
+        "distance_from_fixed": 4
+      },
+      {
+        "thresholds": [
+          17.0,
+          35.0,
+          55.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.7189,
+          "Balanced_Accuracy": 0.716,
+          "High_Risk_Recall": 0.8092,
+          "MAOE": 0.2595,
+          "Severe_Jumping_Error_Rate": 0.0071,
+          "Avg_Asymmetric_Cost": 0.6258,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6225,
+          "diag_Level3_Recall": 0.663
+        },
+        "distance_from_fixed": 2
+      },
+      {
+        "thresholds": [
+          17.0,
+          35.0,
+          57.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.7168,
+          "Balanced_Accuracy": 0.7087,
+          "High_Risk_Recall": 0.8092,
+          "MAOE": 0.2586,
+          "Severe_Jumping_Error_Rate": 0.0055,
+          "Avg_Asymmetric_Cost": 0.6482,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6202,
+          "diag_Level3_Recall": 0.6037
+        },
+        "distance_from_fixed": 4
+      },
+      {
+        "thresholds": [
+          17.0,
+          35.0,
+          59.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.711,
+          "Balanced_Accuracy": 0.6997,
+          "High_Risk_Recall": 0.8092,
+          "MAOE": 0.26,
+          "Severe_Jumping_Error_Rate": 0.005,
+          "Avg_Asymmetric_Cost": 0.6738,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6136,
+          "diag_Level3_Recall": 0.5448
+        },
+        "distance_from_fixed": 6
+      },
+      {
+        "thresholds": [
+          17.0,
+          37.0,
+          51.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.7046,
+          "Balanced_Accuracy": 0.7107,
+          "High_Risk_Recall": 0.747,
+          "MAOE": 0.2667,
+          "Severe_Jumping_Error_Rate": 0.0101,
+          "Avg_Asymmetric_Cost": 0.6424,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5591,
+          "diag_Level3_Recall": 0.7767
+        },
+        "distance_from_fixed": 8
+      },
+      {
+        "thresholds": [
+          17.0,
+          37.0,
+          53.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.7067,
+          "Balanced_Accuracy": 0.7055,
+          "High_Risk_Recall": 0.747,
+          "MAOE": 0.2647,
+          "Severe_Jumping_Error_Rate": 0.0086,
+          "Avg_Asymmetric_Cost": 0.6614,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5607,
+          "diag_Level3_Recall": 0.723
+        },
+        "distance_from_fixed": 6
+      },
+      {
+        "thresholds": [
+          17.0,
+          37.0,
+          55.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.7081,
+          "Balanced_Accuracy": 0.6997,
+          "High_Risk_Recall": 0.747,
+          "MAOE": 0.263,
+          "Severe_Jumping_Error_Rate": 0.0074,
+          "Avg_Asymmetric_Cost": 0.6837,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5626,
+          "diag_Level3_Recall": 0.663
+        },
+        "distance_from_fixed": 4
+      },
+      {
+        "thresholds": [
+          17.0,
+          37.0,
+          57.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.7067,
+          "Balanced_Accuracy": 0.6924,
+          "High_Risk_Recall": 0.747,
+          "MAOE": 0.262,
+          "Severe_Jumping_Error_Rate": 0.0058,
+          "Avg_Asymmetric_Cost": 0.7061,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5603,
+          "diag_Level3_Recall": 0.6037
+        },
+        "distance_from_fixed": 6
+      },
+      {
+        "thresholds": [
+          17.0,
+          37.0,
+          59.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.7014,
+          "Balanced_Accuracy": 0.6834,
+          "High_Risk_Recall": 0.747,
+          "MAOE": 0.2634,
+          "Severe_Jumping_Error_Rate": 0.0052,
+          "Avg_Asymmetric_Cost": 0.7317,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5537,
+          "diag_Level3_Recall": 0.5448
+        },
+        "distance_from_fixed": 8
+      },
+      {
+        "thresholds": [
+          17.0,
+          39.0,
+          51.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.688,
+          "Balanced_Accuracy": 0.6938,
+          "High_Risk_Recall": 0.6881,
+          "MAOE": 0.2741,
+          "Severe_Jumping_Error_Rate": 0.011,
+          "Avg_Asymmetric_Cost": 0.702,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5035,
+          "diag_Level3_Recall": 0.7767
+        },
+        "distance_from_fixed": 10
+      },
+      {
+        "thresholds": [
+          17.0,
+          39.0,
+          53.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6912,
+          "Balanced_Accuracy": 0.6886,
+          "High_Risk_Recall": 0.6881,
+          "MAOE": 0.2722,
+          "Severe_Jumping_Error_Rate": 0.0095,
+          "Avg_Asymmetric_Cost": 0.7211,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5052,
+          "diag_Level3_Recall": 0.723
+        },
+        "distance_from_fixed": 8
+      },
+      {
+        "thresholds": [
+          17.0,
+          39.0,
+          55.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6937,
+          "Balanced_Accuracy": 0.6828,
+          "High_Risk_Recall": 0.6881,
+          "MAOE": 0.2704,
+          "Severe_Jumping_Error_Rate": 0.0083,
+          "Avg_Asymmetric_Cost": 0.7434,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.507,
+          "diag_Level3_Recall": 0.663
+        },
+        "distance_from_fixed": 6
+      },
+      {
+        "thresholds": [
+          17.0,
+          39.0,
+          57.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.693,
+          "Balanced_Accuracy": 0.6755,
+          "High_Risk_Recall": 0.6881,
+          "MAOE": 0.2695,
+          "Severe_Jumping_Error_Rate": 0.0067,
+          "Avg_Asymmetric_Cost": 0.7658,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5048,
+          "diag_Level3_Recall": 0.6037
+        },
+        "distance_from_fixed": 8
+      },
+      {
+        "thresholds": [
+          17.0,
+          39.0,
+          59.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6882,
+          "Balanced_Accuracy": 0.6665,
+          "High_Risk_Recall": 0.6881,
+          "MAOE": 0.2708,
+          "Severe_Jumping_Error_Rate": 0.0061,
+          "Avg_Asymmetric_Cost": 0.7914,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.4981,
+          "diag_Level3_Recall": 0.5448
+        },
+        "distance_from_fixed": 10
+      },
+      {
+        "thresholds": [
+          19.0,
+          31.0,
+          51.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6954,
+          "Balanced_Accuracy": 0.7374,
+          "High_Risk_Recall": 0.9071,
+          "MAOE": 0.3091,
+          "Severe_Jumping_Error_Rate": 0.0091,
+          "Avg_Asymmetric_Cost": 0.592,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.7109,
+          "diag_Level3_Recall": 0.7767
+        },
+        "distance_from_fixed": 12
+      },
+      {
+        "thresholds": [
+          19.0,
+          31.0,
+          53.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6958,
+          "Balanced_Accuracy": 0.7322,
+          "High_Risk_Recall": 0.9071,
+          "MAOE": 0.3071,
+          "Severe_Jumping_Error_Rate": 0.0076,
+          "Avg_Asymmetric_Cost": 0.6111,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.7125,
+          "diag_Level3_Recall": 0.723
+        },
+        "distance_from_fixed": 10
+      },
+      {
+        "thresholds": [
+          19.0,
+          31.0,
+          55.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6956,
+          "Balanced_Accuracy": 0.7265,
+          "High_Risk_Recall": 0.9071,
+          "MAOE": 0.3054,
+          "Severe_Jumping_Error_Rate": 0.0064,
+          "Avg_Asymmetric_Cost": 0.6333,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.7144,
+          "diag_Level3_Recall": 0.663
+        },
+        "distance_from_fixed": 8
+      },
+      {
+        "thresholds": [
+          19.0,
+          31.0,
+          57.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.693,
+          "Balanced_Accuracy": 0.7191,
+          "High_Risk_Recall": 0.9071,
+          "MAOE": 0.3044,
+          "Severe_Jumping_Error_Rate": 0.0048,
+          "Avg_Asymmetric_Cost": 0.6557,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.7121,
+          "diag_Level3_Recall": 0.6037
+        },
+        "distance_from_fixed": 10
+      },
+      {
+        "thresholds": [
+          19.0,
+          31.0,
+          59.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.687,
+          "Balanced_Accuracy": 0.7102,
+          "High_Risk_Recall": 0.9071,
+          "MAOE": 0.3058,
+          "Severe_Jumping_Error_Rate": 0.0043,
+          "Avg_Asymmetric_Cost": 0.6813,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.7055,
+          "diag_Level3_Recall": 0.5448
+        },
+        "distance_from_fixed": 12
+      },
+      {
+        "thresholds": [
+          19.0,
+          33.0,
+          51.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6998,
+          "Balanced_Accuracy": 0.7328,
+          "High_Risk_Recall": 0.8612,
+          "MAOE": 0.2972,
+          "Severe_Jumping_Error_Rate": 0.0093,
+          "Avg_Asymmetric_Cost": 0.6203,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6673,
+          "diag_Level3_Recall": 0.7767
+        },
+        "distance_from_fixed": 10
+      },
+      {
+        "thresholds": [
+          19.0,
+          33.0,
+          53.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.7006,
+          "Balanced_Accuracy": 0.7276,
+          "High_Risk_Recall": 0.8612,
+          "MAOE": 0.2952,
+          "Severe_Jumping_Error_Rate": 0.0078,
+          "Avg_Asymmetric_Cost": 0.6393,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6689,
+          "diag_Level3_Recall": 0.723
+        },
+        "distance_from_fixed": 8
+      },
+      {
+        "thresholds": [
+          19.0,
+          33.0,
+          55.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.7007,
+          "Balanced_Accuracy": 0.7218,
+          "High_Risk_Recall": 0.8612,
+          "MAOE": 0.2935,
+          "Severe_Jumping_Error_Rate": 0.0066,
+          "Avg_Asymmetric_Cost": 0.6616,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6708,
+          "diag_Level3_Recall": 0.663
+        },
+        "distance_from_fixed": 6
+      },
+      {
+        "thresholds": [
+          19.0,
+          33.0,
+          57.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6983,
+          "Balanced_Accuracy": 0.7145,
+          "High_Risk_Recall": 0.8612,
+          "MAOE": 0.2925,
+          "Severe_Jumping_Error_Rate": 0.005,
+          "Avg_Asymmetric_Cost": 0.684,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6685,
+          "diag_Level3_Recall": 0.6037
+        },
+        "distance_from_fixed": 8
+      },
+      {
+        "thresholds": [
+          19.0,
+          33.0,
+          59.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6923,
+          "Balanced_Accuracy": 0.7055,
+          "High_Risk_Recall": 0.8612,
+          "MAOE": 0.2939,
+          "Severe_Jumping_Error_Rate": 0.0044,
+          "Avg_Asymmetric_Cost": 0.7096,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6619,
+          "diag_Level3_Recall": 0.5448
+        },
+        "distance_from_fixed": 10
+      },
+      {
+        "thresholds": [
+          19.0,
+          35.0,
+          51.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6969,
+          "Balanced_Accuracy": 0.723,
+          "High_Risk_Recall": 0.8092,
+          "MAOE": 0.2939,
+          "Severe_Jumping_Error_Rate": 0.0102,
+          "Avg_Asymmetric_Cost": 0.6633,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.619,
+          "diag_Level3_Recall": 0.7767
+        },
+        "distance_from_fixed": 8
+      },
+      {
+        "thresholds": [
+          19.0,
+          35.0,
+          53.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6982,
+          "Balanced_Accuracy": 0.7178,
+          "High_Risk_Recall": 0.8092,
+          "MAOE": 0.292,
+          "Severe_Jumping_Error_Rate": 0.0087,
+          "Avg_Asymmetric_Cost": 0.6824,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6206,
+          "diag_Level3_Recall": 0.723
+        },
+        "distance_from_fixed": 6
+      },
+      {
+        "thresholds": [
+          19.0,
+          35.0,
+          55.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6987,
+          "Balanced_Accuracy": 0.7121,
+          "High_Risk_Recall": 0.8092,
+          "MAOE": 0.2902,
+          "Severe_Jumping_Error_Rate": 0.0075,
+          "Avg_Asymmetric_Cost": 0.7047,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6225,
+          "diag_Level3_Recall": 0.663
+        },
+        "distance_from_fixed": 4
+      },
+      {
+        "thresholds": [
+          19.0,
+          35.0,
+          57.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6966,
+          "Balanced_Accuracy": 0.7047,
+          "High_Risk_Recall": 0.8092,
+          "MAOE": 0.2893,
+          "Severe_Jumping_Error_Rate": 0.0059,
+          "Avg_Asymmetric_Cost": 0.7271,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6202,
+          "diag_Level3_Recall": 0.6037
+        },
+        "distance_from_fixed": 6
+      },
+      {
+        "thresholds": [
+          19.0,
+          35.0,
+          59.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6909,
+          "Balanced_Accuracy": 0.6958,
+          "High_Risk_Recall": 0.8092,
+          "MAOE": 0.2906,
+          "Severe_Jumping_Error_Rate": 0.0053,
+          "Avg_Asymmetric_Cost": 0.7526,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6136,
+          "diag_Level3_Recall": 0.5448
+        },
+        "distance_from_fixed": 8
+      },
+      {
+        "thresholds": [
+          19.0,
+          37.0,
+          51.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6849,
+          "Balanced_Accuracy": 0.7067,
+          "High_Risk_Recall": 0.747,
+          "MAOE": 0.2974,
+          "Severe_Jumping_Error_Rate": 0.0104,
+          "Avg_Asymmetric_Cost": 0.7212,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5591,
+          "diag_Level3_Recall": 0.7767
+        },
+        "distance_from_fixed": 10
+      },
+      {
+        "thresholds": [
+          19.0,
+          37.0,
+          53.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.687,
+          "Balanced_Accuracy": 0.7015,
+          "High_Risk_Recall": 0.747,
+          "MAOE": 0.2954,
+          "Severe_Jumping_Error_Rate": 0.0089,
+          "Avg_Asymmetric_Cost": 0.7403,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5607,
+          "diag_Level3_Recall": 0.723
+        },
+        "distance_from_fixed": 8
+      },
+      {
+        "thresholds": [
+          19.0,
+          37.0,
+          55.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6884,
+          "Balanced_Accuracy": 0.6958,
+          "High_Risk_Recall": 0.747,
+          "MAOE": 0.2936,
+          "Severe_Jumping_Error_Rate": 0.0077,
+          "Avg_Asymmetric_Cost": 0.7625,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5626,
+          "diag_Level3_Recall": 0.663
+        },
+        "distance_from_fixed": 6
+      },
+      {
+        "thresholds": [
+          19.0,
+          37.0,
+          57.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.687,
+          "Balanced_Accuracy": 0.6884,
+          "High_Risk_Recall": 0.747,
+          "MAOE": 0.2927,
+          "Severe_Jumping_Error_Rate": 0.0061,
+          "Avg_Asymmetric_Cost": 0.7849,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5603,
+          "diag_Level3_Recall": 0.6037
+        },
+        "distance_from_fixed": 8
+      },
+      {
+        "thresholds": [
+          19.0,
+          37.0,
+          59.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6817,
+          "Balanced_Accuracy": 0.6795,
+          "High_Risk_Recall": 0.747,
+          "MAOE": 0.2941,
+          "Severe_Jumping_Error_Rate": 0.0056,
+          "Avg_Asymmetric_Cost": 0.8105,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5537,
+          "diag_Level3_Recall": 0.5448
+        },
+        "distance_from_fixed": 10
+      },
+      {
+        "thresholds": [
+          19.0,
+          39.0,
+          51.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6686,
+          "Balanced_Accuracy": 0.6898,
+          "High_Risk_Recall": 0.6881,
+          "MAOE": 0.3048,
+          "Severe_Jumping_Error_Rate": 0.0113,
+          "Avg_Asymmetric_Cost": 0.7809,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5035,
+          "diag_Level3_Recall": 0.7767
+        },
+        "distance_from_fixed": 12
+      },
+      {
+        "thresholds": [
+          19.0,
+          39.0,
+          53.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6718,
+          "Balanced_Accuracy": 0.6846,
+          "High_Risk_Recall": 0.6881,
+          "MAOE": 0.3028,
+          "Severe_Jumping_Error_Rate": 0.0098,
+          "Avg_Asymmetric_Cost": 0.8,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5052,
+          "diag_Level3_Recall": 0.723
+        },
+        "distance_from_fixed": 10
+      },
+      {
+        "thresholds": [
+          19.0,
+          39.0,
+          55.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6742,
+          "Balanced_Accuracy": 0.6788,
+          "High_Risk_Recall": 0.6881,
+          "MAOE": 0.3011,
+          "Severe_Jumping_Error_Rate": 0.0086,
+          "Avg_Asymmetric_Cost": 0.8222,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.507,
+          "diag_Level3_Recall": 0.663
+        },
+        "distance_from_fixed": 8
+      },
+      {
+        "thresholds": [
+          19.0,
+          39.0,
+          57.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6735,
+          "Balanced_Accuracy": 0.6715,
+          "High_Risk_Recall": 0.6881,
+          "MAOE": 0.3001,
+          "Severe_Jumping_Error_Rate": 0.007,
+          "Avg_Asymmetric_Cost": 0.8446,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5048,
+          "diag_Level3_Recall": 0.6037
+        },
+        "distance_from_fixed": 10
+      },
+      {
+        "thresholds": [
+          19.0,
+          39.0,
+          59.0
+        ],
+        "metrics": {
+          "Macro_F1": 0.6688,
+          "Balanced_Accuracy": 0.6625,
+          "High_Risk_Recall": 0.6881,
+          "MAOE": 0.3015,
+          "Severe_Jumping_Error_Rate": 0.0065,
+          "Avg_Asymmetric_Cost": 0.8702,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.4981,
+          "diag_Level3_Recall": 0.5448
+        },
+        "distance_from_fixed": 12
+      }
+    ]
+  },
+  "seed_runs": [
+    {
+      "seed": 42,
+      "validation_metrics": {
+        "M5_fixed": {
+          "Macro_F1": 0.716,
+          "Balanced_Accuracy": 0.6991,
+          "High_Risk_Recall": 0.8092,
+          "MAOE": 0.2568,
+          "Severe_Jumping_Error_Rate": 0.007,
+          "Avg_Asymmetric_Cost": 0.5929,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6225,
+          "diag_Level3_Recall": 0.663
+        },
+        "M5_val_tuned": {
+          "Macro_F1": 0.7214,
+          "Balanced_Accuracy": 0.7258,
+          "High_Risk_Recall": 0.8612,
+          "MAOE": 0.2628,
+          "Severe_Jumping_Error_Rate": 0.0062,
+          "Avg_Asymmetric_Cost": 0.5828,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6708,
+          "diag_Level3_Recall": 0.663
+        },
+        "M6_Ordinal_RF": {
+          "Macro_F1": 0.6892,
+          "Balanced_Accuracy": 0.7332,
+          "High_Risk_Recall": 0.8447,
+          "MAOE": 0.3026,
+          "Severe_Jumping_Error_Rate": 0.0216,
+          "Avg_Asymmetric_Cost": 0.5873,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6194,
+          "diag_Level3_Recall": 0.8875
+        }
+      }
+    },
+    {
+      "seed": 43,
+      "validation_metrics": {
+        "M5_fixed": {
+          "Macro_F1": 0.7146,
+          "Balanced_Accuracy": 0.6962,
+          "High_Risk_Recall": 0.8075,
+          "MAOE": 0.2563,
+          "Severe_Jumping_Error_Rate": 0.0064,
+          "Avg_Asymmetric_Cost": 0.5967,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6177,
+          "diag_Level3_Recall": 0.6528
+        },
+        "M5_val_tuned": {
+          "Macro_F1": 0.719,
+          "Balanced_Accuracy": 0.7223,
+          "High_Risk_Recall": 0.8598,
+          "MAOE": 0.2642,
+          "Severe_Jumping_Error_Rate": 0.0058,
+          "Avg_Asymmetric_Cost": 0.5891,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6663,
+          "diag_Level3_Recall": 0.6528
+        },
+        "M6_Ordinal_RF": {
+          "Macro_F1": 0.6887,
+          "Balanced_Accuracy": 0.7328,
+          "High_Risk_Recall": 0.8428,
+          "MAOE": 0.3039,
+          "Severe_Jumping_Error_Rate": 0.0216,
+          "Avg_Asymmetric_Cost": 0.5902,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6202,
+          "diag_Level3_Recall": 0.8932
+        }
+      }
+    },
+    {
+      "seed": 44,
+      "validation_metrics": {
+        "M5_fixed": {
+          "Macro_F1": 0.7151,
+          "Balanced_Accuracy": 0.6978,
+          "High_Risk_Recall": 0.8114,
+          "MAOE": 0.2567,
+          "Severe_Jumping_Error_Rate": 0.0064,
+          "Avg_Asymmetric_Cost": 0.5911,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6227,
+          "diag_Level3_Recall": 0.6596
+        },
+        "M5_val_tuned": {
+          "Macro_F1": 0.7182,
+          "Balanced_Accuracy": 0.7221,
+          "High_Risk_Recall": 0.8591,
+          "MAOE": 0.2662,
+          "Severe_Jumping_Error_Rate": 0.0063,
+          "Avg_Asymmetric_Cost": 0.5895,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6673,
+          "diag_Level3_Recall": 0.6596
+        },
+        "M6_Ordinal_RF": {
+          "Macro_F1": 0.69,
+          "Balanced_Accuracy": 0.7343,
+          "High_Risk_Recall": 0.8441,
+          "MAOE": 0.3019,
+          "Severe_Jumping_Error_Rate": 0.0222,
+          "Avg_Asymmetric_Cost": 0.5862,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.6192,
+          "diag_Level3_Recall": 0.8909
+        }
+      }
+    }
+  ],
+  "validation_mean_std": {
+    "M5_fixed": {
+      "Macro_F1": {
+        "mean": 0.7152333333333334,
+        "std": 0.0007094598884597406
+      },
+      "Balanced_Accuracy": {
+        "mean": 0.6977000000000001,
+        "std": 0.0014525839046333994
+      },
+      "High_Risk_Recall": {
+        "mean": 0.8093666666666667,
+        "std": 0.0019553345834750014
+      },
+      "MAOE": {
+        "mean": 0.25659999999999994,
+        "std": 0.0002645751311064614
+      },
+      "Severe_Jumping_Error_Rate": {
+        "mean": 0.006600000000000001,
+        "std": 0.00034641016151377535
+      },
+      "Avg_Asymmetric_Cost": {
+        "mean": 0.5935666666666667,
+        "std": 0.0028589042189855664
+      }
+    },
+    "M5_val_tuned": {
+      "Macro_F1": {
+        "mean": 0.7195333333333332,
+        "std": 0.001665332799572954
+      },
+      "Balanced_Accuracy": {
+        "mean": 0.7234000000000002,
+        "std": 0.0020808652046684787
+      },
+      "High_Risk_Recall": {
+        "mean": 0.8600333333333333,
+        "std": 0.0010692676621563539
+      },
+      "MAOE": {
+        "mean": 0.26439999999999997,
+        "std": 0.001708800749063513
+      },
+      "Severe_Jumping_Error_Rate": {
+        "mean": 0.0061,
+        "std": 0.00026457513110645926
+      },
+      "Avg_Asymmetric_Cost": {
+        "mean": 0.5871333333333334,
+        "std": 0.003758102358017058
+      }
+    },
+    "M6_Ordinal_RF": {
+      "Macro_F1": {
+        "mean": 0.6892999999999999,
+        "std": 0.0006557438524301786
+      },
+      "Balanced_Accuracy": {
+        "mean": 0.7334333333333333,
+        "std": 0.0007767453465153793
+      },
+      "High_Risk_Recall": {
+        "mean": 0.8438666666666667,
+        "std": 0.0009712534856222327
+      },
+      "MAOE": {
+        "mean": 0.3028,
+        "std": 0.001014889156509225
+      },
+      "Severe_Jumping_Error_Rate": {
+        "mean": 0.0218,
+        "std": 0.00034641016151377535
+      },
+      "Avg_Asymmetric_Cost": {
+        "mean": 0.5879,
+        "std": 0.002066397831977124
+      }
+    }
+  },
+  "models": {
+    "M5_fixed": {
+      "validation_metrics_seed42": {
+        "Macro_F1": 0.716,
+        "Balanced_Accuracy": 0.6991,
+        "High_Risk_Recall": 0.8092,
+        "MAOE": 0.2568,
+        "Severe_Jumping_Error_Rate": 0.007,
+        "Avg_Asymmetric_Cost": 0.5929,
+        "n_samples": 16656,
+        "n_high_risk": 4842,
+        "diag_High_Risk_Exact_Recall": 0.6225,
+        "diag_Level3_Recall": 0.663
+      },
+      "test_metrics_seed42": {
+        "Macro_F1": 0.7,
+        "Balanced_Accuracy": 0.6793,
+        "High_Risk_Recall": 0.8413,
+        "MAOE": 0.2787,
+        "Severe_Jumping_Error_Rate": 0.01,
+        "Avg_Asymmetric_Cost": 0.7242,
+        "n_samples": 16647,
+        "n_high_risk": 6848,
+        "diag_High_Risk_Exact_Recall": 0.6516,
+        "diag_Level3_Recall": 0.7085
+      },
+      "validation_mean_std": {
+        "Macro_F1": {
+          "mean": 0.7152333333333334,
+          "std": 0.0007094598884597406
+        },
+        "Balanced_Accuracy": {
+          "mean": 0.6977000000000001,
+          "std": 0.0014525839046333994
+        },
+        "High_Risk_Recall": {
+          "mean": 0.8093666666666667,
+          "std": 0.0019553345834750014
+        },
+        "MAOE": {
+          "mean": 0.25659999999999994,
+          "std": 0.0002645751311064614
+        },
+        "Severe_Jumping_Error_Rate": {
+          "mean": 0.006600000000000001,
+          "std": 0.00034641016151377535
+        },
+        "Avg_Asymmetric_Cost": {
+          "mean": 0.5935666666666667,
+          "std": 0.0028589042189855664
+        }
+      }
+    },
+    "M5_val_tuned": {
+      "validation_metrics_seed42": {
+        "Macro_F1": 0.7214,
+        "Balanced_Accuracy": 0.7258,
+        "High_Risk_Recall": 0.8612,
+        "MAOE": 0.2628,
+        "Severe_Jumping_Error_Rate": 0.0062,
+        "Avg_Asymmetric_Cost": 0.5828,
+        "n_samples": 16656,
+        "n_high_risk": 4842,
+        "diag_High_Risk_Exact_Recall": 0.6708,
+        "diag_Level3_Recall": 0.663
+      },
+      "test_metrics_seed42": {
+        "Macro_F1": 0.7078,
+        "Balanced_Accuracy": 0.7117,
+        "High_Risk_Recall": 0.8788,
+        "MAOE": 0.2873,
+        "Severe_Jumping_Error_Rate": 0.0091,
+        "Avg_Asymmetric_Cost": 0.7083,
+        "n_samples": 16647,
+        "n_high_risk": 6848,
+        "diag_High_Risk_Exact_Recall": 0.6853,
+        "diag_Level3_Recall": 0.7085
+      },
+      "validation_mean_std": {
+        "Macro_F1": {
+          "mean": 0.7195333333333332,
+          "std": 0.001665332799572954
+        },
+        "Balanced_Accuracy": {
+          "mean": 0.7234000000000002,
+          "std": 0.0020808652046684787
+        },
+        "High_Risk_Recall": {
+          "mean": 0.8600333333333333,
+          "std": 0.0010692676621563539
+        },
+        "MAOE": {
+          "mean": 0.26439999999999997,
+          "std": 0.001708800749063513
+        },
+        "Severe_Jumping_Error_Rate": {
+          "mean": 0.0061,
+          "std": 0.00026457513110645926
+        },
+        "Avg_Asymmetric_Cost": {
+          "mean": 0.5871333333333334,
+          "std": 0.003758102358017058
+        }
+      }
+    },
+    "M6_Ordinal_RF": {
+      "validation_metrics_seed42": {
+        "Macro_F1": 0.6892,
+        "Balanced_Accuracy": 0.7332,
+        "High_Risk_Recall": 0.8447,
+        "MAOE": 0.3026,
+        "Severe_Jumping_Error_Rate": 0.0216,
+        "Avg_Asymmetric_Cost": 0.5873,
+        "n_samples": 16656,
+        "n_high_risk": 4842,
+        "diag_High_Risk_Exact_Recall": 0.6194,
+        "diag_Level3_Recall": 0.8875
+      },
+      "test_metrics_seed42": {
+        "Macro_F1": 0.6839,
+        "Balanced_Accuracy": 0.7139,
+        "High_Risk_Recall": 0.8642,
+        "MAOE": 0.3169,
+        "Severe_Jumping_Error_Rate": 0.0239,
+        "Avg_Asymmetric_Cost": 0.6616,
+        "n_samples": 16647,
+        "n_high_risk": 6848,
+        "diag_High_Risk_Exact_Recall": 0.6584,
+        "diag_Level3_Recall": 0.8777
+      },
+      "validation_mean_std": {
+        "Macro_F1": {
+          "mean": 0.6892999999999999,
+          "std": 0.0006557438524301786
+        },
+        "Balanced_Accuracy": {
+          "mean": 0.7334333333333333,
+          "std": 0.0007767453465153793
+        },
+        "High_Risk_Recall": {
+          "mean": 0.8438666666666667,
+          "std": 0.0009712534856222327
+        },
+        "MAOE": {
+          "mean": 0.3028,
+          "std": 0.001014889156509225
+        },
+        "Severe_Jumping_Error_Rate": {
+          "mean": 0.0218,
+          "std": 0.00034641016151377535
+        },
+        "Avg_Asymmetric_Cost": {
+          "mean": 0.5879,
+          "std": 0.002066397831977124
+        }
+      }
+    }
+  },
+  "monotonicity": {
+    "val": {
+      "violating_samples_before": 580,
+      "violation_rate_before": 0.034822286263208456,
+      "violating_samples_after": 0,
+      "max_downward_correction": 0.2907383498407997,
+      "n_samples": 16656
+    },
+    "test": {
+      "violating_samples_before": 883,
+      "violation_rate_before": 0.053042590256502674,
+      "violating_samples_after": 0,
+      "max_downward_correction": 0.26839715803040287,
+      "n_samples": 16647
+    }
+  },
+  "interval": {
+    "source_model": "M5 RandomForestRegressor",
+    "method": "5/50/95 percentiles of individual tree point predictions",
+    "warning": "Tree spread is not calibrated outcome uncertainty; not a Quantile Regression Forest",
+    "validation": {
+      "PICP": 0.7179995196926032,
+      "MPIW": 16.47881955312277,
+      "n_samples": 16656,
+      "nominal_tree_percentiles": [
+        0.05,
+        0.5,
+        0.95
+      ],
+      "unit": "ug/m3",
+      "calibrated_prediction_interval": false
+    },
+    "test": {
+      "PICP": 0.7182675557157446,
+      "MPIW": 20.787659945934625,
+      "n_samples": 16647,
+      "nominal_tree_percentiles": [
+        0.05,
+        0.5,
+        0.95
+      ],
+      "unit": "ug/m3",
+      "calibrated_prediction_interval": false
+    }
+  },
+  "acceptance": {
+    "M5_fixed": {
+      "recall_at_least_0_85": false,
+      "maoe_at_most_0_29": true
+    },
+    "M5_val_tuned": {
+      "recall_at_least_0_85": true,
+      "maoe_at_most_0_29": true
+    },
+    "M6_Ordinal_RF": {
+      "recall_at_least_0_85": false,
+      "maoe_at_most_0_29": false
+    }
+  },
+  "test_evaluation_count": 1,
+  "test_prediction_batches": {
+    "M5_all_tree_predictions": 1,
+    "M6_three_cumulative_forests": 1
+  },
+  "spec_clarifications": [
+    "spec 4.2 says M6 for concentration interval; implemented on M5 because M6 predicts levels/probabilities",
+    "spec 4.4 says no baseline meets both gates, but its own M3 val numbers 0.8744/0.2822 meet them",
+    "Only proba arrays have shape (n,4); labels/timestamps/row IDs have shape (n,)",
+    "M5 tuned thresholds calibrated once on seed42 val and fixed for seeds43/44; labels always use 15/35/55",
+    "M6 uses balanced_subsample; comparison includes both decomposition and changed binary class weights"
+  ],
+  "artifacts": {
+    "rf_regressor.joblib": "d5f2487eba403ea5862ba69069e9cd7b95add29b8f3b8516ee0988bc28ce8ac3",
+    "ordinal_rf.joblib": "8a1c16807a6c3b930fbdc800b50aee6ddc9cea6b92f6e7ccc9e9801480744172",
+    "ordinal_probs_val_test.npz": "72f3ae5c2b5be13e2f2b8464624272c47592cca26277758dd18ffb3725ba065e",
+    "stage5_predictions.npz": "1e39eded352d9597eff4c4a85bb49cdca63dbeea32eb9def9c9ad5828826a2c7",
+    "stage5_selection.json": "2c59f016f288bb0f86ca80c5968531565e09803c2601466da2520a0ddf3c4b66"
+  },
+  "refactor": {
+    "checked_at": "2026-11-11T15:58:53.901076+00:00",
+    "scope": "readability-only refactor; real fitted models and result arrays unchanged",
+    "original_metrics_sha256": "83981d56262938942a7cd2f4ffbcf8ffc4c2ad10a549c510b24a4d2392e97999",
+    "code_sha256": {
+      "05_reg_to_cls.py": "166ff9bdedebd46c727ad3512c4554085bf4ae63eae331dabd481bb155b512e4",
+      "05_ordinal_rf.py": "106f185ae8998e924b007fed295eae2ca9cfd0fb39a0ef5e1044c252f7a15b0b",
+      "ordinal_forest.py": "5727804ec28b5d6d0a69353775ca046fef2e3889367460a743b70c1db7132852",
+      "utils_metrics.py": "b0bcc02975ba7d23ad1d503bba40c2d4c86a0cdffa835613d71a4da5e95749f3",
+      "config.py": "362b8e51c41d5f31af2ed83fdaf82caeb493f802f3ff313f6e0b5ba0b44e9e7c"
+    },
+    "validation_rows_compared": 16656,
+    "validation_level_differences": 0,
+    "validation_probability_max_abs_difference": 5.551115123125783e-16,
+    "comparison_tolerance": 1e-12,
+    "synthetic_training_seeds_checked": [
+      42,
+      43,
+      44
+    ],
+    "synthetic_cv_and_candidate_selection_equal": true,
+    "real_data_folds_and_threshold_search_equal": true,
+    "cached_test_outputs_equal": true,
+    "new_test_prediction_batches": 0,
+    "unchanged_artifacts": {
+      "models/rf_regressor.joblib": "d5f2487eba403ea5862ba69069e9cd7b95add29b8f3b8516ee0988bc28ce8ac3",
+      "models/ordinal_rf.joblib": "8a1c16807a6c3b930fbdc800b50aee6ddc9cea6b92f6e7ccc9e9801480744172",
+      "models/ordinal_probs_val_test.npz": "72f3ae5c2b5be13e2f2b8464624272c47592cca26277758dd18ffb3725ba065e",
+      "models/stage5_predictions.npz": "1e39eded352d9597eff4c4a85bb49cdca63dbeea32eb9def9c9ad5828826a2c7",
+      "models/stage5_selection.json": "2c59f016f288bb0f86ca80c5968531565e09803c2601466da2520a0ddf3c4b66",
+      "figures/fig_interval_band.png": "d1a1a8ee5aabf413949d16700cf8845df2c89e075205d182b53102af26ec4554",
+      "figures/fig_ordinal_error_distribution.png": "6b08a3580bc7ece245a20b77c96c6f98d71bd6fbe47da325616e0b5efecbd6ac"
+    },
+    "source_lines_before": {
+      "05_reg_to_cls.py": 149,
+      "05_ordinal_rf.py": 317,
+      "ordinal_forest.py": 70
+    },
+    "source_lines_after": {
+      "05_reg_to_cls.py": 137,
+      "05_ordinal_rf.py": 305,
+      "ordinal_forest.py": 72
+    }
+  }
+}
