@@ -22,9 +22,11 @@
 from __future__ import annotations
 
 import argparse
+import json
 import re
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 PROTECTED = {
@@ -139,6 +141,54 @@ def blob(branch: str, path: str, limit: int = 2_000_000) -> bytes:
     return r.stdout[:limit]
 
 
+def prose_check(branch: str, paths: dict[str, int]) -> tuple[bool, str]:
+    """对本分支的 reports/*.md 跑 check_prose，返回 (是否通过, 说明)。"""
+    reps = [p for p in paths if p.startswith("reports/") and p.endswith(".md")]
+    if not reps:
+        return False, "分支里没有报告文件"
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from check_prose import check_file  # 同目录，复用同一套规则
+
+    bad = []
+    with tempfile.TemporaryDirectory() as td:
+        for p in reps:
+            fp = Path(td) / Path(p).name
+            fp.write_bytes(blob(branch, p))
+            fails = check_file(str(fp))["fails"]
+            if fails:
+                bad.append(f"{Path(p).name} — " + "；".join(fails))
+    return (not bad), ("干净" if not bad else " | ".join(bad))
+
+
+PERIODIC_BASES = ("hour", "month", "dayofweek", "wind_direction")
+
+
+def feature_pair_check(branch: str) -> tuple[bool, str] | None:
+    """周期特征的 sin/cos 必须成对。
+
+    只留 sin 的话，24 个钟点会塌成 13 个不同取值：11 组两两同值，
+    而且两个起报接缝时刻都在里面（04↔08、16↔20）。
+    模型没法区分 08:00 和 04:00，而 08:00 恰恰是跳变最大的时刻之一。
+    """
+    paths = tree(branch)
+    if "models/selected_features.json" not in paths:
+        return None
+    try:
+        payload = json.loads(blob(branch, "models/selected_features.json").decode("utf-8"))
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return False, "selected_features.json 读不出来"
+    feats = set(payload.get("selected_features") or [])
+    bad = []
+    for base in PERIODIC_BASES:
+        a, b = f"{base}_sin", f"{base}_cos"
+        if (a in feats) != (b in feats):
+            bad.append(f"{a}/{b} 只进了一个")
+    if bad:
+        return False, "；".join(bad) + f"（共 {len(feats)} 个特征）"
+    pairs = [f"{b}_sin/cos" for b in PERIODIC_BASES if f"{b}_sin" in feats]
+    return True, ("成对：" + "、".join(pairs)) if pairs else "无周期特征"
+
+
 def module_of(branch: str) -> str | None:
     m = re.match(r"(?:feat|fix)/(\d{2})-", branch)
     return m.group(1) if m else None
@@ -225,6 +275,15 @@ def audit(branch: str) -> tuple[list[tuple[str, bool, str]], str]:
               and Path(p).name.startswith(spec["report_prefix"])]
         rows.append(("报告章节", bool(rp), rp[0] if rp else f"缺 reports/{spec['report_prefix']}*.md"))
 
+    # 7b 报告文字（课程 C.2：AI 生成文本零分）
+    ok_prose, note_prose = prose_check(branch, paths)
+    rows.append(("报告文字", ok_prose, note_prose))
+
+    # 7c 周期特征成对（sin/cos）
+    pair = feature_pair_check(branch)
+    if pair is not None:
+        rows.append(("周期特征配对", pair[0], pair[1]))
+
     # 8 指标文件
     for mp in spec["metrics"]:
         if mp not in paths:
@@ -250,9 +309,17 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="合并闸门检查")
     ap.add_argument("branch", nargs="?", default=None)
     ap.add_argument("--all", action="store_true", help="体检所有 feat/* 分支")
+    ap.add_argument("--main", action="store_true", help="只查 main 上的周期特征配对")
     args = ap.parse_args()
 
     git("fetch", "--all", "--prune", "-q")
+
+    if args.main:
+        pair = feature_pair_check("main")
+        print(f"main 周期特征配对：{'PASS' if pair and pair[0] else 'FAIL'}")
+        if pair:
+            print(f"  {pair[1]}")
+        return 0 if pair and pair[0] else 1
 
     if args.all:
         branches = [l.split("refs/heads/")[-1]

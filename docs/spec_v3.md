@@ -35,14 +35,16 @@ v2.0 是在开工前写的，那时数据还是"大吉隆坡 8 个监测站"的�
 | 模块 | 负责人 | 状态 | 证据位置 |
 |---|---|---|---|
 | 01 数据工程与基线 | 1 号 | ✅ 完成并已并入 `main` | `models/metrics_stage1.json`、`models/gate0_report.json` |
-| 02 EDA 与时空特征 | 2 号 | ✅ 交付，**未并入** | `models/metrics_stage2_eda.json`、`metrics_stage2_features.json`、`metrics_stage2_verification.json` |
-| 03 粒化与特征选择 | 3 号 | ✅ 交付，**未并入** | `models/metrics_stage3.json`、`models/selected_features.json` |
-| 04 名义/平衡 RF 与提升 | 4 号 | ✅ 交付，**未并入** | `models/metrics_stage4.json`、三个 joblib、三张图 |
-| 05 两种保序范式 | 5 号 | ✅ 交付，**未并入** | `models/metrics_stage5.json`、三个模型、两张图 |
-| 06 代价敏感与可解释性 | 6 号 | ⬜ 未开工 | 分支 `feat/06-cost-explain` 仍是空的 |
+| 02 EDA 与时空特征 | 2 号 | ✅ 已并入 `main`（8e7c847） | `models/metrics_stage2_eda.json`、`metrics_stage2_features.json`、`metrics_stage2_verification.json` |
+| 03 粒化与特征选择 | 3 号 | ✅ 已并入 `main`（b955a23） | `models/metrics_stage3.json`、`models/selected_features.json` |
+| 04 名义/平衡 RF 与提升 | 4 号 | ✅ 已并入 `main`（1e75e86） | `models/metrics_stage4.json`、三个 joblib、三张图 |
+| 05 两种保序范式 | 5 号 | ✅ 已并入 `main`（d90db26） | `models/metrics_stage5.json`、三个模型、两张图 |
+| 06 代价敏感与可解释性 | 6 号 | 🟡 已交付，闸门 3 项未过 | 缺 `all_models_benchmark.csv`；`cost_thresholds.json` 缺 `generated_at`/`git_commit`；改了 `.gitignore` |
 | 07 系统与报告 | 7 号 | ⬜ 未开工 | 分支 `feat/07-streamlit` 仍是空的 |
 
-**注意**：`main` 目前只到 01。02、03、04 各自从 `main` 切出去、又在本地串着跑（03 的 `git_commit` 记的是 02 的 `2165c4c`，04 的 `input_sha256.features_final` 记的是 03 的产物哈希），所以**合并必须按 02 → 03 → 04 的顺序**，详见第 7 节。
+**注意**：截至 2026-11-13，`main` 已包含 01~05 五个模块（按 02 → 03 → 04 → 05 顺序并入）。
+这条顺序不是形式：03 的 `git_commit` 记的是 02 的提交，04 和 05 的 `input_sha256.features_final` 记的都是 03 的产物哈希，
+04 的代码还要读 03 生成的 `data/features_final.parquet`，所以**跳序合并会让 main 上有代码没数据**。
 
 ### 1.2 已有模型的成绩
 
@@ -58,7 +60,9 @@ test 段，受体节点，种子 42：
 | M5 回归切档（调阈值） | 16,647 | **0.7078** | — | 0.8788 | 0.2873 | **0.0091** | 0.7083 |
 | M6 有序 RF | 16,647 | 0.6839 | — | 0.8642 | 0.3169 | 0.0239 | 0.6616 |
 
-**M1 的样本量比其他人多 81 行**（16,728 vs 16,647）。原因是 02 引入了 `audit_model_eligible` 筛选，M1 那版跑在这之前。这 81 行不影响结论方向，但**最终表里不能让 M1 用旧口径**，详见第 8 节欠账 A1。
+**M1 的样本量比其他人多 81 行**（16,728 vs 16,647），因为 02 引入 `audit_model_eligible` 之前就跑了。
+已按同一口径重算：Macro_F1 0.6658、高危召回 0.7675、MAOE 0.3199、代价 0.9047，**排序不变**。
+两版都留在 `metrics_stage1.json`（`metrics` 与 `metrics_test_eligible`），主表用后者。详见第 8 节 A1。
 
 val 段，种子 42/43/44 的均值（4 号自己的表）：
 
@@ -172,6 +176,22 @@ temperature_2m, no2_lag_2, co, no2_lag_24, far_source_pm25_mean_24h
 | `far_source_pm25_mean_Wh` | 更短的窗口（48h→24h→12h） | 窗口不够长就用短窗 |
 
 这三条要在报告的 Data / Method 里写明，否则读者会以为空间特征是完整的。
+
+---
+
+### 3.5 已知数据伪影：起报接缝（不可避免，只能声明）
+
+CAMS 每天 00Z / 12Z 各起报一次，拼成连续序列时接缝落在本地 **08:00 与 20:00**。
+实测这两个钟点的逐小时变化是其他时段的 3.2 倍，扣掉季节与日变化后仍 3.0 倍；
+20:00 有 79% 的节点同时同向跳（其他 45%），六种污染物同时跳。
+
+**不修改数据**（没有独立参考序列），在报告 §2.1.5 声明。复现：`tools/check_run_seam.py`。
+
+对模型的影响：17:00–19:00 发出、三小时后跨过 20:00 的目标，
+会多带一份输入里看不到的误差。分时段误差分析必须考虑这一点。
+
+另外，「小时值由 3 小时数据插值而来」这个猜测**不成立**：CAMS 地面单层场本就逐小时输出，
+数据里也没有周期 3 结构（块内一阶差分恒定仅 1.2%）。报告里不要写这个说法。
 
 ---
 
@@ -342,9 +362,13 @@ python tools/check_merge_gate.py --all        # 体检所有 feat/* 分支
 python tools/check_merge_gate.py feat/03-granulation
 ```
 
-它检查九项，任何一项 FAIL 就不该点合并：落后 main 的提交数、交付物齐全、越权改动、
-禁词、体积与 LFS、交接文档、报告章节、指标文件是否带 `generated_at`/`git_commit`、
-test 使用次数是否超过 1。**全过再提 PR，提 PR 时把这段输出贴上来。**
+它检查十项，任何一项 FAIL 就不该点合并：落后 main 的提交数、交付物齐全、越权改动、
+禁词、体积与 LFS、交接文档、报告章节、**报告文字（复用 check_prose 的规则）**、
+指标文件是否带 `generated_at`/`git_commit`、test 使用次数是否超过 1。
+**全过再提 PR，提 PR 时把这段输出贴上来。**
+
+第十项是 6 号交付后才加的：他的报告里有一个 `Importantly,`，这是典型的大模型过渡词，
+原来的闸门只查 `verify_data`，没查文字，所以漏过去了。现在合并前就能拦住。
 
 ### 7.3 每次合并前跑三条
 
@@ -366,7 +390,7 @@ git diff --stat origin/main...HEAD       # 确认没动别人的文件
 
 | 编号 | 事项 | 谁 | 为什么必须做 |
 |---|---|---|---|
-| A1 | **M1 用可建模行数重跑一次** | 1 号 | 现在 M1 是 16,728 行，其他模型是 16,647 行，进同一张表不可比。差 81 行不影响方向，但要在表里说明或直接重跑 |
+| A1 | M1 已按同口径重算 | 1 号 | 在 16,647 行上重算：Macro_F1 0.6658、高危召回 0.7675、MAOE 0.3199、代价 0.9047，**排序不变**。结果写进 `metrics_stage1.json` 的 `metrics_test_eligible`，主表用这一组，旧口径保留可追溯 |
 | A2 | 02 分支并入 main | 1 号 + 2 号 | 03/04 都卡在它后面 |
 | A3 | 03、04 依次并线 | 1 号 + 3/4 号 | 同上 |
 | A4 | 4 号补交接文档与报告章节 | 4 号 | 现在只有代码和产物，没有 `docs/handover/04_*.md`，也没有 `reports/sec2_5.md`。下一棒 5 号拿不到口径说明 |
