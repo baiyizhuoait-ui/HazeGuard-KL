@@ -347,7 +347,9 @@ which is what a baseline should show.
 
 ## 2.2.4.2 Results
 
-Test split, receptor nodes, n = 16,728 (of which 6,865 high-risk):
+Test split, receptor nodes, n = 16,728 (of which 6,865 high-risk). This table keeps the
+original M1 run. The main comparison table uses the same 16,647 eligible rows as M2–M7;
+the recomputed M1 values differ by at most 0.014 and are stored as `metrics_test_eligible`.
 
 | Metric | M0 Persistence | M1 Decision Tree | Δ (M1 − M0) |
 |---|---|---|---|

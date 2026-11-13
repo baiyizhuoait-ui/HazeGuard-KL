@@ -51,6 +51,8 @@ assert m["sha256"] == hashlib.sha256(open("data/haze_panel_clean.parquet","rb").
 
 ### 基线成绩（test 段，只取受体节点，n = 16,728，其中高危 6,865）
 
+> 注：与 M2~M7 同口径的版本（n=16,647）在 `metrics_stage1.json` 的 `metrics_test_eligible`，主表用那一组。
+
 | 指标 | M0 纯持续性 | M1 决策树 |
 |---|---|---|
 | Macro_F1 | 0.6222 | **0.6620** |
