@@ -611,12 +611,15 @@ def tab_probability(station: pd.DataFrame, when: pd.Timestamp, preds: pd.DataFra
     t3 = s3.slider("τ3  for level ≥ 3", 0.05, 0.95, float(tau[2]), 0.05)
     rows = {
         "Your thresholds": evaluate_predictions(val["y_true"], apply_thresholds(proba, (t1, t2, t3))),
-        f"M7 selected ({tau[0]:.2f}, {tau[1]:.2f}, {tau[2]:.2f})":
-            evaluate_predictions(val["y_true"], val["pred_m7"]),
-        "M6 most probable level": evaluate_predictions(val["y_true"], val["pred_m6"]),
+        "M7 selected": evaluate_predictions(val["y_true"], val["pred_m7"]),
+        "M6 default": evaluate_predictions(val["y_true"], val["pred_m6"]),
     }
     table = pd.DataFrame(rows).T[list(METRICS)]
-    st.dataframe(table.style.format("{:.4f}"), use_container_width=True)
+    table.insert(0, "Decision", table.index)
+    st.dataframe(table.style.format({m: "{:.4f}" for m in METRICS}),
+                 use_container_width=True, hide_index=True)
+    st.caption(f"M7 selected: τ = ({tau[0]:.2f}, {tau[1]:.2f}, {tau[2]:.2f}), the lowest "
+               "Avg_Asymmetric_Cost on the validation grid. M6 default: the most probable level.")
 
 
 def tab_models(benchmark: pd.DataFrame | None) -> None:
