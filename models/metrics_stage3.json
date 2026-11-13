@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-11-13T15:00:40.839965+00:00",
-  "git_commit": "97b5faa4e2aebd8763fd86a0bf6a734e6ed38cf6",
-  "code_sha256": "301208a9c91f1856ec95d789a194d784926ff4a30c19bdd434b8ad698fc73805",
+  "generated_at": "2026-11-13T15:50:51.271291+00:00",
+  "git_commit": "1f9ced4a651e7a75bd32512e7890a38f24d7103b",
+  "code_sha256": "6fc5e1a6233e6b471873cb8a508c947a55b229df2fa6268bd7fcc47eba5cd8a2",
   "input_sha256": {
     "feat_spatiotemporal": "208cf00942b404aead0ffe913497d34157ec01f3e1a4ccf593b10f71fb61a55e",
     "feat_granulation": "71c156b0bb149f025d0f38dac27d3f166aa4d24d47cbd388396f441f4c8f6d2e"
@@ -666,7 +666,294 @@
         "diag_Level3_Recall": 0.0060024994793835725
       }
     },
-    "7 Previous + neighbour mean": {
+    "7 Previous + 50 neighbour columns": {
+      "n_features": 75,
+      "features": [
+        "pm2_5",
+        "pm10",
+        "pm2_5_mean_3h",
+        "hour_sin",
+        "pm2_5_lag_1",
+        "no2",
+        "pm2_5_change_3h",
+        "pm10_lag_1",
+        "so2",
+        "no2_lag_12",
+        "spatial_pm25_gradient",
+        "pm2_5_slope_6h",
+        "gran_slope_12h",
+        "gran_low_12h",
+        "relative_humidity_2m_lag_3",
+        "gran_low_6h",
+        "pm2_5_mean_6h",
+        "gran_up_6h",
+        "no2_lag_6",
+        "o3",
+        "temperature_2m",
+        "no2_lag_2",
+        "co",
+        "no2_lag_24",
+        "far_source_pm25_mean_24h",
+        "nbr01_pm2_5",
+        "nbr01_change_3h",
+        "nbr02_pm2_5",
+        "nbr02_change_3h",
+        "nbr03_pm2_5",
+        "nbr03_change_3h",
+        "nbr04_pm2_5",
+        "nbr04_change_3h",
+        "nbr05_pm2_5",
+        "nbr05_change_3h",
+        "nbr06_pm2_5",
+        "nbr06_change_3h",
+        "nbr07_pm2_5",
+        "nbr07_change_3h",
+        "nbr08_pm2_5",
+        "nbr08_change_3h",
+        "nbr09_pm2_5",
+        "nbr09_change_3h",
+        "nbr10_pm2_5",
+        "nbr10_change_3h",
+        "nbr11_pm2_5",
+        "nbr11_change_3h",
+        "nbr12_pm2_5",
+        "nbr12_change_3h",
+        "nbr13_pm2_5",
+        "nbr13_change_3h",
+        "nbr14_pm2_5",
+        "nbr14_change_3h",
+        "nbr15_pm2_5",
+        "nbr15_change_3h",
+        "nbr16_pm2_5",
+        "nbr16_change_3h",
+        "nbr17_pm2_5",
+        "nbr17_change_3h",
+        "nbr18_pm2_5",
+        "nbr18_change_3h",
+        "nbr19_pm2_5",
+        "nbr19_change_3h",
+        "nbr20_pm2_5",
+        "nbr20_change_3h",
+        "nbr21_pm2_5",
+        "nbr21_change_3h",
+        "nbr22_pm2_5",
+        "nbr22_change_3h",
+        "nbr23_pm2_5",
+        "nbr23_change_3h",
+        "nbr24_pm2_5",
+        "nbr24_change_3h",
+        "nbr25_pm2_5",
+        "nbr25_change_3h"
+      ],
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "runs": [
+        {
+          "Macro_F1": 0.7024,
+          "Balanced_Accuracy": 0.6788,
+          "High_Risk_Recall": 0.7259,
+          "MAOE": 0.2655,
+          "Severe_Jumping_Error_Rate": 0.0105,
+          "Avg_Asymmetric_Cost": 0.7006,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5498,
+          "diag_Level3_Recall": 0.6271
+        },
+        {
+          "Macro_F1": 0.7036,
+          "Balanced_Accuracy": 0.6797,
+          "High_Risk_Recall": 0.7259,
+          "MAOE": 0.2641,
+          "Severe_Jumping_Error_Rate": 0.0098,
+          "Avg_Asymmetric_Cost": 0.7019,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5498,
+          "diag_Level3_Recall": 0.6219
+        },
+        {
+          "Macro_F1": 0.6993,
+          "Balanced_Accuracy": 0.6756,
+          "High_Risk_Recall": 0.7216,
+          "MAOE": 0.2671,
+          "Severe_Jumping_Error_Rate": 0.0099,
+          "Avg_Asymmetric_Cost": 0.7071,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5425,
+          "diag_Level3_Recall": 0.6248
+        }
+      ],
+      "mean": {
+        "Macro_F1": 0.7017666666666668,
+        "Balanced_Accuracy": 0.6780333333333332,
+        "High_Risk_Recall": 0.7244666666666667,
+        "MAOE": 0.2655666666666667,
+        "Severe_Jumping_Error_Rate": 0.010066666666666666,
+        "Avg_Asymmetric_Cost": 0.7031999999999999,
+        "diag_High_Risk_Exact_Recall": 0.5473666666666667,
+        "diag_Level3_Recall": 0.6246
+      },
+      "std": {
+        "Macro_F1": 0.0022188585654190026,
+        "Balanced_Accuracy": 0.002154839514519192,
+        "High_Risk_Recall": 0.0024826061575153736,
+        "MAOE": 0.0015011106998930282,
+        "Severe_Jumping_Error_Rate": 0.00037859388972001857,
+        "Avg_Asymmetric_Cost": 0.0034394767043839456,
+        "diag_High_Risk_Exact_Recall": 0.004214656965084253,
+        "diag_Level3_Recall": 0.002605762844159069
+      }
+    },
+    "8 Previous + hour_cos + 50 neighbour columns": {
+      "n_features": 76,
+      "features": [
+        "pm2_5",
+        "pm10",
+        "pm2_5_mean_3h",
+        "hour_sin",
+        "pm2_5_lag_1",
+        "no2",
+        "pm2_5_change_3h",
+        "pm10_lag_1",
+        "so2",
+        "no2_lag_12",
+        "spatial_pm25_gradient",
+        "pm2_5_slope_6h",
+        "gran_slope_12h",
+        "gran_low_12h",
+        "relative_humidity_2m_lag_3",
+        "gran_low_6h",
+        "pm2_5_mean_6h",
+        "gran_up_6h",
+        "no2_lag_6",
+        "o3",
+        "temperature_2m",
+        "no2_lag_2",
+        "co",
+        "no2_lag_24",
+        "far_source_pm25_mean_24h",
+        "hour_cos",
+        "nbr01_pm2_5",
+        "nbr01_change_3h",
+        "nbr02_pm2_5",
+        "nbr02_change_3h",
+        "nbr03_pm2_5",
+        "nbr03_change_3h",
+        "nbr04_pm2_5",
+        "nbr04_change_3h",
+        "nbr05_pm2_5",
+        "nbr05_change_3h",
+        "nbr06_pm2_5",
+        "nbr06_change_3h",
+        "nbr07_pm2_5",
+        "nbr07_change_3h",
+        "nbr08_pm2_5",
+        "nbr08_change_3h",
+        "nbr09_pm2_5",
+        "nbr09_change_3h",
+        "nbr10_pm2_5",
+        "nbr10_change_3h",
+        "nbr11_pm2_5",
+        "nbr11_change_3h",
+        "nbr12_pm2_5",
+        "nbr12_change_3h",
+        "nbr13_pm2_5",
+        "nbr13_change_3h",
+        "nbr14_pm2_5",
+        "nbr14_change_3h",
+        "nbr15_pm2_5",
+        "nbr15_change_3h",
+        "nbr16_pm2_5",
+        "nbr16_change_3h",
+        "nbr17_pm2_5",
+        "nbr17_change_3h",
+        "nbr18_pm2_5",
+        "nbr18_change_3h",
+        "nbr19_pm2_5",
+        "nbr19_change_3h",
+        "nbr20_pm2_5",
+        "nbr20_change_3h",
+        "nbr21_pm2_5",
+        "nbr21_change_3h",
+        "nbr22_pm2_5",
+        "nbr22_change_3h",
+        "nbr23_pm2_5",
+        "nbr23_change_3h",
+        "nbr24_pm2_5",
+        "nbr24_change_3h",
+        "nbr25_pm2_5",
+        "nbr25_change_3h"
+      ],
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "runs": [
+        {
+          "Macro_F1": 0.7062,
+          "Balanced_Accuracy": 0.6826,
+          "High_Risk_Recall": 0.7284,
+          "MAOE": 0.261,
+          "Severe_Jumping_Error_Rate": 0.0092,
+          "Avg_Asymmetric_Cost": 0.6899,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5516,
+          "diag_Level3_Recall": 0.6311
+        },
+        {
+          "Macro_F1": 0.7065,
+          "Balanced_Accuracy": 0.6829,
+          "High_Risk_Recall": 0.7305,
+          "MAOE": 0.2606,
+          "Severe_Jumping_Error_Rate": 0.0089,
+          "Avg_Asymmetric_Cost": 0.6855,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5539,
+          "diag_Level3_Recall": 0.6351
+        },
+        {
+          "Macro_F1": 0.7089,
+          "Balanced_Accuracy": 0.6853,
+          "High_Risk_Recall": 0.7346,
+          "MAOE": 0.2591,
+          "Severe_Jumping_Error_Rate": 0.0094,
+          "Avg_Asymmetric_Cost": 0.6833,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5591,
+          "diag_Level3_Recall": 0.6305
+        }
+      ],
+      "mean": {
+        "Macro_F1": 0.7071999999999999,
+        "Balanced_Accuracy": 0.6835999999999999,
+        "High_Risk_Recall": 0.7311666666666667,
+        "MAOE": 0.26023333333333337,
+        "Severe_Jumping_Error_Rate": 0.009166666666666665,
+        "Avg_Asymmetric_Cost": 0.6862333333333334,
+        "diag_High_Risk_Exact_Recall": 0.5548666666666667,
+        "diag_Level3_Recall": 0.6322333333333333
+      },
+      "std": {
+        "Macro_F1": 0.0014798648586948388,
+        "Balanced_Accuracy": 0.0014798648586949025,
+        "High_Risk_Recall": 0.0031533051443419302,
+        "MAOE": 0.0010016652800877864,
+        "Severe_Jumping_Error_Rate": 0.0002516611478423585,
+        "Avg_Asymmetric_Cost": 0.0033605555096342518,
+        "diag_High_Risk_Exact_Recall": 0.0038423083339749853,
+        "diag_Level3_Recall": 0.002500666577801491
+      }
+    },
+    "9 Previous + nearest-3 mean (control)": {
       "n_features": 26,
       "features": [
         "pm2_5",
@@ -760,102 +1047,7 @@
         "diag_Level3_Recall": 0.006017751518078272
       }
     },
-    "8 Previous + hour_cos + neighbour mean": {
-      "n_features": 27,
-      "features": [
-        "pm2_5",
-        "pm10",
-        "pm2_5_mean_3h",
-        "hour_sin",
-        "pm2_5_lag_1",
-        "no2",
-        "pm2_5_change_3h",
-        "pm10_lag_1",
-        "so2",
-        "no2_lag_12",
-        "spatial_pm25_gradient",
-        "pm2_5_slope_6h",
-        "gran_slope_12h",
-        "gran_low_12h",
-        "relative_humidity_2m_lag_3",
-        "gran_low_6h",
-        "pm2_5_mean_6h",
-        "gran_up_6h",
-        "no2_lag_6",
-        "o3",
-        "temperature_2m",
-        "no2_lag_2",
-        "co",
-        "no2_lag_24",
-        "far_source_pm25_mean_24h",
-        "hour_cos",
-        "nbr_pm25_mean_k3"
-      ],
-      "seeds": [
-        42,
-        43,
-        44
-      ],
-      "runs": [
-        {
-          "Macro_F1": 0.7142,
-          "Balanced_Accuracy": 0.6977,
-          "High_Risk_Recall": 0.7703,
-          "MAOE": 0.2562,
-          "Severe_Jumping_Error_Rate": 0.0087,
-          "Avg_Asymmetric_Cost": 0.6421,
-          "n_samples": 16656,
-          "n_high_risk": 4842,
-          "diag_High_Risk_Exact_Recall": 0.5857,
-          "diag_Level3_Recall": 0.6528
-        },
-        {
-          "Macro_F1": 0.7111,
-          "Balanced_Accuracy": 0.693,
-          "High_Risk_Recall": 0.767,
-          "MAOE": 0.2573,
-          "Severe_Jumping_Error_Rate": 0.0082,
-          "Avg_Asymmetric_Cost": 0.6508,
-          "n_samples": 16656,
-          "n_high_risk": 4842,
-          "diag_High_Risk_Exact_Recall": 0.5787,
-          "diag_Level3_Recall": 0.6385
-        },
-        {
-          "Macro_F1": 0.7135,
-          "Balanced_Accuracy": 0.6955,
-          "High_Risk_Recall": 0.7633,
-          "MAOE": 0.2553,
-          "Severe_Jumping_Error_Rate": 0.0079,
-          "Avg_Asymmetric_Cost": 0.6447,
-          "n_samples": 16656,
-          "n_high_risk": 4842,
-          "diag_High_Risk_Exact_Recall": 0.5781,
-          "diag_Level3_Recall": 0.6505
-        }
-      ],
-      "mean": {
-        "Macro_F1": 0.7129333333333333,
-        "Balanced_Accuracy": 0.6953999999999999,
-        "High_Risk_Recall": 0.7668666666666667,
-        "MAOE": 0.25626666666666664,
-        "Severe_Jumping_Error_Rate": 0.008266666666666667,
-        "Avg_Asymmetric_Cost": 0.6458666666666667,
-        "diag_High_Risk_Exact_Recall": 0.5808333333333334,
-        "diag_Level3_Recall": 0.6472666666666668
-      },
-      "std": {
-        "Macro_F1": 0.0016258331197676352,
-        "Balanced_Accuracy": 0.002351595203260989,
-        "High_Risk_Recall": 0.003501904243884084,
-        "MAOE": 0.001001665280087755,
-        "Severe_Jumping_Error_Rate": 0.0004041451884327373,
-        "Avg_Asymmetric_Cost": 0.004465795935030337,
-        "diag_High_Risk_Exact_Recall": 0.004225320500664238,
-        "diag_Level3_Recall": 0.007678758580222058
-      }
-    },
-    "9 Top-25 paired (delivered)": {
+    "10 Top-25 paired (delivered)": {
       "n_features": 25,
       "features": [
         "pm2_5",
@@ -947,6 +1139,149 @@
         "diag_High_Risk_Exact_Recall": 0.0028183919765237563,
         "diag_Level3_Recall": 0.0054064775963653
       }
+    },
+    "11 Delivered + 50 neighbour columns": {
+      "n_features": 75,
+      "features": [
+        "pm2_5",
+        "pm10",
+        "pm2_5_mean_3h",
+        "hour_sin",
+        "pm2_5_lag_1",
+        "no2",
+        "pm10_lag_1",
+        "pm2_5_change_3h",
+        "gran_up_6h",
+        "so2",
+        "spatial_pm25_gradient",
+        "no2_lag_12",
+        "pm2_5_slope_6h",
+        "gran_low_6h",
+        "gran_slope_12h",
+        "pm2_5_mean_6h",
+        "no2_lag_6",
+        "relative_humidity_2m_lag_3",
+        "o3",
+        "temperature_2m",
+        "co",
+        "no2_lag_24",
+        "far_source_pm25_mean_24h",
+        "no2_lag_2",
+        "hour_cos",
+        "nbr01_pm2_5",
+        "nbr01_change_3h",
+        "nbr02_pm2_5",
+        "nbr02_change_3h",
+        "nbr03_pm2_5",
+        "nbr03_change_3h",
+        "nbr04_pm2_5",
+        "nbr04_change_3h",
+        "nbr05_pm2_5",
+        "nbr05_change_3h",
+        "nbr06_pm2_5",
+        "nbr06_change_3h",
+        "nbr07_pm2_5",
+        "nbr07_change_3h",
+        "nbr08_pm2_5",
+        "nbr08_change_3h",
+        "nbr09_pm2_5",
+        "nbr09_change_3h",
+        "nbr10_pm2_5",
+        "nbr10_change_3h",
+        "nbr11_pm2_5",
+        "nbr11_change_3h",
+        "nbr12_pm2_5",
+        "nbr12_change_3h",
+        "nbr13_pm2_5",
+        "nbr13_change_3h",
+        "nbr14_pm2_5",
+        "nbr14_change_3h",
+        "nbr15_pm2_5",
+        "nbr15_change_3h",
+        "nbr16_pm2_5",
+        "nbr16_change_3h",
+        "nbr17_pm2_5",
+        "nbr17_change_3h",
+        "nbr18_pm2_5",
+        "nbr18_change_3h",
+        "nbr19_pm2_5",
+        "nbr19_change_3h",
+        "nbr20_pm2_5",
+        "nbr20_change_3h",
+        "nbr21_pm2_5",
+        "nbr21_change_3h",
+        "nbr22_pm2_5",
+        "nbr22_change_3h",
+        "nbr23_pm2_5",
+        "nbr23_change_3h",
+        "nbr24_pm2_5",
+        "nbr24_change_3h",
+        "nbr25_pm2_5",
+        "nbr25_change_3h"
+      ],
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "runs": [
+        {
+          "Macro_F1": 0.708,
+          "Balanced_Accuracy": 0.685,
+          "High_Risk_Recall": 0.7317,
+          "MAOE": 0.2595,
+          "Severe_Jumping_Error_Rate": 0.0092,
+          "Avg_Asymmetric_Cost": 0.6856,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5556,
+          "diag_Level3_Recall": 0.6334
+        },
+        {
+          "Macro_F1": 0.7095,
+          "Balanced_Accuracy": 0.6869,
+          "High_Risk_Recall": 0.7328,
+          "MAOE": 0.2579,
+          "Severe_Jumping_Error_Rate": 0.0089,
+          "Avg_Asymmetric_Cost": 0.6779,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5564,
+          "diag_Level3_Recall": 0.6425
+        },
+        {
+          "Macro_F1": 0.706,
+          "Balanced_Accuracy": 0.6835,
+          "High_Risk_Recall": 0.7311,
+          "MAOE": 0.2606,
+          "Severe_Jumping_Error_Rate": 0.0088,
+          "Avg_Asymmetric_Cost": 0.6829,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.552,
+          "diag_Level3_Recall": 0.6408
+        }
+      ],
+      "mean": {
+        "Macro_F1": 0.7078333333333333,
+        "Balanced_Accuracy": 0.6851333333333334,
+        "High_Risk_Recall": 0.7318666666666668,
+        "MAOE": 0.25933333333333336,
+        "Severe_Jumping_Error_Rate": 0.008966666666666666,
+        "Avg_Asymmetric_Cost": 0.6821333333333333,
+        "diag_High_Risk_Exact_Recall": 0.5546666666666668,
+        "diag_Level3_Recall": 0.6389
+      },
+      "std": {
+        "Macro_F1": 0.001755942292142151,
+        "Balanced_Accuracy": 0.0017039170558842507,
+        "High_Risk_Recall": 0.0008621678104251853,
+        "MAOE": 0.0013576941236277435,
+        "Severe_Jumping_Error_Rate": 0.00020816659994661298,
+        "Avg_Asymmetric_Cost": 0.00390683162336611,
+        "diag_High_Risk_Exact_Recall": 0.0023437861108328985,
+        "diag_Level3_Recall": 0.004838388161361191
+      }
     }
   },
   "metrics_persistence_M0_val": {
@@ -962,63 +1297,619 @@
     "diag_Level3_Recall": 0.5425
   },
   "neighbour_feature": {
-    "column": "nbr_pm25_mean_k3",
-    "used_in": "ablation rows 7 and 8 only, not a selection candidate",
-    "definition": "simple mean of pm2_5 at the same hour t over the 3 nearest grid cells by great-circle distance, excluding the cell itself; no upwind weights",
-    "missing_rule": "hours flagged qc_interpolated or is_missing are excluded; mean of the available neighbours; if none is available, the cell's own pm2_5 at t",
-    "neighbours_by_receptor": {
-      "KL_City": {
-        "neighbours": [
-          "Sepang",
-          "Port_Klang",
-          "Seremban"
+    "main": {
+      "columns": [
+        "nbr01_pm2_5",
+        "nbr01_change_3h",
+        "nbr02_pm2_5",
+        "nbr02_change_3h",
+        "nbr03_pm2_5",
+        "nbr03_change_3h",
+        "nbr04_pm2_5",
+        "nbr04_change_3h",
+        "nbr05_pm2_5",
+        "nbr05_change_3h",
+        "nbr06_pm2_5",
+        "nbr06_change_3h",
+        "nbr07_pm2_5",
+        "nbr07_change_3h",
+        "nbr08_pm2_5",
+        "nbr08_change_3h",
+        "nbr09_pm2_5",
+        "nbr09_change_3h",
+        "nbr10_pm2_5",
+        "nbr10_change_3h",
+        "nbr11_pm2_5",
+        "nbr11_change_3h",
+        "nbr12_pm2_5",
+        "nbr12_change_3h",
+        "nbr13_pm2_5",
+        "nbr13_change_3h",
+        "nbr14_pm2_5",
+        "nbr14_change_3h",
+        "nbr15_pm2_5",
+        "nbr15_change_3h",
+        "nbr16_pm2_5",
+        "nbr16_change_3h",
+        "nbr17_pm2_5",
+        "nbr17_change_3h",
+        "nbr18_pm2_5",
+        "nbr18_change_3h",
+        "nbr19_pm2_5",
+        "nbr19_change_3h",
+        "nbr20_pm2_5",
+        "nbr20_change_3h",
+        "nbr21_pm2_5",
+        "nbr21_change_3h",
+        "nbr22_pm2_5",
+        "nbr22_change_3h",
+        "nbr23_pm2_5",
+        "nbr23_change_3h",
+        "nbr24_pm2_5",
+        "nbr24_change_3h",
+        "nbr25_pm2_5",
+        "nbr25_change_3h"
+      ],
+      "n_columns": 50,
+      "used_in": "ablation rows 7, 8 and 11 only; not a selection candidate, not in features_final",
+      "definition": "for each receptor, all other grid cells (self excluded) ordered by great-circle distance, nbr01 = nearest; per cell two raw values at hour t: pm2_5 and the stage 2 column pm2_5_change_3h (x(t) - x(t-3)); no averaging, no upwind weights",
+      "missing_rule": "hours flagged qc_interpolated or is_missing are NaN (stage 2 masking rule, interpolation may use future endpoints); not filled, the random forest handles missing values natively"
+    },
+    "layout_check": {
+      "definition": "same raw values with one fixed column per grid cell (52 columns, the receptor's own cell left NaN), added to the previous Top-25; not plotted",
+      "result": {
+        "n_features": 77,
+        "features": [
+          "pm2_5",
+          "pm10",
+          "pm2_5_mean_3h",
+          "hour_sin",
+          "pm2_5_lag_1",
+          "no2",
+          "pm2_5_change_3h",
+          "pm10_lag_1",
+          "so2",
+          "no2_lag_12",
+          "spatial_pm25_gradient",
+          "pm2_5_slope_6h",
+          "gran_slope_12h",
+          "gran_low_12h",
+          "relative_humidity_2m_lag_3",
+          "gran_low_6h",
+          "pm2_5_mean_6h",
+          "gran_up_6h",
+          "no2_lag_6",
+          "o3",
+          "temperature_2m",
+          "no2_lag_2",
+          "co",
+          "no2_lag_24",
+          "far_source_pm25_mean_24h",
+          "cell_Alor_Setar_pm2_5",
+          "cell_Alor_Setar_change_3h",
+          "cell_Banda_Aceh_pm2_5",
+          "cell_Banda_Aceh_change_3h",
+          "cell_Banjarmasin_pm2_5",
+          "cell_Banjarmasin_change_3h",
+          "cell_Bengkulu_pm2_5",
+          "cell_Bengkulu_change_3h",
+          "cell_Bintulu_pm2_5",
+          "cell_Bintulu_change_3h",
+          "cell_Dumai_pm2_5",
+          "cell_Dumai_change_3h",
+          "cell_Ipoh_pm2_5",
+          "cell_Ipoh_change_3h",
+          "cell_Jambi_pm2_5",
+          "cell_Jambi_change_3h",
+          "cell_Johor_Bahru_pm2_5",
+          "cell_Johor_Bahru_change_3h",
+          "cell_KL_City_pm2_5",
+          "cell_KL_City_change_3h",
+          "cell_Kota_Bharu_pm2_5",
+          "cell_Kota_Bharu_change_3h",
+          "cell_Kuala_Terengganu_pm2_5",
+          "cell_Kuala_Terengganu_change_3h",
+          "cell_Kuantan_pm2_5",
+          "cell_Kuantan_change_3h",
+          "cell_Kuching_pm2_5",
+          "cell_Kuching_change_3h",
+          "cell_Malacca_pm2_5",
+          "cell_Malacca_change_3h",
+          "cell_Medan_pm2_5",
+          "cell_Medan_change_3h",
+          "cell_Padang_pm2_5",
+          "cell_Padang_change_3h",
+          "cell_Palangkaraya_pm2_5",
+          "cell_Palangkaraya_change_3h",
+          "cell_Palembang_pm2_5",
+          "cell_Palembang_change_3h",
+          "cell_Pekanbaru_pm2_5",
+          "cell_Pekanbaru_change_3h",
+          "cell_Penang_pm2_5",
+          "cell_Penang_change_3h",
+          "cell_Pontianak_pm2_5",
+          "cell_Pontianak_change_3h",
+          "cell_Port_Klang_pm2_5",
+          "cell_Port_Klang_change_3h",
+          "cell_Sepang_pm2_5",
+          "cell_Sepang_change_3h",
+          "cell_Seremban_pm2_5",
+          "cell_Seremban_change_3h",
+          "cell_Temerloh_pm2_5",
+          "cell_Temerloh_change_3h"
         ],
-        "distance_km": [
-          31.1,
-          38.9,
-          48.2
-        ]
-      },
-      "Port_Klang": {
-        "neighbours": [
-          "KL_City",
-          "Sepang",
-          "Seremban"
+        "seeds": [
+          42,
+          43,
+          44
         ],
-        "distance_km": [
-          38.9,
-          39.5,
-          67.7
-        ]
-      },
-      "Sepang": {
-        "neighbours": [
-          "Seremban",
-          "KL_City",
-          "Port_Klang"
+        "runs": [
+          {
+            "Macro_F1": 0.7068,
+            "Balanced_Accuracy": 0.6842,
+            "High_Risk_Recall": 0.7377,
+            "MAOE": 0.2596,
+            "Severe_Jumping_Error_Rate": 0.0079,
+            "Avg_Asymmetric_Cost": 0.6787,
+            "n_samples": 16656,
+            "n_high_risk": 4842,
+            "diag_High_Risk_Exact_Recall": 0.5568,
+            "diag_Level3_Recall": 0.6334
+          },
+          {
+            "Macro_F1": 0.7072,
+            "Balanced_Accuracy": 0.6839,
+            "High_Risk_Recall": 0.7431,
+            "MAOE": 0.2589,
+            "Severe_Jumping_Error_Rate": 0.0081,
+            "Avg_Asymmetric_Cost": 0.6738,
+            "n_samples": 16656,
+            "n_high_risk": 4842,
+            "diag_High_Risk_Exact_Recall": 0.5605,
+            "diag_Level3_Recall": 0.6288
+          },
+          {
+            "Macro_F1": 0.7091,
+            "Balanced_Accuracy": 0.6861,
+            "High_Risk_Recall": 0.7408,
+            "MAOE": 0.2582,
+            "Severe_Jumping_Error_Rate": 0.0081,
+            "Avg_Asymmetric_Cost": 0.67,
+            "n_samples": 16656,
+            "n_high_risk": 4842,
+            "diag_High_Risk_Exact_Recall": 0.5634,
+            "diag_Level3_Recall": 0.6436
+          }
         ],
-        "distance_km": [
-          28.3,
-          31.1,
-          39.5
-        ]
+        "mean": {
+          "Macro_F1": 0.7077,
+          "Balanced_Accuracy": 0.6847333333333334,
+          "High_Risk_Recall": 0.7405333333333334,
+          "MAOE": 0.25889999999999996,
+          "Severe_Jumping_Error_Rate": 0.008033333333333333,
+          "Avg_Asymmetric_Cost": 0.6741666666666667,
+          "diag_High_Risk_Exact_Recall": 0.5602333333333332,
+          "diag_Level3_Recall": 0.6352666666666666
+        },
+        "std": {
+          "Macro_F1": 0.0012288205727444194,
+          "Balanced_Accuracy": 0.00119303534454492,
+          "High_Risk_Recall": 0.0027098585448936683,
+          "MAOE": 0.0007000000000000062,
+          "Severe_Jumping_Error_Rate": 0.00011547005383792445,
+          "Avg_Asymmetric_Cost": 0.004361574639202343,
+          "diag_High_Risk_Exact_Recall": 0.0033080709383768512,
+          "diag_Level3_Recall": 0.007574518686578892
+        }
       }
+    },
+    "control": {
+      "column": "nbr_pm25_mean_k3",
+      "used_in": "ablation row 9 only",
+      "definition": "simple mean of nbr01..nbr03_pm2_5 (the 3 nearest cells)",
+      "missing_rule": "mean of the available values; if none, the cell's own pm2_5 at t"
+    },
+    "neighbours_by_receptor": {
+      "KL_City": [
+        {
+          "rank": 1,
+          "station_id": "Sepang",
+          "distance_km": 31.1
+        },
+        {
+          "rank": 2,
+          "station_id": "Port_Klang",
+          "distance_km": 38.9
+        },
+        {
+          "rank": 3,
+          "station_id": "Seremban",
+          "distance_km": 48.2
+        },
+        {
+          "rank": 4,
+          "station_id": "Temerloh",
+          "distance_km": 85.7
+        },
+        {
+          "rank": 5,
+          "station_id": "Malacca",
+          "distance_km": 117.5
+        },
+        {
+          "rank": 6,
+          "station_id": "Dumai",
+          "distance_km": 163.1
+        },
+        {
+          "rank": 7,
+          "station_id": "Ipoh",
+          "distance_km": 180.1
+        },
+        {
+          "rank": 8,
+          "station_id": "Kuantan",
+          "distance_km": 193.9
+        },
+        {
+          "rank": 9,
+          "station_id": "Johor_Bahru",
+          "distance_km": 287.0
+        },
+        {
+          "rank": 10,
+          "station_id": "Pekanbaru",
+          "distance_km": 290.8
+        },
+        {
+          "rank": 11,
+          "station_id": "Kuala_Terengganu",
+          "distance_km": 292.7
+        },
+        {
+          "rank": 12,
+          "station_id": "Penang",
+          "distance_km": 299.7
+        },
+        {
+          "rank": 13,
+          "station_id": "Kota_Bharu",
+          "distance_km": 340.3
+        },
+        {
+          "rank": 14,
+          "station_id": "Medan",
+          "distance_km": 343.3
+        },
+        {
+          "rank": 15,
+          "station_id": "Alor_Setar",
+          "distance_km": 367.1
+        },
+        {
+          "rank": 16,
+          "station_id": "Padang",
+          "distance_km": 476.1
+        },
+        {
+          "rank": 17,
+          "station_id": "Jambi",
+          "distance_km": 564.9
+        },
+        {
+          "rank": 18,
+          "station_id": "Palembang",
+          "distance_km": 756.5
+        },
+        {
+          "rank": 19,
+          "station_id": "Banda_Aceh",
+          "distance_km": 759.9
+        },
+        {
+          "rank": 20,
+          "station_id": "Bengkulu",
+          "distance_km": 770.4
+        },
+        {
+          "rank": 21,
+          "station_id": "Pontianak",
+          "distance_km": 915.3
+        },
+        {
+          "rank": 22,
+          "station_id": "Kuching",
+          "distance_km": 974.6
+        },
+        {
+          "rank": 23,
+          "station_id": "Bintulu",
+          "distance_km": 1256.3
+        },
+        {
+          "rank": 24,
+          "station_id": "Palangkaraya",
+          "distance_km": 1478.4
+        },
+        {
+          "rank": 25,
+          "station_id": "Banjarmasin",
+          "distance_km": 1598.3
+        }
+      ],
+      "Port_Klang": [
+        {
+          "rank": 1,
+          "station_id": "KL_City",
+          "distance_km": 38.9
+        },
+        {
+          "rank": 2,
+          "station_id": "Sepang",
+          "distance_km": 39.5
+        },
+        {
+          "rank": 3,
+          "station_id": "Seremban",
+          "distance_km": 67.7
+        },
+        {
+          "rank": 4,
+          "station_id": "Temerloh",
+          "distance_km": 124.3
+        },
+        {
+          "rank": 5,
+          "station_id": "Malacca",
+          "distance_km": 131.2
+        },
+        {
+          "rank": 6,
+          "station_id": "Dumai",
+          "distance_km": 148.5
+        },
+        {
+          "rank": 7,
+          "station_id": "Ipoh",
+          "distance_km": 180.7
+        },
+        {
+          "rank": 8,
+          "station_id": "Kuantan",
+          "distance_km": 232.7
+        },
+        {
+          "rank": 9,
+          "station_id": "Pekanbaru",
+          "distance_km": 277.3
+        },
+        {
+          "rank": 10,
+          "station_id": "Penang",
+          "distance_km": 293.2
+        },
+        {
+          "rank": 11,
+          "station_id": "Medan",
+          "distance_km": 309.1
+        },
+        {
+          "rank": 12,
+          "station_id": "Johor_Bahru",
+          "distance_km": 310.2
+        },
+        {
+          "rank": 13,
+          "station_id": "Kuala_Terengganu",
+          "distance_km": 323.6
+        },
+        {
+          "rank": 14,
+          "station_id": "Kota_Bharu",
+          "distance_km": 359.9
+        },
+        {
+          "rank": 15,
+          "station_id": "Alor_Setar",
+          "distance_km": 364.8
+        },
+        {
+          "rank": 16,
+          "station_id": "Padang",
+          "distance_km": 454.0
+        },
+        {
+          "rank": 17,
+          "station_id": "Jambi",
+          "distance_km": 569.0
+        },
+        {
+          "rank": 18,
+          "station_id": "Banda_Aceh",
+          "distance_km": 730.0
+        },
+        {
+          "rank": 19,
+          "station_id": "Bengkulu",
+          "distance_km": 762.3
+        },
+        {
+          "rank": 20,
+          "station_id": "Palembang",
+          "distance_km": 763.5
+        },
+        {
+          "rank": 21,
+          "station_id": "Pontianak",
+          "distance_km": 945.5
+        },
+        {
+          "rank": 22,
+          "station_id": "Kuching",
+          "distance_km": 1009.2
+        },
+        {
+          "rank": 23,
+          "station_id": "Bintulu",
+          "distance_km": 1293.6
+        },
+        {
+          "rank": 24,
+          "station_id": "Palangkaraya",
+          "distance_km": 1507.9
+        },
+        {
+          "rank": 25,
+          "station_id": "Banjarmasin",
+          "distance_km": 1626.4
+        }
+      ],
+      "Sepang": [
+        {
+          "rank": 1,
+          "station_id": "Seremban",
+          "distance_km": 28.3
+        },
+        {
+          "rank": 2,
+          "station_id": "KL_City",
+          "distance_km": 31.1
+        },
+        {
+          "rank": 3,
+          "station_id": "Port_Klang",
+          "distance_km": 39.5
+        },
+        {
+          "rank": 4,
+          "station_id": "Malacca",
+          "distance_km": 93.5
+        },
+        {
+          "rank": 5,
+          "station_id": "Temerloh",
+          "distance_km": 105.2
+        },
+        {
+          "rank": 6,
+          "station_id": "Dumai",
+          "distance_km": 132.2
+        },
+        {
+          "rank": 7,
+          "station_id": "Ipoh",
+          "distance_km": 208.1
+        },
+        {
+          "rank": 8,
+          "station_id": "Kuantan",
+          "distance_km": 210.5
+        },
+        {
+          "rank": 9,
+          "station_id": "Pekanbaru",
+          "distance_km": 259.6
+        },
+        {
+          "rank": 10,
+          "station_id": "Johor_Bahru",
+          "distance_km": 270.8
+        },
+        {
+          "rank": 11,
+          "station_id": "Kuala_Terengganu",
+          "distance_km": 320.6
+        },
+        {
+          "rank": 12,
+          "station_id": "Penang",
+          "distance_km": 325.4
+        },
+        {
+          "rank": 13,
+          "station_id": "Medan",
+          "distance_km": 347.1
+        },
+        {
+          "rank": 14,
+          "station_id": "Kota_Bharu",
+          "distance_km": 371.4
+        },
+        {
+          "rank": 15,
+          "station_id": "Alor_Setar",
+          "distance_km": 394.6
+        },
+        {
+          "rank": 16,
+          "station_id": "Padang",
+          "distance_km": 446.0
+        },
+        {
+          "rank": 17,
+          "station_id": "Jambi",
+          "distance_km": 537.2
+        },
+        {
+          "rank": 18,
+          "station_id": "Palembang",
+          "distance_km": 730.1
+        },
+        {
+          "rank": 19,
+          "station_id": "Bengkulu",
+          "distance_km": 739.6
+        },
+        {
+          "rank": 20,
+          "station_id": "Banda_Aceh",
+          "distance_km": 769.3
+        },
+        {
+          "rank": 21,
+          "station_id": "Pontianak",
+          "distance_km": 906.4
+        },
+        {
+          "rank": 22,
+          "station_id": "Kuching",
+          "distance_km": 972.2
+        },
+        {
+          "rank": 23,
+          "station_id": "Bintulu",
+          "distance_km": 1259.6
+        },
+        {
+          "rank": 24,
+          "station_id": "Palangkaraya",
+          "distance_km": 1468.7
+        },
+        {
+          "rank": 25,
+          "station_id": "Banjarmasin",
+          "distance_km": 1587.0
+        }
+      ]
     },
     "row_counts_eligible_receptor": {
       "train": {
         "rows": 77753,
-        "some_neighbour_missing": 64,
-        "no_neighbour_used_own_value": 0
+        "rows_with_any_missing_neighbour_value": 241,
+        "missing_fraction_of_50_columns": 0.000105,
+        "control_mean_rows_with_no_neighbour": 0
       },
       "val": {
         "rows": 16656,
-        "some_neighbour_missing": 0,
-        "no_neighbour_used_own_value": 0
+        "rows_with_any_missing_neighbour_value": 0,
+        "missing_fraction_of_50_columns": 0.0,
+        "control_mean_rows_with_no_neighbour": 0
       },
       "test": {
         "rows": 16647,
-        "some_neighbour_missing": 0,
-        "no_neighbour_used_own_value": 0
+        "rows_with_any_missing_neighbour_value": 2349,
+        "missing_fraction_of_50_columns": 0.005385,
+        "control_mean_rows_with_no_neighbour": 0
       }
     }
   },

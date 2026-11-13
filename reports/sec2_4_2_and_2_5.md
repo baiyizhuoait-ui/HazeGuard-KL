@@ -54,7 +54,7 @@ Their union of 64 columns was reduced to 25 by recursive feature elimination wit
 
 ### Ablation
 
-We trained a default random forest with seeds 42, 43 and 44 and evaluated on the validation split (16,656 eligible receptor rows, 4,842 high risk). Sets 1 to 4 add one feature family at a time. Sets 5 to 8 separate two factors on top of the first-run Top-25: the missing `hour_cos` and a neighbourhood mean. The neighbourhood mean is the simple average of PM2.5 at hour t over the three nearest grid cells, excluding the cell itself, with no upwind weights so that any gain can be attributed to neighbour concentration alone. For the three receptors these neighbours lie 28 to 68 km away. Set 9 is the delivered Top-25. Metrics come from `src/utils_metrics.py`. High-risk recall is the share of true Level 2 or 3 hours predicted as Level 2 or 3. M0 predicts the current level.
+We trained a default random forest with seeds 42, 43 and 44 and evaluated on the validation split (16,656 eligible receptor rows, 4,842 high risk). Sets 1 to 4 add one feature family at a time. Sets 5 to 8 separate two factors on top of the first-run Top-25: the missing `hour_cos` and raw neighbour values. For the raw neighbour values, each receptor takes all 25 other grid cells, ordered by distance, and for each cell its PM2.5 at hour t and its 3-hour change. This gives 50 columns with no averaging and no upwind weights, so any effect can be attributed to neighbour concentration itself. Hours flagged as interpolated or missing are left missing for the forest to handle. Set 9 is a control that replaces the 50 columns with the mean of the three nearest cells, 28 to 68 km away. Set 10 is the delivered Top-25, and set 11 adds the 50 neighbour columns to it. Metrics come from `src/utils_metrics.py`. High-risk recall is the share of true Level 2 or 3 hours predicted as Level 2 or 3. M0 predicts the current level.
 
 **Table 2.** Feature ablation on the validation split (mean ± standard deviation over three seeds).
 
@@ -67,9 +67,11 @@ We trained a default random forest with seeds 42, 43 and 44 and evaluated on the
 | 4. + Granulation | 68 | 0.7129 ± 0.0018 | 0.7623 ± 0.0006 | 0.2561 | 0.6419 |
 | 5. First-run Top-25 | 25 | 0.7107 ± 0.0013 | 0.7664 ± 0.0019 | 0.2597 | 0.6497 |
 | 6. Set 5 + `hour_cos` | 26 | 0.7142 ± 0.0021 | 0.7687 ± 0.0013 | 0.2557 | 0.6399 |
-| 7. Set 5 + neighbourhood mean | 26 | 0.7131 ± 0.0011 | 0.7665 ± 0.0019 | 0.2565 | 0.6479 |
-| 8. Set 5 + both | 27 | 0.7129 ± 0.0016 | 0.7669 ± 0.0035 | 0.2563 | 0.6459 |
-| 9. Paired Top-25 (delivered) | 25 | 0.7157 ± 0.0010 | 0.7712 ± 0.0008 | 0.2546 | 0.6369 |
+| 7. Set 5 + 50 neighbour columns | 75 | 0.7018 ± 0.0022 | 0.7245 ± 0.0025 | 0.2656 | 0.7032 |
+| 8. Set 5 + `hour_cos` + 50 neighbour columns | 76 | 0.7072 ± 0.0015 | 0.7312 ± 0.0032 | 0.2602 | 0.6862 |
+| 9. Set 5 + nearest-3 mean (control) | 26 | 0.7131 ± 0.0011 | 0.7665 ± 0.0019 | 0.2565 | 0.6479 |
+| 10. Paired Top-25 (delivered) | 25 | 0.7157 ± 0.0010 | 0.7712 ± 0.0008 | 0.2546 | 0.6369 |
+| 11. Set 10 + 50 neighbour columns | 75 | 0.7078 ± 0.0018 | 0.7319 ± 0.0009 | 0.2593 | 0.6821 |
 
 ### Figure 7 Feature ablation on the validation split
 
@@ -81,15 +83,15 @@ Dots are means over three seeds, bars one standard deviation, and the dashed lin
 
 **Lags and rolling statistics give almost all of the gain.** They raise macro-F1 by 0.046 (0.6666 to 0.7125) and high-risk recall by 0.10 (0.6597 to 0.7642). With the original variables alone, high-risk recall stays below M0 (0.6597 against 0.7051).
 
-**Spatial features did not help.** Adding them lowers macro-F1 from 0.7125 to 0.7103 and high-risk recall from 0.7642 to 0.7555, drops larger than the seed standard deviations. No advection column was selected. Two facts explain this. The forecast horizon is three hours, and the Sumatran and Bornean source cells lie outside the 150 km near-field radius, so they only describe the regional background. And in about one row in ten the filled advection columns simply repeat the cell's own lags. The value of spatial information is better judged in the cross-cell generalisation study.
+**The upwind spatial features did not help.** Adding them lowers macro-F1 from 0.7125 to 0.7103 and high-risk recall from 0.7642 to 0.7555, drops larger than the seed standard deviations. This result concerns the weighted advection features from stage 2. Raw neighbour concentration is a different feature and is tested separately below. No advection column was selected. Two facts explain this. The forecast horizon is three hours, and the Sumatran and Bornean source cells lie outside the 150 km near-field radius, so they only describe the regional background. And in about one row in ten the filled advection columns simply repeat the cell's own lags. The value of spatial information is better judged in the cross-cell generalisation study.
 
 **Granulation adds little.** Set 4 is only 0.0004 above set 2 in macro-F1 (0.7129 against 0.7125) with the same average cost. Three granulation columns were still selected, but most of their information is already in the rolling features.
 
 **The half-encoded hour was a real defect.** Adding `hour_cos` to the first-run Top-25 improves all three metrics: macro-F1 from 0.7107 to 0.7142, high-risk recall from 0.7664 to 0.7687 and average cost from 0.6497 to 0.6399.
 
-**Raw neighbour concentration adds little.** The neighbourhood mean raises macro-F1 by 0.0024 but leaves high-risk recall almost unchanged (0.7665 against 0.7664). Adding both factors together (set 8) is no better than adding `hour_cos` alone. So even without upwind weighting or filling, the concentration of nearby cells at hour t tells the model little beyond the cell's own recent history. This supports the reading that the weak spatial result comes from the three-hour horizon and not only from how the advection features were built.
+**Raw neighbour columns did not help this model.** Adding the 50 columns lowers macro-F1 from 0.7107 to 0.7018, high-risk recall from 0.7664 to 0.7245 and raises the average cost from 0.6497 to 0.7032. The same happens on the delivered set (set 11 against set 10). We checked that each column holds the right cell's value at the right hour, and a layout with one fixed column per cell (recorded in `models/metrics_stage3.json`) also performed worse. A possible reason is that the default forest samples only the square root of the number of features at each split, so with 75 columns the receptor's own strong features are offered less often, while most of the 50 columns describe cells hundreds of kilometres away. Another team member found a gain from the same kind of features with a different model, so this result should be read as specific to the default forest used here. The control with the nearest-3 mean changes little (macro-F1 +0.0024, recall almost unchanged).
 
-**The paired Top-25 is the best set.** With 25 of 68 columns it gives the highest macro-F1 (0.7157), the highest high-risk recall (0.7712) and the lowest average cost (0.6369) of all nine sets.
+**The paired Top-25 is the best set.** With 25 of 68 candidates it gives the highest macro-F1 (0.7157), the highest high-risk recall (0.7712) and the lowest average cost (0.6369) of all eleven sets, so the neighbour columns were not added to the final table.
 
 **Limitations.** The standard deviations only reflect the forest seed, so differences below about 0.01 should not be read as firm rankings. Because the Top-25 was chosen on the whole training split, later cross-validation inside that split will be slightly optimistic. No test data were used here.
 
