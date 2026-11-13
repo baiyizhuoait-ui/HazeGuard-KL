@@ -1,0 +1,39 @@
+{
+  "model": "M7",
+  "split": "test",
+  "threshold_source": "validation",
+  "thresholds": [
+    0.2,
+    0.3,
+    0.45
+  ],
+  "test_samples": 16647,
+  "metrics": {
+    "Default": {
+      "Macro_F1": 0.6972,
+      "Balanced_Accuracy": 0.7192,
+      "High_Risk_Recall": 0.8737,
+      "MAOE": 0.3013,
+      "Severe_Jumping_Error_Rate": 0.0171,
+      "Avg_Asymmetric_Cost": 0.6497
+    },
+    "M7_Grid_Search": {
+      "Macro_F1": 0.6659,
+      "Balanced_Accuracy": 0.6656,
+      "High_Risk_Recall": 0.9376,
+      "MAOE": 0.33,
+      "Severe_Jumping_Error_Rate": 0.0173,
+      "Avg_Asymmetric_Cost": 0.5405
+    },
+    "Bayesian": {
+      "Macro_F1": 0.6247,
+      "Balanced_Accuracy": 0.6524,
+      "High_Risk_Recall": 0.9594,
+      "MAOE": 0.3993,
+      "Severe_Jumping_Error_Rate": 0.032,
+      "Avg_Asymmetric_Cost": 0.5458
+    }
+  },
+  "generated_at": "2026-11-13T09:26:22Z",
+  "git_commit": "978e7e83ea08d703472eaea36357a24d2302e8de"
+}
