@@ -214,7 +214,7 @@ We also tested the alternative explanation that the hourly values are interpolat
 three-hourly field. They are not. CAMS publishes single-level fields hourly, and the data
 show no three-hour periodicity: the first difference is constant within a three-hour block
 in only 1.2 % of blocks, and the mean absolute second difference grouped by hour modulo
-three is 6.07, 4.72 and 6.08, i.e. flat. A linear interpolation from three-hourly nodes
+three is 6.07, 5.17 and 6.04, i.e. flat. A linear interpolation from three-hourly nodes
 would produce the opposite pattern.
 
 **Consequences, stated rather than corrected.** The seam cannot be removed without an

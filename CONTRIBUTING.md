@@ -212,6 +212,8 @@ n_high_risk
 - [ ] `docs/handover/` 里自己的交接文档写完了，**"已知缺陷"和"我没做的事"两段不能空**
 - [ ] `reports/sec*.md` 是英文学术写法，图表编号连续，每个数字能在 json 里查到
 - [ ] `python tools/check_prose.py reports/` 通过（第 9 节，AI 腔自查）
+- [ ] `python tools/check_report_numbers.py` 待复核清单里没有**指标值**
+      （差值、百分比换算属正常；指标值查不到只可能是报告写错了）
 - [ ] `git diff main --stat` 里没有 `data/raw/`、没有绝对路径（`D:\`、`C:\Users`）、没有密钥
 - [ ] 没有单个文件超过 50 MB
 - [ ] 没有改别人负责的、已经存在的文件。**越权改动 = 直接拒绝合并**，内容再好也不收：先在群里提，由负责人自己改
