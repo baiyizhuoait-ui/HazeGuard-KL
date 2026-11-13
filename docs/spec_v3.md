@@ -35,14 +35,16 @@ v2.0 是在开工前写的，那时数据还是"大吉隆坡 8 个监测站"的�
 | 模块 | 负责人 | 状态 | 证据位置 |
 |---|---|---|---|
 | 01 数据工程与基线 | 1 号 | ✅ 完成并已并入 `main` | `models/metrics_stage1.json`、`models/gate0_report.json` |
-| 02 EDA 与时空特征 | 2 号 | ✅ 交付，**未并入** | `models/metrics_stage2_eda.json`、`metrics_stage2_features.json`、`metrics_stage2_verification.json` |
-| 03 粒化与特征选择 | 3 号 | ✅ 交付，**未并入** | `models/metrics_stage3.json`、`models/selected_features.json` |
-| 04 名义/平衡 RF 与提升 | 4 号 | ✅ 交付，**未并入** | `models/metrics_stage4.json`、三个 joblib、三张图 |
-| 05 两种保序范式 | 5 号 | ✅ 交付，**未并入** | `models/metrics_stage5.json`、三个模型、两张图 |
-| 06 代价敏感与可解释性 | 6 号 | ⬜ 未开工 | 分支 `feat/06-cost-explain` 仍是空的 |
+| 02 EDA 与时空特征 | 2 号 | ✅ 已并入 `main`（8e7c847） | `models/metrics_stage2_eda.json`、`metrics_stage2_features.json`、`metrics_stage2_verification.json` |
+| 03 粒化与特征选择 | 3 号 | ✅ 已并入 `main`（b955a23） | `models/metrics_stage3.json`、`models/selected_features.json` |
+| 04 名义/平衡 RF 与提升 | 4 号 | ✅ 已并入 `main`（1e75e86） | `models/metrics_stage4.json`、三个 joblib、三张图 |
+| 05 两种保序范式 | 5 号 | ✅ 已并入 `main`（d90db26） | `models/metrics_stage5.json`、三个模型、两张图 |
+| 06 代价敏感与可解释性 | 6 号 | 🟡 已交付，闸门 3 项未过 | 缺 `all_models_benchmark.csv`；`cost_thresholds.json` 缺 `generated_at`/`git_commit`；改了 `.gitignore` |
 | 07 系统与报告 | 7 号 | ⬜ 未开工 | 分支 `feat/07-streamlit` 仍是空的 |
 
-**注意**：`main` 目前只到 01。02、03、04 各自从 `main` 切出去、又在本地串着跑（03 的 `git_commit` 记的是 02 的 `2165c4c`，04 的 `input_sha256.features_final` 记的是 03 的产物哈希），所以**合并必须按 02 → 03 → 04 的顺序**，详见第 7 节。
+**注意**：截至 2026-11-13，`main` 已包含 01~05 五个模块（按 02 → 03 → 04 → 05 顺序并入）。
+这条顺序不是形式：03 的 `git_commit` 记的是 02 的提交，04 和 05 的 `input_sha256.features_final` 记的都是 03 的产物哈希，
+04 的代码还要读 03 生成的 `data/features_final.parquet`，所以**跳序合并会让 main 上有代码没数据**。
 
 ### 1.2 已有模型的成绩
 
