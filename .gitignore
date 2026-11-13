@@ -13,5 +13,3 @@ data/feat_granulation.parquet
 # 中间产物
 *.tmp
 *.log
-.venv/
-catboost_info/
