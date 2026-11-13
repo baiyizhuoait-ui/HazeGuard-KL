@@ -1,0 +1,25 @@
+{
+    "model": "M7",
+    "method": "Grid Search",
+    "objective": "Avg_Asymmetric_Cost",
+    "selected_on": "validation",
+    "thresholds": [
+        0.2,
+        0.3,
+        0.45
+    ],
+    "grid_step": 0.05,
+    "combinations_searched": 6859,
+    "validation_samples": 16656,
+    "validation_cost": 0.44950768491834775,
+    "default_cost": 0.5619596541786743,
+    "bayesian_cost": 0.48895292987512007,
+    "validation_metrics": {
+        "Macro_F1": 0.6884,
+        "Balanced_Accuracy": 0.7143,
+        "High_Risk_Recall": 0.936,
+        "MAOE": 0.31,
+        "Severe_Jumping_Error_Rate": 0.0162,
+        "Avg_Asymmetric_Cost": 0.4495
+    }
+}
