@@ -59,6 +59,17 @@ def analyse(df: pd.DataFrame) -> dict:
     dp = p.diff()
     agree = (dp.gt(0).sum(axis=1) / dp.notna().sum(axis=1)).groupby(dp.index.hour).mean()
 
+    # 顺带排除「3 小时插值」这一说：若成立，块内 Δ 应恒定、Δ² 应集中在 3 的倍数上
+    v = s["pm2_5"].dropna()
+    hh = v.index.hour.to_numpy()
+    vals = v.to_numpy()
+    block = []
+    for i in range(len(v) - 2):
+        if hh[i] % 3 == 0 and hh[i + 1] == hh[i] + 1 and hh[i + 2] == hh[i] + 2:
+            block.append(abs((vals[i + 1] - vals[i]) - (vals[i + 2] - vals[i + 1])) < 1e-9)
+    d2 = v.diff().diff().abs().dropna()
+    mod3 = d2.groupby(d2.index.hour % 3).mean()
+
     # 其他污染物是否同时跳（起报切换会影响所有物种）
     others = {}
     for col in ("pm10", "no2", "so2", "o3", "co"):
@@ -76,6 +87,11 @@ def analyse(df: pd.DataFrame) -> dict:
         "same_sign_share_background": round(
             float(agree.drop(index=list(SEAM_HOURS)).mean()), 2),
         "other_pollutant_seam_ratio": others,
+        "three_hour_interpolation_test": {
+            "block_constant_share_pct": round(100 * float(np.mean(block)), 2),
+            "abs_second_diff_by_hour_mod3": {int(k): round(float(x), 2) for k, x in mod3.items()},
+            "note": "若为 3 小时线性插值，块内 Δ 恒定应接近 100%、Δ² 应按 3 的倍数起伏；实测都不是",
+        },
         "interpretation": (
             "00Z/12Z 接缝处的逐小时变化显著高于其他时段，扣掉季节与日变化后仍存在，"
             "且同一时刻多个节点同向变化、所有污染物同时跳，说明是两次起报拼接造成的"
@@ -95,6 +111,9 @@ def main() -> None:
     print(f"  去气候态后 接缝/其余 = {res['anomaly_seam_ratio']}×")
     print(f"  同时刻同向站点占比：接缝 {res['same_sign_share_at_seam']}，其余 {res['same_sign_share_background']}")
     print(f"  其他污染物接缝倍数：{res['other_pollutant_seam_ratio']}")
+    t3 = res["three_hour_interpolation_test"]
+    print(f"  3 小时插值检验：块内 Δ 恒定 {t3['block_constant_share_pct']}%，"
+          f"Δ² 按 hour%3 = {t3['abs_second_diff_by_hour_mod3']}")
     top = sorted(res["raw_abs_diff_by_hour"].items(), key=lambda kv: -kv[1])[:4]
     print(f"  变化最强的四个钟点：{top}")
 

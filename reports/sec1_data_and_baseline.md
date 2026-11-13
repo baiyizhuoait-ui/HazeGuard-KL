@@ -214,7 +214,7 @@ We also tested the alternative explanation that the hourly values are interpolat
 three-hourly field. They are not. CAMS publishes single-level fields hourly, and the data
 show no three-hour periodicity: the first difference is constant within a three-hour block
 in only 1.2 % of blocks, and the mean absolute second difference grouped by hour modulo
-three is 6.07, 4.72 and 6.08, i.e. flat. A linear interpolation from three-hourly nodes
+three is 6.07, 5.17 and 6.04, i.e. flat. A linear interpolation from three-hourly nodes
 would produce the opposite pattern.
 
 **Consequences, stated rather than corrected.** The seam cannot be removed without an
@@ -347,7 +347,9 @@ which is what a baseline should show.
 
 ## 2.2.4.2 Results
 
-Test split, receptor nodes, n = 16,728 (of which 6,865 high-risk):
+Test split, receptor nodes, n = 16,728 (of which 6,865 high-risk). This table keeps the
+original M1 run. The main comparison table uses the same 16,647 eligible rows as M2–M7;
+the recomputed M1 values differ by at most 0.014 and are stored as `metrics_test_eligible`.
 
 | Metric | M0 Persistence | M1 Decision Tree | Δ (M1 − M0) |
 |---|---|---|---|

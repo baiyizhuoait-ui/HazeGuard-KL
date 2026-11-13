@@ -149,5 +149,18 @@
   "train_universe": "receptor nodes only (KL_City, Port_Klang, Sepang)",
   "train_universe_note": "主实验统一只在 3 个受体节点上训练与验证；23 个走廊/源区节点只作特征输入与泛化实验对照",
   "metric_version": "High_Risk_Recall = P(ŷ∈{2,3} | y∈{2,3})，诊断项 diag_* 不参与横向排序",
-  "elapsed_sec": 10.4
+  "elapsed_sec": 10.4,
+  "metrics_test_eligible": {
+    "Macro_F1": 0.6658,
+    "Balanced_Accuracy": 0.6473,
+    "High_Risk_Recall": 0.7675,
+    "MAOE": 0.3199,
+    "Severe_Jumping_Error_Rate": 0.021,
+    "Avg_Asymmetric_Cost": 0.9047,
+    "n_samples": 16647,
+    "n_high_risk": 6848,
+    "diag_High_Risk_Exact_Recall": 0.5739,
+    "diag_Level3_Recall": 0.6716
+  },
+  "eligible_note": "主指标在 M1 原始口径（受体全部行，n=16,728）上算的；这一组是把 M1 重算在与 M2~M7 相同的可建模行（n=16,647）上得到的，两者差值最大 0.014，六个指标排序不变。主表用这一组，保证同表可比。"
 }
