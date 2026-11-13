@@ -1,13 +1,14 @@
 {
   "module": "07 system analysis",
-  "generated_at": "2026-11-13T14:11:05.800098+00:00",
-  "git_commit": "2de0eef1b3dceb6c44361c387353144fdf77581f",
-  "code_sha256": "d46e898b49660c5ee9d40cfde284dac6c3a784bab08ec85d20ae8bc462b631d1",
+  "generated_at": "2026-11-13T15:07:07.860541+00:00",
+  "git_commit": "d69d1d19dc0230d8aa647754896cd71b77737076",
+  "code_sha256": "76ff3c56e7c04d8861583786f66a818e79f354ac3fb50dab353c36d4072bc552",
   "input_sha256": {
     "ordinal_probs_val_test": "72f3ae5c2b5be13e2f2b8464624272c47592cca26277758dd18ffb3725ba065e",
     "stage5_predictions": "1e39eded352d9597eff4c4a85bb49cdca63dbeea32eb9def9c9ad5828826a2c7",
     "cost_thresholds": "bf3c4e0adadca493009db32c400565b22878f71ff8c5c2d2441050af50af990e",
-    "features_final": "64285f40e81c72ab4872d282d52be68401078e8c33dec50134d93e7877d2f55b"
+    "features_final": "64285f40e81c72ab4872d282d52be68401078e8c33dec50134d93e7877d2f55b",
+    "seam_report": "ce79a1285791c59dd06f58696ab23f7280f7d4d60a677b2fe7fbb8a94a678b5c"
   },
   "rows_by_split": {
     "val": 16656,
@@ -21,6 +22,8 @@
     "advantage_h": "model_lead_h plus index_lag_h, for onsets where both exist.",
     "alert_precision": "Share of forecast alert onsets (a predicted level >= 2 after 6 predicted hours below 2) with an observed high-risk hour between one hour before and three hours after the predicted hour.",
     "index_note": "The running mean stands in for an index built on a daily average. It uses the same CAMS series and the project's own 35 µg/m³ boundary. It is not the official Malaysian API.",
+    "run_boundary": "Onsets are split by whether the onset hour is a CAMS run boundary in local time. The hours are read from models/seam_report.json (seam_hours_local) when that file exists, otherwise 08:00 and 20:00.",
+    "major": "An episode is major when its peak observed PM2.5 reaches 55 (level 3).",
     "calibration": "Ten equal-width bins of the M6 cumulative probability P(level >= k). ECE is the sample-weighted mean absolute gap between mean predicted probability and observed frequency.",
     "error": "M5 concentration forecast minus realised concentration, µg/m³. Negative means the forecast was too low.",
     "trend": "rising: realised concentration exceeds current PM2.5 by more than 10; falling: is lower by more than 10; otherwise steady."
@@ -151,6 +154,138 @@
             },
             "alert_onsets": 407,
             "alert_precision": 0.7101
+          }
+        }
+      },
+      "breakdown": {
+        "run_boundary_hours_local": [
+          8,
+          20
+        ],
+        "onsets_by_hour": {
+          "0": 7,
+          "1": 6,
+          "2": 3,
+          "3": 2,
+          "4": 2,
+          "5": 0,
+          "6": 0,
+          "7": 3,
+          "8": 33,
+          "9": 21,
+          "10": 1,
+          "11": 3,
+          "12": 7,
+          "13": 3,
+          "14": 11,
+          "15": 8,
+          "16": 6,
+          "17": 17,
+          "18": 30,
+          "19": 99,
+          "20": 115,
+          "21": 18,
+          "22": 8,
+          "23": 16
+        },
+        "at_run_boundary": {
+          "n_onsets": 148,
+          "rules": {
+            "M5_val_tuned": {
+              "share_alert_before_onset": 0.75,
+              "share_full_horizon": 0.6959,
+              "missed": 18
+            },
+            "M5_fixed": {
+              "share_alert_before_onset": 0.75,
+              "share_full_horizon": 0.6824,
+              "missed": 22
+            },
+            "M6": {
+              "share_alert_before_onset": 0.7365,
+              "share_full_horizon": 0.6757,
+              "missed": 25
+            },
+            "M7": {
+              "share_alert_before_onset": 0.7973,
+              "share_full_horizon": 0.7635,
+              "missed": 11
+            }
+          }
+        },
+        "other_hours": {
+          "n_onsets": 271,
+          "rules": {
+            "M5_val_tuned": {
+              "share_alert_before_onset": 0.8155,
+              "share_full_horizon": 0.4502,
+              "missed": 24
+            },
+            "M5_fixed": {
+              "share_alert_before_onset": 0.7565,
+              "share_full_horizon": 0.3727,
+              "missed": 33
+            },
+            "M6": {
+              "share_alert_before_onset": 0.8229,
+              "share_full_horizon": 0.417,
+              "missed": 19
+            },
+            "M7": {
+              "share_alert_before_onset": 0.9188,
+              "share_full_horizon": 0.6199,
+              "missed": 8
+            }
+          }
+        },
+        "major": {
+          "n_onsets": 223,
+          "rules": {
+            "M5_val_tuned": {
+              "share_alert_before_onset": 0.9103,
+              "share_full_horizon": 0.6323,
+              "missed": 0
+            },
+            "M5_fixed": {
+              "share_alert_before_onset": 0.8879,
+              "share_full_horizon": 0.5695,
+              "missed": 0
+            },
+            "M6": {
+              "share_alert_before_onset": 0.8924,
+              "share_full_horizon": 0.6009,
+              "missed": 2
+            },
+            "M7": {
+              "share_alert_before_onset": 0.9596,
+              "share_full_horizon": 0.7489,
+              "missed": 0
+            }
+          }
+        },
+        "minor": {
+          "n_onsets": 196,
+          "rules": {
+            "M5_val_tuned": {
+              "share_alert_before_onset": 0.6582,
+              "share_full_horizon": 0.4286,
+              "missed": 42
+            },
+            "M5_fixed": {
+              "share_alert_before_onset": 0.602,
+              "share_full_horizon": 0.3827,
+              "missed": 55
+            },
+            "M6": {
+              "share_alert_before_onset": 0.6786,
+              "share_full_horizon": 0.4031,
+              "missed": 42
+            },
+            "M7": {
+              "share_alert_before_onset": 0.7806,
+              "share_full_horizon": 0.5816,
+              "missed": 19
+            }
           }
         }
       },
@@ -6148,6 +6283,138 @@
             },
             "alert_onsets": 460,
             "alert_precision": 0.7217
+          }
+        }
+      },
+      "breakdown": {
+        "run_boundary_hours_local": [
+          8,
+          20
+        ],
+        "onsets_by_hour": {
+          "0": 18,
+          "1": 5,
+          "2": 3,
+          "3": 1,
+          "4": 1,
+          "5": 1,
+          "6": 0,
+          "7": 1,
+          "8": 12,
+          "9": 17,
+          "10": 1,
+          "11": 0,
+          "12": 1,
+          "13": 1,
+          "14": 4,
+          "15": 5,
+          "16": 8,
+          "17": 12,
+          "18": 22,
+          "19": 129,
+          "20": 140,
+          "21": 16,
+          "22": 14,
+          "23": 11
+        },
+        "at_run_boundary": {
+          "n_onsets": 152,
+          "rules": {
+            "M5_val_tuned": {
+              "share_alert_before_onset": 0.875,
+              "share_full_horizon": 0.7566,
+              "missed": 6
+            },
+            "M5_fixed": {
+              "share_alert_before_onset": 0.8618,
+              "share_full_horizon": 0.6974,
+              "missed": 8
+            },
+            "M6": {
+              "share_alert_before_onset": 0.8487,
+              "share_full_horizon": 0.6908,
+              "missed": 6
+            },
+            "M7": {
+              "share_alert_before_onset": 0.8882,
+              "share_full_horizon": 0.8487,
+              "missed": 5
+            }
+          }
+        },
+        "other_hours": {
+          "n_onsets": 271,
+          "rules": {
+            "M5_val_tuned": {
+              "share_alert_before_onset": 0.8635,
+              "share_full_horizon": 0.4686,
+              "missed": 26
+            },
+            "M5_fixed": {
+              "share_alert_before_onset": 0.7934,
+              "share_full_horizon": 0.3875,
+              "missed": 37
+            },
+            "M6": {
+              "share_alert_before_onset": 0.8672,
+              "share_full_horizon": 0.4354,
+              "missed": 29
+            },
+            "M7": {
+              "share_alert_before_onset": 0.9373,
+              "share_full_horizon": 0.6679,
+              "missed": 12
+            }
+          }
+        },
+        "major": {
+          "n_onsets": 208,
+          "rules": {
+            "M5_val_tuned": {
+              "share_alert_before_onset": 0.9904,
+              "share_full_horizon": 0.6683,
+              "missed": 0
+            },
+            "M5_fixed": {
+              "share_alert_before_onset": 0.976,
+              "share_full_horizon": 0.5962,
+              "missed": 0
+            },
+            "M6": {
+              "share_alert_before_onset": 0.9808,
+              "share_full_horizon": 0.6298,
+              "missed": 0
+            },
+            "M7": {
+              "share_alert_before_onset": 0.9952,
+              "share_full_horizon": 0.8029,
+              "missed": 0
+            }
+          }
+        },
+        "minor": {
+          "n_onsets": 215,
+          "rules": {
+            "M5_val_tuned": {
+              "share_alert_before_onset": 0.7488,
+              "share_full_horizon": 0.4791,
+              "missed": 32
+            },
+            "M5_fixed": {
+              "share_alert_before_onset": 0.6651,
+              "share_full_horizon": 0.4047,
+              "missed": 45
+            },
+            "M6": {
+              "share_alert_before_onset": 0.7442,
+              "share_full_horizon": 0.4279,
+              "missed": 35
+            },
+            "M7": {
+              "share_alert_before_onset": 0.8465,
+              "share_full_horizon": 0.6651,
+              "missed": 17
+            }
           }
         }
       },
