@@ -1,0 +1,40 @@
+{
+  "frozen_at": "2026-11-11T15:36:51.006849+00:00",
+  "input_sha256": {
+    "features_final": "64285f40e81c72ab4872d282d52be68401078e8c33dec50134d93e7877d2f55b",
+    "selected_features": "2d11fd961aedd1fc57ab3036038bfc1d67e0e797cb40fc3e1b2362b568c80d61"
+  },
+  "code_sha256": {
+    "05_reg_to_cls.py": "c0e934661f597375c03707597b5c38895a73846fbf9d5957fb8703c9b9dcc272",
+    "05_ordinal_rf.py": "20177a9bf1d515be0c50ba63ce0c62e4f1d9534d626ffafa2d917fa47e39c24d",
+    "ordinal_forest.py": "3cc5d01097421cfb9ab05235cd525c6ce45830f91c30645b0510f6d32699db76",
+    "utils_metrics.py": "b0bcc02975ba7d23ad1d503bba40c2d4c86a0cdffa835613d71a4da5e95749f3",
+    "config.py": "362b8e51c41d5f31af2ed83fdaf82caeb493f802f3ff313f6e0b5ba0b44e9e7c"
+  },
+  "selected_regressor_params": {
+    "n_estimators": 100,
+    "max_depth": 14,
+    "min_samples_leaf": 10,
+    "max_features": 0.5
+  },
+  "selected_ordinal_params": {
+    "n_estimators": 100,
+    "max_depth": 14,
+    "min_samples_leaf": 10,
+    "max_features": 0.5
+  },
+  "ordinal_class_weight": "balanced_subsample",
+  "final_seed": 42,
+  "m5_fixed_thresholds": [
+    15.0,
+    35.0,
+    55.0
+  ],
+  "m5_val_tuned_thresholds": [
+    17.0,
+    33.0,
+    55.0
+  ],
+  "test_evaluation_started": true,
+  "note": "All choices fixed before test predictions. No selection uses test metrics."
+}
