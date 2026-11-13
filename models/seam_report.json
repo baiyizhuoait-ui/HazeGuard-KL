@@ -48,6 +48,22 @@
     "o3": 1.81,
     "co": 1.88
   },
+  "reference_station": {
+    "name": "KL_City",
+    "abs_mean_at_seam": 15.17,
+    "abs_mean_other_hours": 4.72,
+    "seam_ratio": 3.22,
+    "anomaly_seam_ratio": 3.02,
+    "signed_mean_at_20": 17.93
+  },
+  "panel": {
+    "n_nodes": 26,
+    "abs_mean_at_seam": 5.82,
+    "abs_mean_other_hours": 1.69,
+    "seam_ratio": 3.45,
+    "signed_mean_at_20": 4.7,
+    "signed_mean_at_08": 0.37
+  },
   "three_hour_interpolation_test": {
     "block_constant_share_pct": 1.23,
     "abs_second_diff_by_hour_mod3": {
