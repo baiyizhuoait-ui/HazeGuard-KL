@@ -122,7 +122,7 @@ This comparison provides a useful theoretical decision-making reference. Althoug
 
 The independent test evaluation supports the use of M7 when the primary objective is to reduce the operational consequences of missed high-risk haze events. Relative to the default decision rule, M7 improved High-Risk Recall by **6.39 percentage points** and reduced Avg Asymmetric Cost by approximately **16.81%**, while lowering Macro-F1 by **0.0313**.
 
-The result should therefore be presented as an explicit trade-off: **better high-risk protection and lower asymmetric cost at the expense of some general classification performance**. Importantly, all M7 thresholds were selected using validation data only, and the independent test results were used exclusively for final evaluation.
+The result should therefore be presented as an explicit trade-off: **better high-risk protection and lower asymmetric cost at the expense of some general classification performance**. All M7 thresholds were selected using validation data only, and the independent test results were used exclusively for final evaluation.
 
 *Results source: `models/m7_test_metrics.json`; threshold-selection record: `models/cost_thresholds.json`.*
 
