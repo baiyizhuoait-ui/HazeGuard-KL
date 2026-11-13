@@ -297,7 +297,7 @@ def window_rows(station: pd.DataFrame, when: pd.Timestamp, hours: int) -> pd.Dat
 def fig_timeline(win: pd.DataFrame, when: pd.Timestamp, show_band: bool,
                  show_mean: bool = False):
     """Observed PM2.5 against the forecast that was issued three hours earlier."""
-    fig, ax = _figure(9.6, 3.4)
+    fig, ax = _figure(9.6, 3.7)
     values = [win["reg"].max(), win["q95"].max() if show_band else np.nan,
               win["pm2_5"].max(), win["target_pm25_3h"].max()]
     ymax = float(np.nanmax(values)) * 1.12 if np.isfinite(np.nanmax(values)) else 60.0
@@ -317,13 +317,15 @@ def fig_timeline(win: pd.DataFrame, when: pd.Timestamp, show_band: bool,
         ax.plot(win["timestamp"], win["pm2_5_mean_24h"], color=INK_2, linewidth=1.5,
                 linestyle=(0, (5, 3)), label="24 h running mean of observed PM2.5")
     ax.axvline(when, color=INK_2, linewidth=1)
-    ax.annotate("now", xy=(when, 1.0), xycoords=("data", "axes fraction"),
-                xytext=(0, 3), textcoords="offset points", ha="center",
+    ax.annotate("now", xy=(when, 0.0), xycoords=("data", "axes fraction"),
+                xytext=(4, 4), textcoords="offset points", ha="left",
                 fontsize=8, color=INK_2)
     _threshold_lines(ax, ymax)
     ax.set_ylim(0, ymax)
     ax.set_ylabel("PM2.5 (µg/m³)", fontsize=9, color=INK_2)
-    ax.legend(loc="upper left", fontsize=8, frameon=False, ncol=2)
+    # legend sits above the plot so it can never cover the first hours of the curve
+    ax.legend(loc="lower left", bbox_to_anchor=(0.0, 1.04), fontsize=8, frameon=False,
+              ncol=4, borderaxespad=0.0, columnspacing=1.4, handlelength=1.8)
     fig.autofmt_xdate(rotation=0, ha="center")
     fig.tight_layout()
     return fig
