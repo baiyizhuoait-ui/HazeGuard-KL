@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-11-10T06:20:35.780427+00:00",
-  "git_commit": "2165c4cbe2965c49284f41214339ce187507c519",
-  "code_sha256": "facf61ae2fb5b024766d5ba87256b90d2ae01aa357bee7429b570911c1d7af24",
+  "generated_at": "2026-11-13T15:00:40.839965+00:00",
+  "git_commit": "97b5faa4e2aebd8763fd86a0bf6a734e6ed38cf6",
+  "code_sha256": "301208a9c91f1856ec95d789a194d784926ff4a30c19bdd434b8ad698fc73805",
   "input_sha256": {
     "feat_spatiotemporal": "208cf00942b404aead0ffe913497d34157ec01f3e1a4ccf593b10f71fb61a55e",
     "feat_granulation": "71c156b0bb149f025d0f38dac27d3f166aa4d24d47cbd388396f441f4c8f6d2e"
@@ -479,7 +479,7 @@
         "diag_Level3_Recall": 0.0035133080327994295
       }
     },
-    "5 Selected Top-25": {
+    "5 Top-25 unpaired (previous)": {
       "n_features": 25,
       "features": [
         "pm2_5",
@@ -571,6 +571,382 @@
         "diag_High_Risk_Exact_Recall": 0.0017559422921420984,
         "diag_Level3_Recall": 0.0063095166217389705
       }
+    },
+    "6 Previous + hour_cos": {
+      "n_features": 26,
+      "features": [
+        "pm2_5",
+        "pm10",
+        "pm2_5_mean_3h",
+        "hour_sin",
+        "pm2_5_lag_1",
+        "no2",
+        "pm2_5_change_3h",
+        "pm10_lag_1",
+        "so2",
+        "no2_lag_12",
+        "spatial_pm25_gradient",
+        "pm2_5_slope_6h",
+        "gran_slope_12h",
+        "gran_low_12h",
+        "relative_humidity_2m_lag_3",
+        "gran_low_6h",
+        "pm2_5_mean_6h",
+        "gran_up_6h",
+        "no2_lag_6",
+        "o3",
+        "temperature_2m",
+        "no2_lag_2",
+        "co",
+        "no2_lag_24",
+        "far_source_pm25_mean_24h",
+        "hour_cos"
+      ],
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "runs": [
+        {
+          "Macro_F1": 0.7163,
+          "Balanced_Accuracy": 0.6996,
+          "High_Risk_Recall": 0.7695,
+          "MAOE": 0.2546,
+          "Severe_Jumping_Error_Rate": 0.0081,
+          "Avg_Asymmetric_Cost": 0.6359,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.588,
+          "diag_Level3_Recall": 0.6625
+        },
+        {
+          "Macro_F1": 0.7121,
+          "Balanced_Accuracy": 0.6951,
+          "High_Risk_Recall": 0.7693,
+          "MAOE": 0.2571,
+          "Severe_Jumping_Error_Rate": 0.0074,
+          "Avg_Asymmetric_Cost": 0.6433,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5822,
+          "diag_Level3_Recall": 0.6505
+        },
+        {
+          "Macro_F1": 0.7143,
+          "Balanced_Accuracy": 0.6974,
+          "High_Risk_Recall": 0.7672,
+          "MAOE": 0.2554,
+          "Severe_Jumping_Error_Rate": 0.0077,
+          "Avg_Asymmetric_Cost": 0.6406,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5828,
+          "diag_Level3_Recall": 0.6562
+        }
+      ],
+      "mean": {
+        "Macro_F1": 0.7142333333333334,
+        "Balanced_Accuracy": 0.6973666666666668,
+        "High_Risk_Recall": 0.7686666666666667,
+        "MAOE": 0.25570000000000004,
+        "Severe_Jumping_Error_Rate": 0.0077333333333333325,
+        "Avg_Asymmetric_Cost": 0.6399333333333334,
+        "diag_High_Risk_Exact_Recall": 0.5843333333333333,
+        "diag_Level3_Recall": 0.6564
+      },
+      "std": {
+        "Macro_F1": 0.0021007935008785445,
+        "Balanced_Accuracy": 0.002250185177564997,
+        "High_Risk_Recall": 0.0012741009902410803,
+        "MAOE": 0.001276714533480369,
+        "Severe_Jumping_Error_Rate": 0.00035118845842842424,
+        "Avg_Asymmetric_Cost": 0.003744774136491166,
+        "diag_High_Risk_Exact_Recall": 0.0031895663237081506,
+        "diag_Level3_Recall": 0.0060024994793835725
+      }
+    },
+    "7 Previous + neighbour mean": {
+      "n_features": 26,
+      "features": [
+        "pm2_5",
+        "pm10",
+        "pm2_5_mean_3h",
+        "hour_sin",
+        "pm2_5_lag_1",
+        "no2",
+        "pm2_5_change_3h",
+        "pm10_lag_1",
+        "so2",
+        "no2_lag_12",
+        "spatial_pm25_gradient",
+        "pm2_5_slope_6h",
+        "gran_slope_12h",
+        "gran_low_12h",
+        "relative_humidity_2m_lag_3",
+        "gran_low_6h",
+        "pm2_5_mean_6h",
+        "gran_up_6h",
+        "no2_lag_6",
+        "o3",
+        "temperature_2m",
+        "no2_lag_2",
+        "co",
+        "no2_lag_24",
+        "far_source_pm25_mean_24h",
+        "nbr_pm25_mean_k3"
+      ],
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "runs": [
+        {
+          "Macro_F1": 0.7139,
+          "Balanced_Accuracy": 0.6966,
+          "High_Risk_Recall": 0.7677,
+          "MAOE": 0.2571,
+          "Severe_Jumping_Error_Rate": 0.0085,
+          "Avg_Asymmetric_Cost": 0.6454,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5861,
+          "diag_Level3_Recall": 0.6528
+        },
+        {
+          "Macro_F1": 0.7119,
+          "Balanced_Accuracy": 0.6938,
+          "High_Risk_Recall": 0.7644,
+          "MAOE": 0.2578,
+          "Severe_Jumping_Error_Rate": 0.0085,
+          "Avg_Asymmetric_Cost": 0.6546,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5803,
+          "diag_Level3_Recall": 0.6408
+        },
+        {
+          "Macro_F1": 0.7136,
+          "Balanced_Accuracy": 0.6962,
+          "High_Risk_Recall": 0.7675,
+          "MAOE": 0.2547,
+          "Severe_Jumping_Error_Rate": 0.0073,
+          "Avg_Asymmetric_Cost": 0.6438,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5803,
+          "diag_Level3_Recall": 0.6476
+        }
+      ],
+      "mean": {
+        "Macro_F1": 0.7131333333333334,
+        "Balanced_Accuracy": 0.6955333333333334,
+        "High_Risk_Recall": 0.7665333333333333,
+        "MAOE": 0.2565333333333333,
+        "Severe_Jumping_Error_Rate": 0.008100000000000001,
+        "Avg_Asymmetric_Cost": 0.6479333333333334,
+        "diag_High_Risk_Exact_Recall": 0.5822333333333333,
+        "diag_Level3_Recall": 0.6470666666666667
+      },
+      "std": {
+        "Macro_F1": 0.001078579312490904,
+        "Balanced_Accuracy": 0.0015143755588800968,
+        "High_Risk_Recall": 0.0018502252115170789,
+        "MAOE": 0.0016258331197676254,
+        "Severe_Jumping_Error_Rate": 0.0006928203230275512,
+        "Avg_Asymmetric_Cost": 0.00582866479850514,
+        "diag_High_Risk_Exact_Recall": 0.0033486315612997813,
+        "diag_Level3_Recall": 0.006017751518078272
+      }
+    },
+    "8 Previous + hour_cos + neighbour mean": {
+      "n_features": 27,
+      "features": [
+        "pm2_5",
+        "pm10",
+        "pm2_5_mean_3h",
+        "hour_sin",
+        "pm2_5_lag_1",
+        "no2",
+        "pm2_5_change_3h",
+        "pm10_lag_1",
+        "so2",
+        "no2_lag_12",
+        "spatial_pm25_gradient",
+        "pm2_5_slope_6h",
+        "gran_slope_12h",
+        "gran_low_12h",
+        "relative_humidity_2m_lag_3",
+        "gran_low_6h",
+        "pm2_5_mean_6h",
+        "gran_up_6h",
+        "no2_lag_6",
+        "o3",
+        "temperature_2m",
+        "no2_lag_2",
+        "co",
+        "no2_lag_24",
+        "far_source_pm25_mean_24h",
+        "hour_cos",
+        "nbr_pm25_mean_k3"
+      ],
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "runs": [
+        {
+          "Macro_F1": 0.7142,
+          "Balanced_Accuracy": 0.6977,
+          "High_Risk_Recall": 0.7703,
+          "MAOE": 0.2562,
+          "Severe_Jumping_Error_Rate": 0.0087,
+          "Avg_Asymmetric_Cost": 0.6421,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5857,
+          "diag_Level3_Recall": 0.6528
+        },
+        {
+          "Macro_F1": 0.7111,
+          "Balanced_Accuracy": 0.693,
+          "High_Risk_Recall": 0.767,
+          "MAOE": 0.2573,
+          "Severe_Jumping_Error_Rate": 0.0082,
+          "Avg_Asymmetric_Cost": 0.6508,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5787,
+          "diag_Level3_Recall": 0.6385
+        },
+        {
+          "Macro_F1": 0.7135,
+          "Balanced_Accuracy": 0.6955,
+          "High_Risk_Recall": 0.7633,
+          "MAOE": 0.2553,
+          "Severe_Jumping_Error_Rate": 0.0079,
+          "Avg_Asymmetric_Cost": 0.6447,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5781,
+          "diag_Level3_Recall": 0.6505
+        }
+      ],
+      "mean": {
+        "Macro_F1": 0.7129333333333333,
+        "Balanced_Accuracy": 0.6953999999999999,
+        "High_Risk_Recall": 0.7668666666666667,
+        "MAOE": 0.25626666666666664,
+        "Severe_Jumping_Error_Rate": 0.008266666666666667,
+        "Avg_Asymmetric_Cost": 0.6458666666666667,
+        "diag_High_Risk_Exact_Recall": 0.5808333333333334,
+        "diag_Level3_Recall": 0.6472666666666668
+      },
+      "std": {
+        "Macro_F1": 0.0016258331197676352,
+        "Balanced_Accuracy": 0.002351595203260989,
+        "High_Risk_Recall": 0.003501904243884084,
+        "MAOE": 0.001001665280087755,
+        "Severe_Jumping_Error_Rate": 0.0004041451884327373,
+        "Avg_Asymmetric_Cost": 0.004465795935030337,
+        "diag_High_Risk_Exact_Recall": 0.004225320500664238,
+        "diag_Level3_Recall": 0.007678758580222058
+      }
+    },
+    "9 Top-25 paired (delivered)": {
+      "n_features": 25,
+      "features": [
+        "pm2_5",
+        "pm10",
+        "pm2_5_mean_3h",
+        "hour_sin",
+        "pm2_5_lag_1",
+        "no2",
+        "pm10_lag_1",
+        "pm2_5_change_3h",
+        "gran_up_6h",
+        "so2",
+        "spatial_pm25_gradient",
+        "no2_lag_12",
+        "pm2_5_slope_6h",
+        "gran_low_6h",
+        "gran_slope_12h",
+        "pm2_5_mean_6h",
+        "no2_lag_6",
+        "relative_humidity_2m_lag_3",
+        "o3",
+        "temperature_2m",
+        "co",
+        "no2_lag_24",
+        "far_source_pm25_mean_24h",
+        "no2_lag_2",
+        "hour_cos"
+      ],
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "runs": [
+        {
+          "Macro_F1": 0.7152,
+          "Balanced_Accuracy": 0.6983,
+          "High_Risk_Recall": 0.7716,
+          "MAOE": 0.2549,
+          "Severe_Jumping_Error_Rate": 0.0077,
+          "Avg_Asymmetric_Cost": 0.6374,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5872,
+          "diag_Level3_Recall": 0.6545
+        },
+        {
+          "Macro_F1": 0.715,
+          "Balanced_Accuracy": 0.698,
+          "High_Risk_Recall": 0.7703,
+          "MAOE": 0.2546,
+          "Severe_Jumping_Error_Rate": 0.0076,
+          "Avg_Asymmetric_Cost": 0.6399,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5859,
+          "diag_Level3_Recall": 0.6522
+        },
+        {
+          "Macro_F1": 0.7168,
+          "Balanced_Accuracy": 0.6998,
+          "High_Risk_Recall": 0.7716,
+          "MAOE": 0.2544,
+          "Severe_Jumping_Error_Rate": 0.0079,
+          "Avg_Asymmetric_Cost": 0.6335,
+          "n_samples": 16656,
+          "n_high_risk": 4842,
+          "diag_High_Risk_Exact_Recall": 0.5913,
+          "diag_Level3_Recall": 0.6625
+        }
+      ],
+      "mean": {
+        "Macro_F1": 0.7156666666666666,
+        "Balanced_Accuracy": 0.6987,
+        "High_Risk_Recall": 0.7711666666666667,
+        "MAOE": 0.2546333333333333,
+        "Severe_Jumping_Error_Rate": 0.007733333333333334,
+        "Avg_Asymmetric_Cost": 0.6369333333333332,
+        "diag_High_Risk_Exact_Recall": 0.5881333333333334,
+        "diag_Level3_Recall": 0.6564
+      },
+      "std": {
+        "Macro_F1": 0.0009865765724632683,
+        "Balanced_Accuracy": 0.0009643650760992929,
+        "High_Risk_Recall": 0.0007505553499464949,
+        "MAOE": 0.00025166114784236,
+        "Severe_Jumping_Error_Rate": 0.00015275252316519506,
+        "Avg_Asymmetric_Cost": 0.0032254198693090416,
+        "diag_High_Risk_Exact_Recall": 0.0028183919765237563,
+        "diag_Level3_Recall": 0.0054064775963653
+      }
     }
   },
   "metrics_persistence_M0_val": {
@@ -584,5 +960,98 @@
     "n_high_risk": 4842,
     "diag_High_Risk_Exact_Recall": 0.4754,
     "diag_Level3_Recall": 0.5425
+  },
+  "neighbour_feature": {
+    "column": "nbr_pm25_mean_k3",
+    "used_in": "ablation rows 7 and 8 only, not a selection candidate",
+    "definition": "simple mean of pm2_5 at the same hour t over the 3 nearest grid cells by great-circle distance, excluding the cell itself; no upwind weights",
+    "missing_rule": "hours flagged qc_interpolated or is_missing are excluded; mean of the available neighbours; if none is available, the cell's own pm2_5 at t",
+    "neighbours_by_receptor": {
+      "KL_City": {
+        "neighbours": [
+          "Sepang",
+          "Port_Klang",
+          "Seremban"
+        ],
+        "distance_km": [
+          31.1,
+          38.9,
+          48.2
+        ]
+      },
+      "Port_Klang": {
+        "neighbours": [
+          "KL_City",
+          "Sepang",
+          "Seremban"
+        ],
+        "distance_km": [
+          38.9,
+          39.5,
+          67.7
+        ]
+      },
+      "Sepang": {
+        "neighbours": [
+          "Seremban",
+          "KL_City",
+          "Port_Klang"
+        ],
+        "distance_km": [
+          28.3,
+          31.1,
+          39.5
+        ]
+      }
+    },
+    "row_counts_eligible_receptor": {
+      "train": {
+        "rows": 77753,
+        "some_neighbour_missing": 64,
+        "no_neighbour_used_own_value": 0
+      },
+      "val": {
+        "rows": 16656,
+        "some_neighbour_missing": 0,
+        "no_neighbour_used_own_value": 0
+      },
+      "test": {
+        "rows": 16647,
+        "some_neighbour_missing": 0,
+        "no_neighbour_used_own_value": 0
+      }
+    }
+  },
+  "factor_rows": {
+    "previous_top25": [
+      "pm2_5",
+      "pm10",
+      "pm2_5_mean_3h",
+      "hour_sin",
+      "pm2_5_lag_1",
+      "no2",
+      "pm2_5_change_3h",
+      "pm10_lag_1",
+      "so2",
+      "no2_lag_12",
+      "spatial_pm25_gradient",
+      "pm2_5_slope_6h",
+      "gran_slope_12h",
+      "gran_low_12h",
+      "relative_humidity_2m_lag_3",
+      "gran_low_6h",
+      "pm2_5_mean_6h",
+      "gran_up_6h",
+      "no2_lag_6",
+      "o3",
+      "temperature_2m",
+      "no2_lag_2",
+      "co",
+      "no2_lag_24",
+      "far_source_pm25_mean_24h"
+    ],
+    "missing_cyclic_half": [
+      "hour_cos"
+    ]
   }
 }
