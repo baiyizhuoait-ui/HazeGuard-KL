@@ -75,32 +75,56 @@ This comparison should not be interpreted as evidence that grid search is theore
 
 The final thresholds were saved in `models/cost_thresholds.json`.
 
-### 3.1.5 Final Independent Test Evaluation
+### 3.1.5 Independent Test-Set Evaluation and Performance Trade-offs
 
-After selecting the optimal thresholds exclusively on the validation set, the frozen thresholds (0.20, 0.30, 0.45) were evaluated on the independent test set containing 16,647 samples.
+After selecting the optimal thresholds on the validation set, the M7 Grid Search decision rule was evaluated once on the independent test set containing 16,647 samples. The selected thresholds were **[0.20, 0.30, 0.45]** and were fixed before test evaluation. No threshold tuning or model selection was performed using the test labels.
 
-No further threshold optimization was performed using test-set labels.
+Three decision strategies were compared using the same test-set probability predictions: the default decision rule, the M7 cost-sensitive grid-search thresholds, and the Bayesian minimum expected cost decision rule.
 
-The following table compares the default ordinal thresholds, the M7 grid-search decision rule, and Bayesian minimum expected cost decision-making.
+**Table: Independent test-set performance comparison**
 
 | Metric | Default | M7 Grid Search | Bayesian |
 |---|---:|---:|---:|
 | Macro-F1 | 0.6972 | 0.6659 | 0.6247 |
 | Balanced Accuracy | 0.7192 | 0.6656 | 0.6524 |
-| High-Risk Recall | 0.8737 | 0.9376 | 0.9594 |
+| High-Risk Recall | 0.8737 | **0.9376** | 0.9594 |
 | MAOE | 0.3013 | 0.3300 | 0.3993 |
 | Severe Jumping Error Rate | 0.0171 | 0.0173 | 0.0320 |
-| Average Asymmetric Cost | 0.6497 | 0.5405 | 0.5458 |
+| Avg Asymmetric Cost | 0.6497 | **0.5405** | 0.5458 |
 
-The M7 grid-search method achieved a 16.81% reduction in Average Asymmetric Cost relative to the default decision thresholds. High-Risk Recall increased by 6.39 percentage points, from 87.37% to 93.76%.
+**High-risk recall and asymmetric cost improvement.**
 
-However, Macro-F1 decreased from 0.6972 to 0.6659, while Balanced Accuracy also decreased. These results demonstrate a trade-off between high-risk warning sensitivity and overall classification performance.
+Compared with the default decision rule, M7 increased High-Risk Recall from **0.8737 to 0.9376**, an improvement of **6.39 percentage points**. At the same time, Avg Asymmetric Cost decreased from **0.6497 to 0.5405**, representing a relative reduction of approximately **16.81%**.
 
-The Bayesian decision rule achieved the highest High-Risk Recall (95.94%), but its Average Asymmetric Cost (0.5458) was slightly higher than that of M7 (0.5405).
+These improvements indicate that the validation-selected cost-sensitive thresholds successfully transferred to the independent test set. M7 identified a larger proportion of genuinely high-risk haze cases while reducing the average penalty defined by the project's asymmetric cost matrix.
 
-Overall, the independent test results support the effectiveness of validation-selected cost-sensitive thresholds for reducing asymmetric prediction cost. They do not imply that M7 outperforms the other decision methods on every metric.
+**Macro-F1 deterioration and performance trade-off.**
 
-The frozen threshold configuration is stored in `models/cost_thresholds.json`, and the independent test results are recorded in `models/m7_test_metrics.json`.
+The improvement in high-risk detection was not achieved without sacrificing other classification metrics. In particular, **Macro-F1 decreased from 0.6972 to 0.6659**, an absolute reduction of **0.0313**. Balanced Accuracy also decreased from 0.7192 to 0.6656, while MAOE increased from 0.3013 to 0.3300. The Severe Jumping Error Rate rose slightly from 0.0171 to 0.0173.
+
+These results demonstrate that M7 is not universally superior to the default classifier. Its threshold adjustment changes the balance between missed hazardous events and precautionary warnings, prioritizing the project's asymmetric cost objective rather than overall class-balanced classification performance.
+
+**Justification based on asymmetric misclassification costs.**
+
+The project's cost matrix assigns substantially higher penalties to certain dangerous underprediction errors than to many overprediction errors. For example, predicting Level 0 when the true condition is Level 2 incurs **8 cost units**, while predicting Level 0 when the true condition is Level 3 incurs **15 cost units**. By comparison, several less severe errors incur penalties of only 1–5 cost units.
+
+Therefore, a reduction in Macro-F1 may be acceptable when it accompanies fewer costly high-risk misses and a meaningful reduction in expected operational loss. The observed trade-off is consistent with a precautionary haze-warning application in which missing severe pollution conditions can have greater consequences than issuing some additional warnings.
+
+Nevertheless, this justification depends on the validity of the specified cost matrix. M7 should be considered a **cost-sensitive operational alternative**, rather than a classifier that dominates the default approach on every metric.
+
+**Comparison with the Bayesian decision rule.**
+
+The Bayesian minimum expected cost strategy achieved the highest High-Risk Recall of 0.9594, but its test-set Avg Asymmetric Cost was 0.5458, slightly higher than M7's 0.5405. It also produced a lower Macro-F1 of 0.6247, a higher MAOE of 0.3993, and a higher Severe Jumping Error Rate of 0.0320.
+
+This comparison provides a useful theoretical decision-making reference. Although the Bayesian rule minimizes expected cost for each probability vector under the specified cost matrix, its empirical performance depends on the quality and calibration of those probabilities. Consequently, it is not guaranteed to achieve the lowest realized cost on a finite test set.
+
+**Conclusion.**
+
+The independent test evaluation supports the use of M7 when the primary objective is to reduce the operational consequences of missed high-risk haze events. Relative to the default decision rule, M7 improved High-Risk Recall by **6.39 percentage points** and reduced Avg Asymmetric Cost by approximately **16.81%**, while lowering Macro-F1 by **0.0313**.
+
+The result should therefore be presented as an explicit trade-off: **better high-risk protection and lower asymmetric cost at the expense of some general classification performance**. Importantly, all M7 thresholds were selected using validation data only, and the independent test results were used exclusively for final evaluation.
+
+*Results source: `models/m7_test_metrics.json`; threshold-selection record: `models/cost_thresholds.json`.*
 
 ## 3.2 Model Interpretability
 
