@@ -1,0 +1,3 @@
+# The charts are drawn on a light surface, so the page uses the light theme too.
+[theme]
+base = "light"

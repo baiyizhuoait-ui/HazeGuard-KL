@@ -56,13 +56,13 @@ FIGURES = ROOT / "figures"
 # Decision rules the dashboard can display. Each one maps to a column of saved
 # predictions and to its row name in models/all_models_benchmark.csv.
 RULES = {
-    "M5_val_tuned": dict(label="M5 Reg-to-Cls RF, cut points tuned on validation",
+    "M5_val_tuned": dict(label="M5 tuned cut points",
                          column="pred_m5_tuned", benchmark="M5_val_tuned"),
-    "M5_fixed": dict(label="M5 Reg-to-Cls RF, fixed cut points 15/35/55",
+    "M5_fixed": dict(label="M5 fixed cut points",
                      column="pred_m5_fixed", benchmark="M5_fixed"),
-    "M6": dict(label="M6 Ordinal RF, most probable level",
+    "M6": dict(label="M6 most probable level",
                column="pred_m6", benchmark="M6_Ordinal_RF"),
-    "M7": dict(label="M7 cost-sensitive thresholds on M6 probabilities",
+    "M7": dict(label="M7 cost-sensitive thresholds",
                column="pred_m7", benchmark="M7"),
 }
 # docs/spec_v3.md section 4.2 names M5 as the main model. Change this one line
@@ -154,6 +154,13 @@ def load_predictions() -> pd.DataFrame:
     out = pd.concat(frames, ignore_index=True)
     out["valid_time"] = out["timestamp"] + pd.Timedelta(hours=HORIZON_H)
     return out
+
+
+def add_running_mean(station: pd.DataFrame) -> pd.DataFrame:
+    """24 h running mean of observed PM2.5 for one station, sorted by time."""
+    indexed = station.set_index("timestamp")["pm2_5"]
+    mean = indexed.rolling("24h", min_periods=18).mean()
+    return station.assign(pm2_5_mean_24h=mean.to_numpy())
 
 
 @st.cache_data(show_spinner="Loading observations")
@@ -287,7 +294,8 @@ def window_rows(station: pd.DataFrame, when: pd.Timestamp, hours: int) -> pd.Dat
     return station[(station["timestamp"] >= start) & (station["timestamp"] <= when)]
 
 
-def fig_timeline(win: pd.DataFrame, when: pd.Timestamp, show_band: bool):
+def fig_timeline(win: pd.DataFrame, when: pd.Timestamp, show_band: bool,
+                 show_mean: bool = False):
     """Observed PM2.5 against the forecast that was issued three hours earlier."""
     fig, ax = _figure(9.6, 3.4)
     values = [win["reg"].max(), win["q95"].max() if show_band else np.nan,
@@ -305,6 +313,9 @@ def fig_timeline(win: pd.DataFrame, when: pd.Timestamp, show_band: bool):
                 linestyle=(0, (1, 2)), label="What happened next (shown for replay)")
     ax.plot(win["valid_time"], win["reg"], color=ORANGE, linewidth=2,
             label=f"M5 forecast issued {HORIZON_H} h earlier")
+    if show_mean and win["pm2_5_mean_24h"].notna().any():
+        ax.plot(win["timestamp"], win["pm2_5_mean_24h"], color=INK_2, linewidth=1.5,
+                linestyle=(0, (5, 3)), label="24 h running mean of observed PM2.5")
     ax.axvline(when, color=INK_2, linewidth=1)
     ax.annotate("now", xy=(when, 1.0), xycoords=("data", "axes fraction"),
                 xytext=(0, 3), textcoords="offset points", ha="center",
@@ -364,10 +375,10 @@ def cumulative_table(row: pd.Series, tau) -> pd.DataFrame:
     rows = []
     for k, t in enumerate(tau, start=1):
         cumulative = sum(probs[k:])
-        rows.append({"Question": f"Is the level at least L{k}?",
-                     "Cumulative probability": round(cumulative, 3),
-                     "M7 threshold": float(t),
-                     "Passes": "yes" if cumulative >= float(t) else "no"})
+        rows.append({"Question": f"At least L{k}?",
+                     "P(at least)": round(cumulative, 3),
+                     "M7 τ": float(t),
+                     "Pass": "yes" if cumulative >= float(t) else "no"})
     return pd.DataFrame(rows)
 
 
@@ -405,13 +416,15 @@ def fig_map(snapshot: pd.DataFrame, when: pd.Timestamp):
     if len(wind):
         ax.quiver(wind["lon"], wind["lat"], wind["u"], wind["v"], color=INK_2,
                   width=0.0025, scale=90, zorder=2)
-    # the three receptors sit within about 45 km, so each label gets its own side
+    # the three receptors sit within about 45 km, so labels are pulled out on leader lines
     receptors = snapshot[snapshot["role"] == "receptor"].sort_values("lat", ascending=False)
-    offsets = [((10, 14), "left"), ((-10, 0), "right"), ((10, -14), "left")]
+    offsets = [((-70, 34), "right"), ((-80, 0), "right"), ((-70, -34), "right")]
     for (_, node), (offset, align) in zip(receptors.iterrows(), offsets):
         ax.annotate(node["station_id"].replace("_", " "), xy=(node["lon"], node["lat"]),
                     xytext=offset, textcoords="offset points", ha=align, va="center",
-                    fontsize=8, color=INK)
+                    fontsize=8, color=INK,
+                    arrowprops=dict(arrowstyle="-", color=INK_2, linewidth=0.8,
+                                    shrinkA=2, shrinkB=5))
     handles = [Patch(color=LEVEL_COLORS[k], label=level_label(k)) for k in range(4)]
     handles += [Line2D([], [], marker=m, linestyle="", color=INK_2, markersize=7,
                        label=role.capitalize()) for role, m in ROLE_MARKERS.items()]
@@ -485,7 +498,7 @@ def sidebar(data: pd.DataFrame) -> tuple[pd.DataFrame, pd.Timestamp, str]:
     station_id = st.sidebar.selectbox("Receptor node", stations, index=0,
                                       format_func=lambda s: s.replace("_", " "))
     station = data[(data["split"] == split) & (data["station_id"] == station_id)]
-    station = station.sort_values("timestamp").reset_index(drop=True)
+    station = add_running_mean(station.sort_values("timestamp").reset_index(drop=True))
 
     first, last = station["timestamp"].iloc[0], station["timestamp"].iloc[-1]
     ranked = station["pm2_5"] if station["pm2_5"].notna().any() else station["reg"]
@@ -502,6 +515,9 @@ def sidebar(data: pd.DataFrame) -> tuple[pd.DataFrame, pd.Timestamp, str]:
     rule = st.sidebar.selectbox("Decision rule", list(RULES), index=list(RULES).index(DEFAULT_RULE),
                                 format_func=lambda k: RULES[k]["label"])
     st.sidebar.caption(
+        "M5: regression forest cut into levels. M6: ordinal forest. "
+        "M7: M6 probabilities with cost-sensitive thresholds.")
+    st.sidebar.caption(
         "Replay only. The app reads saved predictions; it does not refit or retune anything.")
     return station, when, rule
 
@@ -517,24 +533,26 @@ def tab_risk(station: pd.DataFrame, when: pd.Timestamp, rule: str, ref: dict,
     c1, c2, c3, c4 = st.columns(4)
     if pd.notna(row["pm2_5"]):
         current = int(np.searchsorted(LEVEL_THRESHOLDS, row["pm2_5"], side="right"))
-        c1.metric("PM2.5 now", f"{row['pm2_5']:.0f} µg/m³", level_label(current),
-                  delta_color="off")
+        c1.metric("PM2.5 now", f"{row['pm2_5']:.0f} µg/m³")
+        c1.caption(level_label(current))
     else:
         c1.metric("PM2.5 now", "n/a")
     c2.metric(f"Forecast level in {HORIZON_H} h", level_label(predicted))
-    c3.metric(f"Forecast PM2.5 in {HORIZON_H} h", f"{row['reg']:.0f} µg/m³",
-              f"tree spread {row['q05']:.0f} to {row['q95']:.0f}", delta_color="off")
-    c4.metric("What happened (replay)", level_label(int(row["y_true"])),
-              "forecast correct" if predicted == int(row["y_true"])
-              else f"off by {abs(predicted - int(row['y_true']))} level(s)",
-              delta_color="off")
+    c2.caption(RULES[rule]["label"])
+    c3.metric(f"Forecast PM2.5 in {HORIZON_H} h", f"{row['reg']:.0f} µg/m³")
+    c3.caption(f"Tree spread {row['q05']:.0f} to {row['q95']:.0f} µg/m³")
+    c4.metric("What happened (replay)", level_label(int(row["y_true"])))
+    c4.caption("Forecast level was correct" if predicted == int(row["y_true"])
+               else f"Forecast was off by {abs(predicted - int(row['y_true']))} level(s)")
 
     st.markdown(f"**Advice for {level_label(predicted)}:** {ADVICE[predicted]}")
     grade, why = reliability_note(row, ref)
     st.info(f"**{grade}.** This forecast was issued at {when:%d %b %Y %H:%M}: {why}")
 
     win = window_rows(station, when, 72)
-    show(fig_timeline(win, when, show_band=False))
+    show(fig_timeline(win, when, show_band=False, show_mean=True))
+    st.caption("The dashed line is a 24 h running mean of the same observations. It is a "
+               "stand-in for an index built on a daily average, not the official API value.")
     st.caption("Level tiles for the same hours. Top row: the selected decision rule. "
                "Bottom row: the level that was actually reached.")
     show(fig_level_strip(win, column))
@@ -563,23 +581,24 @@ def tab_probability(station: pd.DataFrame, when: pd.Timestamp, preds: pd.DataFra
     row = station[station["timestamp"] == when].iloc[0]
     thresholds = load_thresholds()
     tau = thresholds["thresholds"]
-    left, right = st.columns([1, 1.6])
+    st.subheader("Four-level probability")
+    left, right = st.columns(2)
     with left:
-        st.subheader("Four-level probability")
         show(fig_probabilities(row))
+    with right:
         st.dataframe(cumulative_table(row, tau), use_container_width=True, hide_index=True)
         st.caption("M7 walks up the levels and stops at the first question that fails.")
-    with right:
-        st.subheader("Concentration and tree spread")
-        win = window_rows(station, when, 72)
-        show(fig_timeline(win, when, show_band=True))
-        stage5 = load_json_or_none("metrics_stage5.json")
-        if stage5 and "interval" in stage5:
-            test = stage5["interval"]["test"]
-            st.warning(
-                f"The band is the spread between the trees of the M5 forest. It is not a "
-                f"calibrated prediction interval: on the test split it covered "
-                f"{test['PICP']:.1%} of outcomes with a mean width of {test['MPIW']:.1f} µg/m³.")
+
+    st.subheader("Concentration and tree spread")
+    win = window_rows(station, when, 72)
+    show(fig_timeline(win, when, show_band=True))
+    stage5 = load_json_or_none("metrics_stage5.json")
+    if stage5 and "interval" in stage5:
+        test = stage5["interval"]["test"]
+        st.warning(
+            f"The band is the spread between the trees of the M5 forest. It is not a "
+            f"calibrated prediction interval: on the test split it covered "
+            f"{test['PICP']:.1%} of outcomes with a mean width of {test['MPIW']:.1f} µg/m³.")
 
     st.subheader("Threshold trade-off (validation split only)")
     st.caption("Move the three thresholds to see what the cost-sensitive rule trades away. "
@@ -644,12 +663,14 @@ def tab_explain() -> None:
         ("fig_roc_high_risk.png", "ROC of the high-risk (L2 or L3) decision on validation."),
         ("fig_confusion_matrices_comparison.png", "Confusion matrices on validation."),
     ]
-    for name, caption in figures:
-        path = FIGURES / name
-        if path.exists():
-            st.image(str(path), caption=caption, use_container_width=True)
-        else:
-            missing(f"figures/{name}")
+    for start in range(0, len(figures), 2):
+        for column, (name, caption) in zip(st.columns(2), figures[start:start + 2]):
+            path = FIGURES / name
+            with column:
+                if path.exists():
+                    st.image(str(path), caption=caption, use_container_width=True)
+                else:
+                    missing(f"figures/{name}")
 
     st.subheader("Leave-one-node-out")
     loso = load_table("loso_results.csv")
