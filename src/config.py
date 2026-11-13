@@ -157,6 +157,12 @@ PANEL_CONTRACT = {
     "receptor_train_rows": 78_102,
     "receptor_val_rows": 16_737,
     "receptor_test_rows": 16_728,
+    # 2 号按 audit_model_eligible 筛过后的可建模行数（来源：
+    # models/metrics_stage2_features.json → eligibility_by_receptor_split）
+    # 下游模型脚本应核对这一组，而不是上面的面板行数
+    "receptor_train_eligible_rows": 77_753,
+    "receptor_val_eligible_rows": 16_656,
+    "receptor_test_eligible_rows": 16_647,
     "timestamp_dtype_prefix": "datetime64",
     "max_parquet_mb": 50.0,
     "banned_terms": ["agent", "智能体"],

@@ -42,9 +42,15 @@ overall.zero_weight_fraction = 73.31%      ← 七成行的上风向权重是零
 
 原有 `spatial_pm25_gradient` 保留，但只在近场定义。
 
+**⚠ 口径修正（2026-11-10 20:xx）**：原文写"全表 zero_weight_fraction ≤10%"是错的。
+13 个源区节点在设计上就位于近场圈之外，它们的近场权重天然为 0，
+按全表统计会把"设计如此"算成"没算出来"。
+2 号重跑后全表 61.33%，其中 `Banda_Aceh` 单节点就是 100%——这属于正常。
+统计应限定在**受体 + 走廊**节点，且受体行单独报一份。
+
 **验收标准：**
 
-1. 重算后 `spatial_training_diagnostics.overall.zero_weight_fraction` ≤ 10%（现在是 73.31%）；
+1. **在受体与走廊节点内**统计的 `zero_weight_fraction` ≤ 10%（口径修正见下方说明）；
 2. `coordinate_pairs_within_sigma` ≥ 10；
 3. 受体行中空间列的 NaN 率 ≤ 5%（现在是 16.20%）；
 4. 旧的两列 `upwind_pm25_advection_1h/_2h` 定义被替换（不是并存），交付清单同步更新；
@@ -130,11 +136,13 @@ if "role" in frame.columns:
         raise ValueError("no receptor rows found; check data/…parquet")
 
 # 与契约登记值对账（数字来自 src/config.py 的 PANEL_CONTRACT）
+# 注意：核对的是"可建模行数"，不是面板原始行数。
+# 2 号按 audit_model_eligible 筛掉了 349 / 81 / 81 行，面板 78,102 与可建模 77,753 都对。
 n_train = int((frame["split"] == "train").sum())
-expected = C.PANEL_CONTRACT["receptor_train_rows"]
-if abs(n_train - expected) > 200:          # 容忍 03 离线筛选的正常损耗
+expected = C.PANEL_CONTRACT["receptor_train_eligible_rows"]   # 77,753
+if n_train != expected:                     # 要求完全相等，不再用 ±200 容差
     raise ValueError(
-        f"receptor train rows = {n_train}, contract expects ~{expected}; "
+        f"receptor train rows = {n_train}, contract expects {expected}; "
         "if this is intentional, ask 1号 to register the change first")
 ```
 
@@ -216,6 +224,16 @@ if abs(n_train - expected) > 200:          # 容忍 03 离线筛选的正常损�
 | 报告数字差 89 行 | `models/cleaning_report.json` vs `reports/sec1_data_and_baseline.md`（已修） |
 | agent 命名分布 | `feat/02-eda` 文件树 + 特征表列名 |
 | 课程三条提交要求 | 课程 PDF §D（README.txt / 20MB / Rubric 随报告提交） |
+
+---
+
+## 修订记录
+
+| 版本 | 日期 | 变更 | 依据 |
+|---|---|---|---|
+| v1.0 | 2026-11-10 | 初版：2 号 5 项、4 号 5 项 | 外部评审 + 组内复查 |
+| v1.2 | 2026-11-10 | Q2-1 的零权重率口径从「全表」改为「受体+走廊」，源区节点不计入 | 2 号重跑后全表 61.33% 但源区天然为 0，原口径无法反映真实改进 |
+| v1.1 | 2026-11-10 | Q4-2 的对账基准从面板行数（78,102，±200 容差）改为可建模行数（77,753，要求完全相等）。原因：2 号按 `audit_model_eligible` 筛掉 349 行，原容差会误报 | 3 号反馈 + `models/metrics_stage2_features.json → eligibility_by_receptor_split` 实测 |
 
 ---
 
