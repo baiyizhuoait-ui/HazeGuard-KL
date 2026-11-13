@@ -182,7 +182,51 @@ Applied per node, in order:
 
 Net: 969,072 → **966,677 rows** (99.75 % retention).
 
-## 2.1.5 Target Construction
+## 2.1.5 A Discontinuity at the Model-Run Boundary
+
+The air-quality fields are not a continuous physical measurement; they are assembled from
+successive forecast runs. The CAMS global composition forecast is issued twice per day, at
+00 and 12 UTC, with a five-day horizon on a 0.4° grid, and single-level fields are published
+at hourly resolution. When a long hourly series is built from these runs, each new run
+replaces the previous run's later forecast hours at the cycle boundary. The two values come
+from different initial states and do not agree exactly, so the joined series contains a step
+that belongs to the production system rather than to the atmosphere.
+
+In local time (UTC+8) these boundaries fall at 08:00 and 20:00. The seam is visible in the
+first difference of PM2.5. Averaged over the whole panel, the mean absolute hour-to-hour
+change at 08:00 and 20:00 is 15.2 µg/m³ against 4.7 µg/m³ at all other hours, a factor of
+3.2. At 20:00 the change is not only large but systematic: the mean signed change is
++17.9 µg/m³, and the series steps upward at nearly every node at the same instant.
+
+Three checks separate this from ordinary weather or from the diurnal cycle.
+
+1. **It survives removal of the seasonal and diurnal climatology.** Repeating the same
+   statistic on `pm2_5_anomaly`, which has the (month, hour) climatology subtracted, leaves
+   the ratio at 3.0. A normal diurnal cycle would disappear here.
+2. **It happens across the network at once.** At 20:00, 79 % of the 26 nodes change in the
+   same direction, against 45 % at other hours. Local weather does not synchronise two
+   hundred kilometres of coastline.
+3. **Every pollutant jumps at the same two hours.** Relative to background hours, the
+   absolute change is 3.23× for PM10, 2.35× for NO2, 2.32× for SO2, 1.88× for CO and
+   1.81× for O3.
+
+We also tested the alternative explanation that the hourly values are interpolated from a
+three-hourly field. They are not. CAMS publishes single-level fields hourly, and the data
+show no three-hour periodicity: the first difference is constant within a three-hour block
+in only 1.2 % of blocks, and the mean absolute second difference grouped by hour modulo
+three is 6.07, 4.72 and 6.08, i.e. flat. A linear interpolation from three-hourly nodes
+would produce the opposite pattern.
+
+**Consequences, stated rather than corrected.** The seam cannot be removed without an
+independent reference series, which we do not have, so it is retained and declared here.
+Two effects follow. First, any target whose three-hour lead crosses 20:00 inherits part of
+the step, which adds error that no model can anticipate from the inputs available at issue
+time; targets issued between 17:00 and 19:00 are the affected ones. Second, the anomaly
+series used for baseline subtraction inherits the same step, so anomaly magnitudes near the
+seam should be read with that in mind. Both are properties of the data source, not of the
+pipeline, and `tools/check_run_seam.py` reproduces every number in this subsection.
+
+## 2.1.6 Target Construction
 
 Both targets are built with `groupby("station_id")["pm2_5"].shift(-3)`:
 
@@ -193,7 +237,7 @@ The `groupby` is not incidental. A global `shift(-3)` would concatenate the tail
 node to the head of the next, manufacturing labels that mix two locations. This is a
 quiet failure: the code runs, the model trains, and only the metrics are wrong.
 
-## 2.1.6 Gate 0: Feasibility Checks Before Modelling
+## 2.1.7 Gate 0: Feasibility Checks Before Modelling
 
 Four gates are evaluated before any model is fitted. Two are assessed on **receptor nodes
 only**, because pooling in the low-concentration source cells would dilute the target
