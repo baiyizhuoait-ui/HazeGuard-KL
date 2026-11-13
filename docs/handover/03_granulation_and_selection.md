@@ -6,7 +6,7 @@
 | 任务依据 | 仓库现行规则：`CONTRIBUTING.md`（3 号职责与产物）、`docs/syllabus_coverage.md` §3（只做区间粒化与趋势粒化；互信息 + RFE + permutation importance）、2 号交接文档（白名单、折内拟合） |
 | 上游输入 | `feat/02-eda` 提交 `2165c4c`，`data/feat_spatiotemporal.parquet`（4 个有序分片），清单摘要 `208cf00942b404aead0ffe913497d34157ec01f3e1a4ccf593b10f71fb61a55e` |
 | 下一棒 | 4 号、5 号（读 `features_final.parquet` 和 `selected_features.json`） |
-| 分支 | `feat/03-granulation`，基于 `feat/02-eda`；**合并顺序必须是 02 先、03 后** |
+| 分支 | `feat/03-granulation`，已同步 `main`（02 已于 `8e7c847` 并入 `main`）；合并顺序 02 → 03 → 04，04 读的是本模块的最终表 |
 | 日期 | 2026-11-10 |
 
 ---
@@ -27,7 +27,7 @@
 | `val` | 16,656 |
 | `test` | 16,647 |
 
-中间表 `data/feat_granulation.parquet`（全面板 966,677 行 × 12 列，14.7 MB）**不入库**。它由粒化脚本 1 秒内生成，溯源信息写在文件的 parquet 元数据里。
+中间表 `data/feat_granulation.parquet`（全面板 966,677 行 × 12 列，14.7 MB）**不入库**，`.gitignore` 已登记。它由粒化脚本 1 秒内生成，溯源信息写在文件的 parquet 元数据里。
 
 ### 模型文件与图
 
@@ -109,7 +109,7 @@ Top-25（按最终 RF 重要性从高到低；「策略」列表示被 a 互信�
 
 ### 2.2 `selected_features.json`
 
-下游只需要 `selected_features`（有序列表，25 个），4 号代码就按这个键名读。其余键：
+下游只需要 `selected_features`（有序列表，25 个），按这个键名读即可。其余键：
 
 | 键 | 内容 |
 |---|---|
@@ -178,7 +178,7 @@ Top-K 取 25：现行规则没有另定数字，协作规范的提交示例写�
 - ④ 加去重后的 5 列粒化特征。
 - ⑤ 选择后的 Top-25，用来对比选择前后。
 
-**最终表只交可直接训练的行**（3 号的决定）。4 号的读取函数要求每一行 Top-25 都是有限值，而全面板里有大量非受体行和边界行带 NaN。代价是：其他 23 个节点不在最终表里，需要时读粒化表和 2 号的特征表；RF 原生的缺失值处理也用不上了。
+**最终表只交可直接训练的行**（3 号的决定）。下游模型要求每一行 Top-25 都是有限值，而全面板里有大量非受体行和边界行带 NaN。代价是：其他 23 个节点不在最终表里，需要时读粒化表和 2 号的特征表；RF 原生的缺失值处理也用不上了。
 
 ---
 
@@ -206,18 +206,20 @@ Top-K 取 25：现行规则没有另定数字，协作规范的提交示例写�
 
 3. **三种策略取并集几乎没有起筛选作用**：并集 64 列，候选只有 68 列。策略 b 只剪共线、不按重要性截断，一下留下 47 列。真正把特征数压到 25 的是 RF-RFE。
 
-4. **行数契约差 349 行。** 1 号 `src/config.py` 的 `PANEL_CONTRACT["receptor_train_rows"]` 是 78,102；质量通告 QN-001 让 4 号加的核对容差是 ±200；而最终表 train 是 77,753 行。协作规范 §3 第 7 条已写明以审计登记的合格行数为准，**需要 1 号在 `PANEL_CONTRACT` 里登记合格行数**，否则 4 号加上这道核对后会报错。
+4. **行数要对照"可建模行数"，不是面板行数。** 最终表 train 是 77,753 行，比面板受体行数 78,102 少 349 行（2 号合格标记筛掉的）。1 号已在 `src/config.py` 的 `PANEL_CONTRACT` 里登记 `receptor_{train,val,test}_eligible_rows` = 77,753 / 16,656 / 16,647，下游核对行数时请对照这一组。
 
-5. **4 号现有读取函数在 pandas 3 下读不了 int8 标签。** `branch4` 上 `src/04_standard_and_reg_rf.py` 第 132 行 `frame.loc[:, "target_level_3h"] = levels.astype(int)` 会报 `TypeError: Invalid value … for dtype 'int8'`。1 号自己的 `haze_panel_clean.parquet` 也一样报错，原因不在 3 号的表。改成 `frame["target_level_3h"] = levels.astype(int)` 即可（第 123、133 行同理），改后读入完整通过。int8 是契约类型，3 号不改。
+5. **标签 `target_level_3h` 是 int8（契约类型）。** pandas 3 下不能用 `frame.loc[:, "target_level_3h"] = ...` 把 int64 整列写回 int8 列，会报 `TypeError: Invalid value … for dtype 'int8'`；要转类型请直接写 `frame["target_level_3h"] = ...`（第 5 节示例就是这样写的）。
 
-6. **Top-25 是用全部 train 选出来的。** 4 号在 train 内部做交叉验证调参时，选择这一步用过全部 train 的标签，内部折的分数会略偏乐观；val 和 test 上的评估不受影响。
+6. **Top-25 是用全部 train 选出来的。** 下游在 train 内部做交叉验证调参时，选择这一步用过全部 train 的标签，内部折的分数会略偏乐观；val 和 test 上的评估不受影响。
 
 7. **上游再变时怎么办。**
    - 白名单、合格标记（`audit_model_eligible`，或拆到 `data/audit_stage2.parquet`）、单文件或分片目录，都已兼容，不用改代码。
    - 填补规则只认三类列：`upwind_pm25_advection_{K}h`、`spatial_pm25_gradient`、`far_source_pm25_mean_{W}h`。如果以后有别的列带 NaN 并且被选进 Top-25，脚本会停下来报出列名。
    - 选择脚本会核对粒化表是用当前特征表生成的，对不上就报错，提醒先重跑粒化脚本。
 
-8. **`feat_granulation.parquet` 是运行时生成的中间文件，不在登记的产物里，不要提交。**
+8. **`feat_granulation.parquet` 是运行时生成的中间文件，不在登记的产物里，不要提交**（已在 `.gitignore` 里）。
+
+9. **不要重新生成后覆盖最终表。** 规范 v3 §3.3 要求下游原样使用这 25 列，4 号的结果也记录了本模块最终表的哈希。重跑结果虽然逐字节相同，但如果上游变了，最终表和清单都会变，下游必须一起重跑。
 
 ---
 
@@ -260,4 +262,4 @@ python src/03_feature_selection.py
 - 2 号交接建议的误报率和分时段稳定性没有单独评估；消融只报了 `utils_metrics` 的六项指标。
 - 没有在 `test` 上做任何评估或选择（按规定留给最后）。
 - 远场列只处理了 `far_source_pm25_mean_48h` 的缺失；其余远场列在合格受体行里本来就没有缺失。
-- 4 号代码和 1 号的行数登记都没有改（不是 3 号的文件），问题和改法见第 4 节第 4、5 条。
+- 报告章节 `reports/sec2_4_2_and_2_5.md` 由 3 号另行提交；规范 v3 §3.4 要求把空间缺失的填补规则写进报告。
