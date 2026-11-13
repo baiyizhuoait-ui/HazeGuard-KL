@@ -416,15 +416,31 @@ def fig_map(snapshot: pd.DataFrame, when: pd.Timestamp):
     if len(wind):
         ax.quiver(wind["lon"], wind["lat"], wind["u"], wind["v"], color=INK_2,
                   width=0.0025, scale=90, zorder=2)
-    # the three receptors sit within about 45 km, so labels are pulled out on leader lines
-    receptors = snapshot[snapshot["role"] == "receptor"].sort_values("lat", ascending=False)
-    offsets = [((-70, 34), "right"), ((-80, 0), "right"), ((-70, -34), "right")]
-    for (_, node), (offset, align) in zip(receptors.iterrows(), offsets):
-        ax.annotate(node["station_id"].replace("_", " "), xy=(node["lon"], node["lat"]),
-                    xytext=offset, textcoords="offset points", ha=align, va="center",
-                    fontsize=8, color=INK,
-                    arrowprops=dict(arrowstyle="-", color=INK_2, linewidth=0.8,
-                                    shrinkA=2, shrinkB=5))
+    # the three receptors sit within about 45 km, so they get a zoomed inset
+    receptors = snapshot[snapshot["role"] == "receptor"]
+    if len(receptors):
+        lon0, lon1 = receptors["lon"].min() - 0.45, receptors["lon"].max() + 0.45
+        lat0, lat1 = receptors["lat"].min() - 0.35, receptors["lat"].max() + 0.35
+        inset = ax.inset_axes([0.02, 0.04, 0.30, 0.44])
+        inset.set_facecolor(SURFACE)
+        near = snapshot[snapshot["lon"].between(lon0, lon1) & snapshot["lat"].between(lat0, lat1)]
+        for role, marker in ROLE_MARKERS.items():
+            part = near[near["role"] == role]
+            inset.scatter(part["lon"], part["lat"], s=110 if role == "receptor" else 70,
+                          marker=marker, c=[LEVEL_COLORS[k] for k in part["level"]],
+                          edgecolors=SURFACE, linewidths=1.5, zorder=3)
+        for _, node in near.iterrows():
+            inset.annotate(node["station_id"].replace("_", " "), xy=(node["lon"], node["lat"]),
+                           xytext=(0, 9), textcoords="offset points", ha="center",
+                           fontsize=7.5, color=INK)
+        inset.set_xlim(lon0, lon1)
+        inset.set_ylim(lat0, lat1)
+        inset.set_xticks([])
+        inset.set_yticks([])
+        for side in inset.spines.values():
+            side.set_color(AXIS)
+        inset.set_title("Greater Kuala Lumpur", fontsize=8, color=INK_2, loc="left", pad=3)
+        ax.indicate_inset_zoom(inset, edgecolor=INK_2, alpha=0.6, linewidth=0.8)
     handles = [Patch(color=LEVEL_COLORS[k], label=level_label(k)) for k in range(4)]
     handles += [Line2D([], [], marker=m, linestyle="", color=INK_2, markersize=7,
                        label=role.capitalize()) for role, m in ROLE_MARKERS.items()]
@@ -477,6 +493,70 @@ def fig_loso(loso: pd.DataFrame):
     return fig
 
 
+def fig_lead_counts(counts: dict):
+    """How many high-risk onsets were flagged 3, 2, 1, 0 hours ahead, late, or not at all."""
+    order = [str(h) for h in range(HORIZON_H, -1, -1)] + ["late", "missed"]
+    labels = [f"{h} h ahead" for h in range(HORIZON_H, 0, -1)] + [
+        "at onset", "after onset", "missed"]
+    values = [int(counts.get(k, 0)) for k in order]
+    fig, ax = _figure(7.4, 2.9)
+    bars = ax.bar(range(len(values)), values, color=BLUE, width=0.62)
+    for bar, value in zip(bars, values):
+        ax.annotate(str(value), xy=(bar.get_x() + bar.get_width() / 2, value),
+                    xytext=(0, 3), textcoords="offset points", ha="center",
+                    fontsize=9, color=INK)
+    ax.set_xticks(range(len(values)))
+    ax.set_xticklabels(labels, fontsize=9, color=INK)
+    ax.set_ylim(0, max(values + [1]) * 1.15)
+    ax.set_ylabel("High-risk onsets", fontsize=9, color=INK_2)
+    fig.tight_layout()
+    return fig
+
+
+def fig_reliability(blocks: dict):
+    """Observed frequency against mean predicted probability, one line per split."""
+    fig, ax = _figure(4.6, 4.2)
+    ax.grid(axis="x", color=GRID, linewidth=0.8)
+    ax.plot([0, 1], [0, 1], color=AXIS, linewidth=1, linestyle=(0, (4, 3)),
+            label="Perfect calibration")
+    names = {"val": ("Validation", BLUE, "o"), "test": ("Test", ORANGE, "s")}
+    for split, (label, colour, marker) in names.items():
+        rows = [b for b in blocks.get(split, {}).get("bins", []) if b["n"]]
+        if rows:
+            ax.plot([b["mean_predicted"] for b in rows], [b["observed_frequency"] for b in rows],
+                    color=colour, linewidth=2, marker=marker, markersize=6,
+                    markeredgecolor=SURFACE, markeredgewidth=1.2, label=label)
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
+    ax.set_aspect("equal")
+    ax.set_xlabel("Mean predicted probability", fontsize=9, color=INK_2)
+    ax.set_ylabel("Observed frequency", fontsize=9, color=INK_2)
+    ax.legend(loc="upper left", fontsize=8, frameon=False)
+    fig.tight_layout()
+    return fig
+
+
+def fig_error_by_level(by_level: dict):
+    """Mean error of the M5 concentration forecast for each true level."""
+    levels = [k for k in ("0", "1", "2", "3") if k in by_level]
+    values = [by_level[k]["mean_error"] for k in levels]
+    fig, ax = _figure(5.6, 3.0)
+    bars = ax.bar(range(len(levels)), values, color=BLUE, width=0.62)
+    ax.axhline(0, color=AXIS, linewidth=1)
+    for bar, value in zip(bars, values):
+        ax.annotate(f"{value:+.1f}", xy=(bar.get_x() + bar.get_width() / 2, value),
+                    xytext=(0, 3 if value >= 0 else -11), textcoords="offset points",
+                    ha="center", fontsize=9, color=INK)
+    ax.set_xticks(range(len(levels)))
+    ax.set_xticklabels([level_label(int(k)) for k in levels], fontsize=9, color=INK)
+    low, high = min(values + [0]), max(values + [0])
+    pad = max(high - low, 1.0) * 0.2
+    ax.set_ylim(low - pad, high + pad)
+    ax.set_ylabel("Forecast minus outcome (µg/m³)", fontsize=9, color=INK_2)
+    fig.tight_layout()
+    return fig
+
+
 def show(fig) -> None:
     st.pyplot(fig, use_container_width=True)
     plt.close(fig)
@@ -489,7 +569,7 @@ def missing(path: str) -> None:
 # ---------------------------------------------------------------------------
 # Sidebar
 # ---------------------------------------------------------------------------
-def sidebar(data: pd.DataFrame) -> tuple[pd.DataFrame, pd.Timestamp, str]:
+def sidebar(data: pd.DataFrame, stage7: dict | None) -> tuple[pd.DataFrame, pd.Timestamp, str]:
     st.sidebar.header("Replay controls")
     split_label = st.sidebar.radio(
         "Period", ["Test (Mar to Oct 2026)", "Validation (Jul 2025 to Mar 2026)"], index=0)
@@ -503,10 +583,30 @@ def sidebar(data: pd.DataFrame) -> tuple[pd.DataFrame, pd.Timestamp, str]:
     first, last = station["timestamp"].iloc[0], station["timestamp"].iloc[-1]
     ranked = station["pm2_5"] if station["pm2_5"].notna().any() else station["reg"]
     peak = station["timestamp"].iloc[int(ranked.to_numpy().argmax())]
-    day = st.sidebar.date_input("Date", value=peak.date(), min_value=first.date(),
-                                max_value=last.date())
-    hour = st.sidebar.slider("Hour (local time)", 0, 23, int(peak.hour))
-    wanted = pd.Timestamp(day) + pd.Timedelta(hours=int(hour))
+
+    events = []
+    if stage7:
+        events = [e for e in stage7["early_warning"][split]["events"]
+                  if e["station_id"] == station_id]
+    wanted = None
+    if events:
+        mode = st.sidebar.radio("Go to", ["High-risk episode", "Date and hour"], index=0)
+        if mode == "High-risk episode":
+            order = sorted(range(len(events)), key=lambda i: -events[i]["peak_pm25"])
+            labels = {i: (f"{pd.Timestamp(events[i]['onset']):%d %b %Y %H:%M}  ·  "
+                          f"peak {events[i]['peak_pm25']:.0f}  ·  {events[i]['duration_h']} h")
+                      for i in order}
+            chosen = st.sidebar.selectbox("Episode (highest peak first)", order, index=0,
+                                          format_func=lambda i: labels[i])
+            onset = pd.Timestamp(events[chosen]["onset"])
+            wanted = onset - pd.Timedelta(hours=HORIZON_H)
+            st.sidebar.caption(f"Showing {HORIZON_H} h before the onset at {onset:%d %b %H:%M}, "
+                               "the last moment a full-horizon alert could be issued.")
+    if wanted is None:
+        day = st.sidebar.date_input("Date", value=peak.date(), min_value=first.date(),
+                                    max_value=last.date())
+        hour = st.sidebar.slider("Hour (local time)", 0, 23, int(peak.hour))
+        wanted = pd.Timestamp(day) + pd.Timedelta(hours=int(hour))
     earlier = station[station["timestamp"] <= wanted]
     when = (earlier["timestamp"].iloc[-1] if len(earlier) else first)
     if when != wanted:
@@ -525,8 +625,49 @@ def sidebar(data: pd.DataFrame) -> tuple[pd.DataFrame, pd.Timestamp, str]:
 # ---------------------------------------------------------------------------
 # Tabs
 # ---------------------------------------------------------------------------
+def early_warning_section(stage7: dict | None, rule: str) -> None:
+    st.subheader("Early-warning record on the test split")
+    if not stage7:
+        st.info("Run `python src/07_system_analysis.py` to produce "
+                "`models/metrics_stage7.json`; this section reads it.")
+        return
+    summary = stage7["early_warning"]["test"]["summary"]
+    mine = summary["rules"][rule]
+    lag = summary["index_lag_h"]
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("High-risk onsets", f"{summary['n_onsets']}")
+    c1.caption("Three receptor nodes")
+    c2.metric("Alert before onset", f"{mine['share_alert_before_onset']:.0%}")
+    c2.caption(f"{mine['share_full_horizon']:.0%} at the full {HORIZON_H} h")
+    c3.metric("24 h mean lags by", f"{lag['median']:.0f} h" if lag else "n/a")
+    c3.caption(f"Median over {lag['n']} onsets it reached" if lag else "No comparable onset")
+    c4.metric("Fresh alerts confirmed",
+              f"{mine['alert_precision']:.0%}" if mine["alert_precision"] is not None else "n/a")
+    c4.caption(f"Of {mine['alert_onsets']} alert onsets")
+    show(fig_lead_counts(mine["lead_counts"]))
+    st.caption(
+        f"Of {summary['n_compared']} onsets that started with the 24 h mean still below the "
+        f"high-risk boundary, the mean never reached it within 48 h for "
+        f"{summary['index_never_within_search']}. The 24 h mean is a stand-in for a "
+        "daily-average index, not the official API.")
+    with st.expander("All decision rules and definitions"):
+        rows = []
+        for key, block in summary["rules"].items():
+            adv = block["advantage_h"]
+            rows.append({"Decision rule": RULES[key]["label"],
+                         "Alert before onset": block["share_alert_before_onset"],
+                         "Full horizon": block["share_full_horizon"],
+                         "Missed": block["lead_counts"]["missed"],
+                         "Median advantage over 24 h mean (h)": adv["median"] if adv else None,
+                         "Alert onsets": block["alert_onsets"],
+                         "Confirmed": block["alert_precision"]})
+        st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+        for name in ("onset", "model_lead_h", "index_lag_h", "advantage_h", "alert_precision"):
+            st.caption(f"**{name}**: {stage7['definitions'][name]}")
+
+
 def tab_risk(station: pd.DataFrame, when: pd.Timestamp, rule: str, ref: dict,
-             benchmark: pd.DataFrame | None) -> None:
+             benchmark: pd.DataFrame | None, stage7: dict | None) -> None:
     row = station[station["timestamp"] == when].iloc[0]
     column = RULES[rule]["column"]
     predicted = int(row[column])
@@ -576,8 +717,11 @@ def tab_risk(station: pd.DataFrame, when: pd.Timestamp, rule: str, ref: dict,
             show(fig_map(snap, when))
             st.caption("Each point is a CAMS model grid cell, not a ground monitoring station.")
 
+    early_warning_section(stage7, rule)
 
-def tab_probability(station: pd.DataFrame, when: pd.Timestamp, preds: pd.DataFrame) -> None:
+
+def tab_probability(station: pd.DataFrame, when: pd.Timestamp, preds: pd.DataFrame,
+                    stage7: dict | None) -> None:
     row = station[station["timestamp"] == when].iloc[0]
     thresholds = load_thresholds()
     tau = thresholds["thresholds"]
@@ -599,6 +743,30 @@ def tab_probability(station: pd.DataFrame, when: pd.Timestamp, preds: pd.DataFra
             f"The band is the spread between the trees of the M5 forest. It is not a "
             f"calibrated prediction interval: on the test split it covered "
             f"{test['PICP']:.1%} of outcomes with a mean width of {test['MPIW']:.1f} µg/m³.")
+
+    if stage7:
+        st.subheader("Are the probabilities calibrated?")
+        level = st.radio("Question", [1, 2, 3], index=1, horizontal=True,
+                         format_func=lambda k: f"Level at least L{k}")
+        blocks = {split: stage7["calibration"][split][f"level_ge_{level}"]
+                  for split in ("val", "test")}
+        left, right = st.columns([1, 1.2])
+        with left:
+            show(fig_reliability(blocks))
+        with right:
+            st.dataframe(pd.DataFrame([
+                {"Split": name, "ECE": blocks[key]["ece"], "Brier": blocks[key]["brier"],
+                 "Mean predicted": blocks[key]["mean_predicted"],
+                 "Observed rate": blocks[key]["base_rate"]}
+                for key, name in (("val", "Validation"), ("test", "Test"))]),
+                use_container_width=True, hide_index=True)
+            st.caption("A point below the dashed line means the forest gave a higher "
+                       "probability than the share of hours that turned out that way.")
+            with st.expander("Bins"):
+                st.dataframe(pd.DataFrame(blocks["val"]["bins"]).assign(split="val"),
+                             use_container_width=True, hide_index=True)
+                st.dataframe(pd.DataFrame(blocks["test"]["bins"]).assign(split="test"),
+                             use_container_width=True, hide_index=True)
 
     st.subheader("Threshold trade-off (validation split only)")
     st.caption("Move the three thresholds to see what the cost-sensitive rule trades away. "
@@ -622,7 +790,7 @@ def tab_probability(station: pd.DataFrame, when: pd.Timestamp, preds: pd.DataFra
                "Avg_Asymmetric_Cost on the validation grid. M6 default: the most probable level.")
 
 
-def tab_models(benchmark: pd.DataFrame | None) -> None:
+def tab_models(benchmark: pd.DataFrame | None, stage7: dict | None) -> None:
     if benchmark is None:
         missing("models/all_models_benchmark.csv")
         return
@@ -651,6 +819,22 @@ def tab_models(benchmark: pd.DataFrame | None) -> None:
         st.subheader("Three decisions on the same M6 probabilities (test)")
         st.dataframe(pd.DataFrame(m7["metrics"]).T[list(METRICS)].style.format("{:.4f}"),
                      use_container_width=True)
+    if stage7:
+        st.subheader("Where the concentration forecast is off (M5, test)")
+        anatomy = stage7["error_anatomy"]["test"]
+        left, right = st.columns([1, 1.3])
+        with left:
+            show(fig_error_by_level(anatomy["by_true_level"]))
+        with right:
+            names = {"n": "Rows", "mean_error": "Mean error", "mae": "MAE",
+                     "persistence_mae": "Persistence MAE",
+                     "share_inside_tree_spread": "Inside tree spread"}
+            trend = pd.DataFrame(anatomy["by_trend"]).T[list(names)].rename(columns=names)
+            trend.insert(0, "PM2.5 over the next 3 h", trend.index)
+            st.dataframe(trend, use_container_width=True, hide_index=True)
+            st.caption(stage7["definitions"]["error"] + " " + stage7["definitions"]["trend"]
+                       + " Persistence MAE is the error of repeating the current value.")
+
     st.subheader("Asymmetric cost matrix")
     cost = pd.DataFrame(DEFAULT_COST_MATRIX,
                         index=[f"true {level_label(k)}" for k in range(4)],
@@ -713,7 +897,8 @@ def main() -> None:
     if problem:
         st.error(problem)
 
-    station, when, rule = sidebar(data)
+    stage7 = load_json_or_none("metrics_stage7.json")
+    station, when, rule = sidebar(data, stage7)
     benchmark = load_table("all_models_benchmark.csv")
     ref = reliability_reference(preds)
 
@@ -721,11 +906,11 @@ def main() -> None:
         f"Risk now and in {HORIZON_H} h", "Probability and spread",
         "Model comparison", "Explanation and generalisation"])
     with t1:
-        tab_risk(station, when, rule, ref, benchmark)
+        tab_risk(station, when, rule, ref, benchmark, stage7)
     with t2:
-        tab_probability(station, when, preds)
+        tab_probability(station, when, preds, stage7)
     with t3:
-        tab_models(benchmark)
+        tab_models(benchmark, stage7)
     with t4:
         tab_explain()
 
