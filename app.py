@@ -782,27 +782,35 @@ def snap(station: pd.DataFrame, wanted: pd.Timestamp) -> pd.Timestamp:
     return earlier["timestamp"].iloc[-1] if len(earlier) else station["timestamp"].iloc[0]
 
 
+def _step(station_id: str, target) -> None:
+    st.session_state["cursor"] = target
+    st.session_state["playing"] = False
+
+
+def _toggle_play() -> None:
+    st.session_state["playing"] = not st.session_state.get("playing", False)
+
+
 def playback_bar(station: pd.DataFrame, when: pd.Timestamp, rule: str) -> None:
     """Step and play controls plus the export of the window on screen."""
     cols = st.columns([1, 1, 1.2, 1, 1, 3.2])
     steps = [("−1 d", -24), ("−1 h", -1), None, ("+1 h", 1), ("+1 d", 24)]
+    station_id = str(station["station_id"].iloc[0])
     for col, step in zip(cols, steps):
         if step is None:
             playing = st.session_state.get("playing", False)
-            if col.button(tr("Pause") if playing else tr("Play"), key="play",
-                          use_container_width=True):
-                st.session_state["playing"] = not playing
-                st.rerun()
-        elif col.button(step[0], key=f"step{step[1]}", use_container_width=True):
-            st.session_state["cursor"] = snap(station, when + pd.Timedelta(hours=step[1]))
-            st.session_state["playing"] = False
-            st.rerun()
+            col.button(tr("Pause") if playing else tr("Play"), key="play",
+                       use_container_width=True, on_click=_toggle_play)
+        else:
+            target = snap(station, when + pd.Timedelta(hours=step[1]))
+            col.button(step[0], key=f"step{step[1]}", use_container_width=True,
+                       disabled=target == when, on_click=_step, args=(station_id, target))
     win = window_rows(station, when, 72)
     keep = [c for c in ("station_id", "timestamp", "valid_time", "pm2_5", "pm2_5_mean_24h", "reg",
                         "cal_lo", "cal_hi", RULES[rule]["column"], "y_true") if c in win]
     cols[5].download_button(
         tr("Download this window (CSV)"), win[keep].to_csv(index=False).encode("utf-8"),
-        file_name=f"hazeguard_{station['station_id'].iloc[0]}_{when:%Y%m%d_%H}.csv",
+        file_name=f"hazeguard_{station_id}_{when:%Y%m%d_%H}.csv",
         mime="text/csv", use_container_width=True)
 
 
@@ -840,16 +848,44 @@ def fig_spark(series: pd.DataFrame, onset: pd.Timestamp):
     return fig
 
 
-def episode_cards(station: pd.DataFrame, events: list[dict], rule: str) -> None:
+def _replay_episode(index: int, label: str) -> None:
+    """Button callback: point the sidebar at this episode. The sidebar then moves the
+    cursor to three hours before its onset, exactly as if it had been picked there."""
+    st.session_state["go_mode"] = "High-risk episode"
+    st.session_state["episode_pick"] = index
+    st.session_state["playing"] = False
+    st.session_state["jumped_to"] = label
+
+
+def scroll_to_top() -> None:
+    """The cards sit low on the page, the change happens at the top; bring the reader up."""
+    try:
+        import streamlit.components.v1 as components
+        components.html("<script>const d=window.parent.document;"
+                        "(d.querySelector('section.main')||d.querySelector('[data-testid=\"stMain\"]')"
+                        "||d.documentElement).scrollTo({top:0,behavior:'smooth'});</script>", height=0)
+    except Exception:
+        pass
+
+
+def episode_cards(station: pd.DataFrame, events: list[dict], rule: str,
+                  when: pd.Timestamp) -> None:
     """The six highest-peak major episodes at this node, each with a replay button."""
-    major = sorted((e for e in events if e["peak_pm25"] >= LEVEL_THRESHOLDS[2]),
-                   key=lambda e: -e["peak_pm25"])[:6]
+    major = sorted((i for i, e in enumerate(events) if e["peak_pm25"] >= LEVEL_THRESHOLDS[2]),
+                   key=lambda i: -events[i]["peak_pm25"])[:6]
     if not major or not station["pm2_5"].notna().any():
         return
     st.subheader(tr("Major episodes at this node"))
+    st.caption(L("Replay moves the whole page to three hours before that onset, the last moment "
+                 "a full-horizon alert could be issued. The banner, charts and map at the top change.",
+                 "点击回放后，整个页面会跳到该事件起始前 3 小时（能提前满 3 小时报警的最后时刻），"
+                 "页面顶部的横幅、图表和地图会随之改变。"))
     for start in range(0, len(major), 3):
-        for col, event in zip(st.columns(3), major[start:start + 3]):
+        for col, index in zip(st.columns(3), major[start:start + 3]):
+            event = events[index]
             onset = pd.Timestamp(event["onset"])
+            target = snap(station, onset - pd.Timedelta(hours=HORIZON_H))
+            on_screen = target == when
             span = station[(station["timestamp"] >= onset - pd.Timedelta(hours=12))
                            & (station["timestamp"] <= onset + pd.Timedelta(
                                hours=min(event["duration_h"], 48) + 6))]
@@ -859,13 +895,12 @@ def episode_cards(station: pd.DataFrame, events: list[dict], rule: str) -> None:
                 st.caption(f"{tr('peak')} {event['peak_pm25']:.0f} µg/m³ · {event['duration_h']} h")
                 st.markdown(f'<span class="hg-tag">{lead_tag(event["model_lead_h"][rule])}</span>',
                             unsafe_allow_html=True)
-                if st.button(tr("Replay"), key=f"ep_{event['onset']}", use_container_width=True):
-                    st.session_state["cursor"] = snap(station, onset - pd.Timedelta(hours=HORIZON_H))
-                    st.session_state["playing"] = False
-                    st.rerun()
-    st.caption(L("The vertical line is the onset; the dashed line is the high-risk boundary. "
-                 "Replay opens three hours before the onset.",
-                 "竖线是事件起始时刻，虚线是高危分界。回放从起始前 3 小时开始。"))
+                st.button(L("Now showing", "正在显示") if on_screen else tr("Replay"),
+                          key=f"ep_{event['onset']}", use_container_width=True,
+                          disabled=on_screen, on_click=_replay_episode,
+                          args=(index, f"{onset:%d %b %Y %H:%M}"))
+    st.caption(L("The vertical line is the onset; the dashed line is the high-risk boundary.",
+                 "竖线是事件起始时刻，虚线是高危分界。"))
 
 
 @st.cache_data(show_spinner=False)
@@ -1038,14 +1073,16 @@ def sidebar(data: pd.DataFrame, stage7: dict | None):
     wanted, picked = None, None
     if events:
         mode = st.sidebar.radio(tr("Go to"), ["High-risk episode", "Date and hour"], index=0,
-                                format_func=tr)
+                                format_func=tr, key="go_mode")
         if mode == "High-risk episode":
             order = sorted(range(len(events)), key=lambda i: -events[i]["peak_pm25"])
             labels = {i: (f"{pd.Timestamp(events[i]['onset']):%d %b %Y %H:%M}  ·  "
                           f"{tr('peak')} {events[i]['peak_pm25']:.0f}  ·  {events[i]['duration_h']} h")
                       for i in order}
+            if st.session_state.get("episode_pick") not in order:
+                st.session_state.pop("episode_pick", None)
             chosen = st.sidebar.selectbox(tr("Episode (highest peak first)"), order, index=0,
-                                          format_func=lambda i: labels[i])
+                                          format_func=lambda i: labels[i], key="episode_pick")
             onset = pd.Timestamp(events[chosen]["onset"])
             wanted, picked = onset - pd.Timedelta(hours=HORIZON_H), ("episode", chosen)
     if wanted is None:
@@ -1202,7 +1239,7 @@ def tab_risk(station: pd.DataFrame, when: pd.Timestamp, rule: str, ref: dict,
             show(fig_map(snap, when))
             st.caption("Each point is a CAMS model grid cell, not a ground monitoring station.")
 
-    episode_cards(station, events, rule)
+    episode_cards(station, events, rule, when)
     unusual_now(str(row["station_id"]), when)
     early_warning_section(stage7, rule)
 
@@ -1450,6 +1487,14 @@ def main() -> None:
     station, when, rule, events = sidebar(data, stage7)
     benchmark = load_table("all_models_benchmark.csv")
     ref = reliability_reference(preds)
+    jumped = st.session_state.pop("jumped_to", None)
+    if jumped:
+        try:
+            st.toast(L(f"Jumped to the episode starting {jumped}.",
+                       f"已跳转到 {jumped} 开始的事件。"))
+        except Exception:
+            pass
+        scroll_to_top()
     playback_bar(station, when, rule)
 
     t1, t2, t3, t4, t5 = st.tabs([
