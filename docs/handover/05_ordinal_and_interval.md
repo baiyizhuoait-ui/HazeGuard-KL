@@ -342,3 +342,37 @@ band = A.apply_calibration(quantiles, cal)  # 下界 / 中位数 / 上界
 研究脚本与应用脚本均保留冻结记录；已有结果禁止直接覆盖。
 
 参考：[MAPIE 标准化残差分数](https://mapie.readthedocs.io/en/stable/content/conformal-prediction/conformity-scores/)。
+
+## 11. 2026-11-14：Q5-3 接缝误差切片，保留官方 v1 成绩
+
+按最新通告，Q5-1（用 v2 重跑 M5/M6）和 Q5-2 已取消。
+本次仅完成 Q5-3；不改变官方模型、指标文件、特征表、分档阈值、benchmark 或区间方案。
+
+### 输入与方法
+
+- 官方 v1：`data/features_final.parquet`，SHA256 为 `64285f40e81c72ab4872d282d52be68401078e8c33dec50134d93e7877d2f55b`。
+- `models/stage5_predictions.npz` 的 `reg_val/reg_test` 是 seed 42 的 M5 森林均值浓度预测。
+- 使用 `models/ordinal_probs_val_test.npz` 的时间戳与节点标识核对行顺序，并核对标签。
+- 连续浓度预测先于分档；M5 固定切点与 val 调整切点共享这份浓度预测，不涉及重新校准等级阈值。
+- 按本地发出时刻切分：05–07 跨 08:00，17–19 跨 20:00，其他钟点为互斥第三组。
+- 为严格落实组长的“跨 20:00 vs 其他时段”，另列非跨 20:00 的合计对照，它包含早间接缝窗口。
+
+### 结果与限制
+
+完整单表见报告 `reports/sec2_6_and_2_7.md` 第 11 节（§2.7 补充）。
+val：跨 20:00 MAE 12.2043，非跨 20:00 合计 5.1697 µg/m³，相差 7.0345，比例 2.3607。
+test：跨 20:00 MAE 13.7345，非跨 20:00 合计 7.2617 µg/m³，相差 6.4729，比例 1.8914。
+未做显著性检验或混杂调整；表中差异支持描述性关联，不单独证明接缝导致了全部额外误差。
+这是已评估预测的事后切片，没有进行模型训练、新的测试预测或模型选择。
+
+### 文件与复核
+
+- `src/05_seam_error.py`：校验 v1 指纹、原缓存摘要和行标识，再汇总 val/test 的 MAE。
+- `models/m5_seam_mae.csv`：8 行（两个切分各 4 行），含分组、样本数和未按展示位数截断的 MAE。
+- `models/metrics_stage5_seam.json`：来源摘要、代码摘要、生成时间、Git 基线、分组含义及差值/比值。
+- `tests/test_stage5_seam.py`：用合成数据检查窗口边界、加权合计、数组对齐及本地时间约定。
+- `python -m unittest discover -s tests -p test_stage5_seam.py -v`
+- `python src/05_seam_error.py`：在输出不存在的独立复现目录运行，已有输出会阻止覆盖。
+
+原始 `models/metrics_stage5.json` 仍是官方成绩；新增的 `metrics_stage5_seam.json` 只存切片分析。
+7 号合报告时引用新增表格即可，不需要替换主模型、主表或原区间结果。
