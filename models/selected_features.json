@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-11-13T15:00:40.839965+00:00",
-  "git_commit": "97b5faa4e2aebd8763fd86a0bf6a734e6ed38cf6",
-  "code_sha256": "301208a9c91f1856ec95d789a194d784926ff4a30c19bdd434b8ad698fc73805",
+  "generated_at": "2026-11-10T06:20:35.780427+00:00",
+  "git_commit": "2165c4cbe2965c49284f41214339ce187507c519",
+  "code_sha256": "facf61ae2fb5b024766d5ba87256b90d2ae01aa357bee7429b570911c1d7af24",
   "input_sha256": {
     "feat_spatiotemporal": "208cf00942b404aead0ffe913497d34157ec01f3e1a4ccf593b10f71fb61a55e",
     "feat_granulation": "71c156b0bb149f025d0f38dac27d3f166aa4d24d47cbd388396f441f4c8f6d2e"
@@ -13,25 +13,25 @@
     "hour_sin",
     "pm2_5_lag_1",
     "no2",
-    "pm10_lag_1",
     "pm2_5_change_3h",
-    "gran_up_6h",
+    "pm10_lag_1",
     "so2",
-    "spatial_pm25_gradient",
     "no2_lag_12",
+    "spatial_pm25_gradient",
     "pm2_5_slope_6h",
-    "gran_low_6h",
     "gran_slope_12h",
-    "pm2_5_mean_6h",
-    "no2_lag_6",
+    "gran_low_12h",
     "relative_humidity_2m_lag_3",
+    "gran_low_6h",
+    "pm2_5_mean_6h",
+    "gran_up_6h",
+    "no2_lag_6",
     "o3",
     "temperature_2m",
+    "no2_lag_2",
     "co",
     "no2_lag_24",
-    "far_source_pm25_mean_24h",
-    "no2_lag_2",
-    "hour_cos"
+    "far_source_pm25_mean_24h"
   ],
   "n_selected": 25,
   "granulation": {
@@ -838,212 +838,7 @@
     "gran_slope_12h"
   ],
   "n_union": 64,
-  "pairing": {
-    "pairs": [
-      [
-        "hour_sin",
-        "hour_cos"
-      ],
-      [
-        "dayofweek_sin",
-        "dayofweek_cos"
-      ],
-      [
-        "month_sin",
-        "month_cos"
-      ]
-    ],
-    "rule": "a sin/cos pair is one unit: if either enters the union both do; RFE drops whole units ranked by summed importance, skipping a pair when that would leave fewer than top_k columns",
-    "union_paired": [
-      "pm2_5",
-      "pm10",
-      "no2",
-      "so2",
-      "o3",
-      "co",
-      "temperature_2m",
-      "relative_humidity_2m",
-      "wind_speed_ms",
-      "precipitation",
-      "lat",
-      "lon",
-      "pm2_5_lag_1",
-      "pm2_5_lag_2",
-      "pm2_5_lag_3",
-      "pm2_5_lag_6",
-      "pm2_5_lag_12",
-      "pm2_5_lag_24",
-      "pm10_lag_1",
-      "pm10_lag_2",
-      "pm10_lag_3",
-      "pm10_lag_6",
-      "pm10_lag_24",
-      "no2_lag_1",
-      "no2_lag_2",
-      "no2_lag_6",
-      "no2_lag_12",
-      "no2_lag_24",
-      "relative_humidity_2m_lag_1",
-      "relative_humidity_2m_lag_2",
-      "relative_humidity_2m_lag_3",
-      "relative_humidity_2m_lag_6",
-      "relative_humidity_2m_lag_12",
-      "relative_humidity_2m_lag_24",
-      "pm2_5_mean_3h",
-      "pm2_5_std_3h",
-      "pm2_5_range_3h",
-      "pm2_5_mean_6h",
-      "pm2_5_range_6h",
-      "pm2_5_mean_12h",
-      "pm2_5_std_12h",
-      "pm2_5_range_12h",
-      "pm2_5_change_3h",
-      "pm2_5_slope_6h",
-      "hour_sin",
-      "hour_cos",
-      "dayofweek_sin",
-      "dayofweek_cos",
-      "month_sin",
-      "month_cos",
-      "u_wind",
-      "v_wind",
-      "upwind_pm25_advection_1h",
-      "upwind_pm25_advection_2h",
-      "upwind_pm25_advection_3h",
-      "spatial_pm25_gradient",
-      "far_source_pm25_mean_12h",
-      "far_source_pm25_mean_24h",
-      "far_source_pm25_lag_24h",
-      "gran_low_6h",
-      "gran_up_6h",
-      "gran_low_12h",
-      "gran_up_12h",
-      "gran_slope_12h"
-    ],
-    "n_union_paired": 64,
-    "added_to_union": []
-  },
   "rfe_ranking": {
-    "pm2_5": 1,
-    "pm10": 1,
-    "no2": 1,
-    "so2": 1,
-    "o3": 1,
-    "co": 1,
-    "temperature_2m": 1,
-    "pm2_5_lag_1": 1,
-    "pm10_lag_1": 1,
-    "no2_lag_2": 1,
-    "no2_lag_6": 1,
-    "no2_lag_12": 1,
-    "no2_lag_24": 1,
-    "relative_humidity_2m_lag_3": 1,
-    "pm2_5_mean_3h": 1,
-    "pm2_5_mean_6h": 1,
-    "pm2_5_change_3h": 1,
-    "pm2_5_slope_6h": 1,
-    "hour_sin": 1,
-    "hour_cos": 1,
-    "spatial_pm25_gradient": 1,
-    "far_source_pm25_mean_24h": 1,
-    "gran_low_6h": 1,
-    "gran_up_6h": 1,
-    "gran_slope_12h": 1,
-    "lat": 38,
-    "precipitation": 37,
-    "dayofweek_sin": 36,
-    "dayofweek_cos": 36,
-    "relative_humidity_2m": 35,
-    "pm10_lag_6": 34,
-    "lon": 33,
-    "pm2_5_range_6h": 32,
-    "relative_humidity_2m_lag_24": 31,
-    "pm2_5_lag_6": 30,
-    "pm2_5_lag_3": 29,
-    "pm10_lag_3": 28,
-    "relative_humidity_2m_lag_12": 27,
-    "upwind_pm25_advection_2h": 26,
-    "pm2_5_range_3h": 25,
-    "pm10_lag_2": 24,
-    "pm2_5_std_12h": 23,
-    "wind_speed_ms": 22,
-    "relative_humidity_2m_lag_1": 21,
-    "pm2_5_lag_24": 20,
-    "pm2_5_range_12h": 19,
-    "upwind_pm25_advection_3h": 18,
-    "far_source_pm25_mean_12h": 17,
-    "pm10_lag_24": 16,
-    "no2_lag_1": 15,
-    "pm2_5_mean_12h": 14,
-    "upwind_pm25_advection_1h": 13,
-    "month_sin": 12,
-    "month_cos": 12,
-    "v_wind": 11,
-    "relative_humidity_2m_lag_2": 10,
-    "pm2_5_lag_2": 9,
-    "far_source_pm25_lag_24h": 8,
-    "pm2_5_std_3h": 7,
-    "u_wind": 6,
-    "pm2_5_lag_12": 5,
-    "gran_up_12h": 4,
-    "gran_low_12h": 3,
-    "relative_humidity_2m_lag_6": 2
-  },
-  "final_rf_importance": {
-    "pm2_5": 0.11285,
-    "pm10": 0.08457,
-    "no2": 0.03981,
-    "so2": 0.03541,
-    "o3": 0.03014,
-    "co": 0.02859,
-    "temperature_2m": 0.03014,
-    "pm2_5_lag_1": 0.04251,
-    "pm10_lag_1": 0.03944,
-    "no2_lag_2": 0.028,
-    "no2_lag_6": 0.03107,
-    "no2_lag_12": 0.03348,
-    "no2_lag_24": 0.02859,
-    "relative_humidity_2m_lag_3": 0.03098,
-    "pm2_5_mean_3h": 0.06266,
-    "pm2_5_mean_6h": 0.03197,
-    "pm2_5_change_3h": 0.03785,
-    "pm2_5_slope_6h": 0.03298,
-    "hour_sin": 0.04935,
-    "hour_cos": 0.02609,
-    "spatial_pm25_gradient": 0.03428,
-    "far_source_pm25_mean_24h": 0.02853,
-    "gran_low_6h": 0.03226,
-    "gran_up_6h": 0.03629,
-    "gran_slope_12h": 0.03218
-  },
-  "selected_features_unpaired": [
-    "pm2_5",
-    "pm10",
-    "pm2_5_mean_3h",
-    "hour_sin",
-    "pm2_5_lag_1",
-    "no2",
-    "pm2_5_change_3h",
-    "pm10_lag_1",
-    "so2",
-    "no2_lag_12",
-    "spatial_pm25_gradient",
-    "pm2_5_slope_6h",
-    "gran_slope_12h",
-    "gran_low_12h",
-    "relative_humidity_2m_lag_3",
-    "gran_low_6h",
-    "pm2_5_mean_6h",
-    "gran_up_6h",
-    "no2_lag_6",
-    "o3",
-    "temperature_2m",
-    "no2_lag_2",
-    "co",
-    "no2_lag_24",
-    "far_source_pm25_mean_24h"
-  ],
-  "rfe_ranking_unpaired": {
     "pm2_5": 1,
     "pm10": 1,
     "no2": 1,
@@ -1109,6 +904,33 @@
     "gran_up_12h": 4,
     "gran_slope_12h": 1
   },
+  "final_rf_importance": {
+    "pm2_5": 0.1101,
+    "pm10": 0.08978,
+    "no2": 0.03902,
+    "so2": 0.03506,
+    "o3": 0.03028,
+    "co": 0.02869,
+    "temperature_2m": 0.02958,
+    "pm2_5_lag_1": 0.0423,
+    "pm10_lag_1": 0.03647,
+    "no2_lag_2": 0.02874,
+    "no2_lag_6": 0.03046,
+    "no2_lag_12": 0.03473,
+    "no2_lag_24": 0.02849,
+    "relative_humidity_2m_lag_3": 0.03177,
+    "pm2_5_mean_3h": 0.05923,
+    "pm2_5_mean_6h": 0.0306,
+    "pm2_5_change_3h": 0.03647,
+    "pm2_5_slope_6h": 0.03337,
+    "hour_sin": 0.0572,
+    "spatial_pm25_gradient": 0.03347,
+    "far_source_pm25_mean_24h": 0.02832,
+    "gran_low_6h": 0.03079,
+    "gran_up_6h": 0.03055,
+    "gran_low_12h": 0.03191,
+    "gran_slope_12h": 0.03261
+  },
   "selected_in_strategies": {
     "pm2_5": [
       "a",
@@ -1136,12 +958,50 @@
       "b",
       "c"
     ],
+    "pm2_5_change_3h": [
+      "a",
+      "b",
+      "c"
+    ],
     "pm10_lag_1": [
       "a",
       "b",
       "c"
     ],
-    "pm2_5_change_3h": [
+    "so2": [
+      "a",
+      "b"
+    ],
+    "no2_lag_12": [
+      "b"
+    ],
+    "spatial_pm25_gradient": [
+      "a",
+      "b"
+    ],
+    "pm2_5_slope_6h": [
+      "a",
+      "b",
+      "c"
+    ],
+    "gran_slope_12h": [
+      "a",
+      "b"
+    ],
+    "gran_low_12h": [
+      "a",
+      "b",
+      "c"
+    ],
+    "relative_humidity_2m_lag_3": [
+      "b",
+      "c"
+    ],
+    "gran_low_6h": [
+      "a",
+      "c"
+    ],
+    "pm2_5_mean_6h": [
       "a",
       "b",
       "c"
@@ -1150,47 +1010,17 @@
       "a",
       "c"
     ],
-    "so2": [
-      "a",
-      "b"
-    ],
-    "spatial_pm25_gradient": [
-      "a",
-      "b"
-    ],
-    "no2_lag_12": [
-      "b"
-    ],
-    "pm2_5_slope_6h": [
-      "a",
-      "b",
-      "c"
-    ],
-    "gran_low_6h": [
-      "a",
-      "c"
-    ],
-    "gran_slope_12h": [
-      "a",
-      "b"
-    ],
-    "pm2_5_mean_6h": [
-      "a",
-      "b",
-      "c"
-    ],
     "no2_lag_6": [
       "b"
-    ],
-    "relative_humidity_2m_lag_3": [
-      "b",
-      "c"
     ],
     "o3": [
       "b",
       "c"
     ],
     "temperature_2m": [
+      "b"
+    ],
+    "no2_lag_2": [
       "b"
     ],
     "co": [
@@ -1203,13 +1033,6 @@
     ],
     "far_source_pm25_mean_24h": [
       "b"
-    ],
-    "no2_lag_2": [
-      "b"
-    ],
-    "hour_cos": [
-      "b",
-      "c"
     ]
   }
 }

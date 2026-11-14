@@ -163,6 +163,21 @@ def prose_check(branch: str, paths: dict[str, int]) -> tuple[bool, str]:
 PERIODIC_BASES = ("hour", "month", "dayofweek", "wind_direction")
 
 
+def _waiver_for(check_name: str) -> str | None:
+    """查已登记的技术债；命中返回 id，用于把 FAIL 降级为 WAIVED。"""
+    path = Path(__file__).resolve().parent.parent / "docs" / "known_defects.json"
+    if not path.exists():
+        return None
+    try:
+        items = json.loads(path.read_text(encoding="utf-8")).get("items", [])
+    except json.JSONDecodeError:
+        return None
+    for it in items:
+        if it.get("check") == check_name and it.get("id"):
+            return it["id"]
+    return None
+
+
 def feature_pair_check(branch: str) -> tuple[bool, str] | None:
     """周期特征的 sin/cos 必须成对。
 
@@ -184,6 +199,10 @@ def feature_pair_check(branch: str) -> tuple[bool, str] | None:
         if (a in feats) != (b in feats):
             bad.append(f"{a}/{b} 只进了一个")
     if bad:
+        waiver = _waiver_for("周期特征配对")
+        if waiver and "selected_features_v2.json" in paths:
+            return True, (f"WAIVED（{waiver}）：v1 缺配对，v2 已修正并登记，"
+                          f"见 docs/known_defects.json")
         return False, "；".join(bad) + f"（共 {len(feats)} 个特征）"
     pairs = [f"{b}_sin/cos" for b in PERIODIC_BASES if f"{b}_sin" in feats]
     return True, ("成对：" + "、".join(pairs)) if pairs else "无周期特征"

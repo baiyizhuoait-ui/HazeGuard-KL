@@ -1,0 +1,1215 @@
+{
+  "generated_at": "2026-11-13T15:00:40.839965+00:00",
+  "git_commit": "97b5faa4e2aebd8763fd86a0bf6a734e6ed38cf6",
+  "code_sha256": "301208a9c91f1856ec95d789a194d784926ff4a30c19bdd434b8ad698fc73805",
+  "input_sha256": {
+    "feat_spatiotemporal": "208cf00942b404aead0ffe913497d34157ec01f3e1a4ccf593b10f71fb61a55e",
+    "feat_granulation": "71c156b0bb149f025d0f38dac27d3f166aa4d24d47cbd388396f441f4c8f6d2e"
+  },
+  "selected_features": [
+    "pm2_5",
+    "pm10",
+    "pm2_5_mean_3h",
+    "hour_sin",
+    "pm2_5_lag_1",
+    "no2",
+    "pm10_lag_1",
+    "pm2_5_change_3h",
+    "gran_up_6h",
+    "so2",
+    "spatial_pm25_gradient",
+    "no2_lag_12",
+    "pm2_5_slope_6h",
+    "gran_low_6h",
+    "gran_slope_12h",
+    "pm2_5_mean_6h",
+    "no2_lag_6",
+    "relative_humidity_2m_lag_3",
+    "o3",
+    "temperature_2m",
+    "co",
+    "no2_lag_24",
+    "far_source_pm25_mean_24h",
+    "no2_lag_2",
+    "hour_cos"
+  ],
+  "n_selected": 25,
+  "granulation": {
+    "generated_at": "2026-11-10T06:18:52.741098+00:00",
+    "git_commit": "2165c4cbe2965c49284f41214339ce187507c519",
+    "code_sha256": "a3a6812402d97f479e5f91d1250e06bab11dd9baa25a2b4772c04d44a94d65c3",
+    "input_sha256": "208cf00942b404aead0ffe913497d34157ec01f3e1a4ccf593b10f71fb61a55e",
+    "eligible_column": "audit_model_eligible",
+    "windows": [
+      6,
+      12
+    ],
+    "columns": [
+      "gran_low_6h",
+      "gran_core_6h",
+      "gran_up_6h",
+      "gran_width_6h",
+      "gran_slope_6h",
+      "gran_low_12h",
+      "gran_core_12h",
+      "gran_up_12h",
+      "gran_width_12h",
+      "gran_slope_12h"
+    ],
+    "rows": 966677,
+    "nan_fraction_all_rows": {
+      "gran_low_6h": 0.00155,
+      "gran_core_6h": 0.00155,
+      "gran_up_6h": 0.00155,
+      "gran_width_6h": 0.00155,
+      "gran_slope_6h": 0.00155,
+      "gran_low_12h": 0.0027,
+      "gran_core_12h": 0.0027,
+      "gran_up_12h": 0.0027,
+      "gran_width_12h": 0.0027,
+      "gran_slope_12h": 0.0027
+    },
+    "nan_rows_eligible_receptor": {
+      "train": 0,
+      "val": 0,
+      "test": 0
+    },
+    "figure_window": {
+      "station_id": "KL_City",
+      "peak": "2025-03-07 07:00:00",
+      "half_span_days": 5
+    }
+  },
+  "id_columns": [
+    "station_id",
+    "timestamp",
+    "region",
+    "role",
+    "split"
+  ],
+  "target_columns": [
+    "target_pm25_3h",
+    "target_level_3h"
+  ],
+  "row_filter": "role == receptor & audit_model_eligible",
+  "rows_by_split": {
+    "train": 77753,
+    "val": 16656,
+    "test": 16647
+  },
+  "spatial_fill": {
+    "rule": "upwind_pm25_advection_Kh <- pm2_5_lag_K; spatial_pm25_gradient <- 0; far_source_pm25_mean_Wh <- nearest shorter far_source mean window; only where the upstream value is NaN",
+    "filled_rows": {
+      "upwind_pm25_advection_1h": {
+        "train": 7586,
+        "val": 1623,
+        "test": 753
+      },
+      "upwind_pm25_advection_2h": {
+        "train": 7585,
+        "val": 1623,
+        "test": 753
+      },
+      "upwind_pm25_advection_3h": {
+        "train": 7584,
+        "val": 1623,
+        "test": 753
+      },
+      "spatial_pm25_gradient": {
+        "train": 7587,
+        "val": 1623,
+        "test": 753
+      },
+      "far_source_pm25_mean_48h": {
+        "train": 70,
+        "val": 72,
+        "test": 72
+      }
+    }
+  },
+  "fit_rows": "role==receptor & eligible & split==train",
+  "train_rows": 77753,
+  "params": {
+    "top_k": 25,
+    "n_top_per_strategy": 30,
+    "spearman_abs_max": 0.92,
+    "quasi_constant_mode_share": 0.99,
+    "seed": 42,
+    "rfe_step": 1
+  },
+  "candidates": [
+    "pm2_5",
+    "pm10",
+    "no2",
+    "so2",
+    "o3",
+    "co",
+    "temperature_2m",
+    "relative_humidity_2m",
+    "wind_speed_ms",
+    "precipitation",
+    "lat",
+    "lon",
+    "pm2_5_lag_1",
+    "pm2_5_lag_2",
+    "pm2_5_lag_3",
+    "pm2_5_lag_6",
+    "pm2_5_lag_12",
+    "pm2_5_lag_24",
+    "pm10_lag_1",
+    "pm10_lag_2",
+    "pm10_lag_3",
+    "pm10_lag_6",
+    "pm10_lag_12",
+    "pm10_lag_24",
+    "no2_lag_1",
+    "no2_lag_2",
+    "no2_lag_3",
+    "no2_lag_6",
+    "no2_lag_12",
+    "no2_lag_24",
+    "relative_humidity_2m_lag_1",
+    "relative_humidity_2m_lag_2",
+    "relative_humidity_2m_lag_3",
+    "relative_humidity_2m_lag_6",
+    "relative_humidity_2m_lag_12",
+    "relative_humidity_2m_lag_24",
+    "pm2_5_mean_3h",
+    "pm2_5_std_3h",
+    "pm2_5_range_3h",
+    "pm2_5_mean_6h",
+    "pm2_5_std_6h",
+    "pm2_5_range_6h",
+    "pm2_5_mean_12h",
+    "pm2_5_std_12h",
+    "pm2_5_range_12h",
+    "pm2_5_change_3h",
+    "pm2_5_slope_6h",
+    "hour_sin",
+    "hour_cos",
+    "dayofweek_sin",
+    "dayofweek_cos",
+    "month_sin",
+    "month_cos",
+    "u_wind",
+    "v_wind",
+    "upwind_pm25_advection_1h",
+    "upwind_pm25_advection_2h",
+    "upwind_pm25_advection_3h",
+    "spatial_pm25_gradient",
+    "far_source_pm25_mean_12h",
+    "far_source_pm25_mean_24h",
+    "far_source_pm25_mean_48h",
+    "far_source_pm25_lag_24h",
+    "gran_low_6h",
+    "gran_up_6h",
+    "gran_low_12h",
+    "gran_up_12h",
+    "gran_slope_12h"
+  ],
+  "n_candidates": 68,
+  "exact_duplicates_removed": {
+    "gran_core_6h": "pm2_5_mean_6h",
+    "gran_width_6h": "pm2_5_range_6h",
+    "gran_slope_6h": "pm2_5_slope_6h",
+    "gran_core_12h": "pm2_5_mean_12h",
+    "gran_width_12h": "pm2_5_range_12h"
+  },
+  "strategy_a_mutual_info": {
+    "top": [
+      "pm2_5",
+      "pm10",
+      "pm2_5_mean_3h",
+      "pm2_5_lag_1",
+      "pm10_lag_1",
+      "gran_up_6h",
+      "gran_low_6h",
+      "pm2_5_mean_6h",
+      "pm2_5_lag_2",
+      "pm10_lag_2",
+      "gran_up_12h",
+      "gran_low_12h",
+      "spatial_pm25_gradient",
+      "so2",
+      "pm2_5_mean_12h",
+      "no2",
+      "pm2_5_lag_3",
+      "pm10_lag_3",
+      "co",
+      "pm2_5_lag_24",
+      "pm2_5_slope_6h",
+      "pm10_lag_24",
+      "pm2_5_change_3h",
+      "no2_lag_1",
+      "gran_slope_12h",
+      "pm2_5_range_12h",
+      "lat",
+      "lon",
+      "pm2_5_lag_6",
+      "no2_lag_24"
+    ],
+    "scores": {
+      "pm2_5": 0.40285,
+      "pm10": 0.37185,
+      "pm2_5_mean_3h": 0.31658,
+      "pm2_5_lag_1": 0.29771,
+      "pm10_lag_1": 0.27843,
+      "gran_up_6h": 0.24789,
+      "gran_low_6h": 0.2394,
+      "pm2_5_mean_6h": 0.23682,
+      "pm2_5_lag_2": 0.22141,
+      "pm10_lag_2": 0.21207,
+      "gran_up_12h": 0.20742,
+      "gran_low_12h": 0.19938,
+      "spatial_pm25_gradient": 0.19017,
+      "so2": 0.18265,
+      "pm2_5_mean_12h": 0.17893,
+      "no2": 0.17636,
+      "pm2_5_lag_3": 0.17532,
+      "pm10_lag_3": 0.16435,
+      "co": 0.15945,
+      "pm2_5_lag_24": 0.1563,
+      "pm2_5_slope_6h": 0.15207,
+      "pm10_lag_24": 0.14605,
+      "pm2_5_change_3h": 0.13692,
+      "no2_lag_1": 0.12655,
+      "gran_slope_12h": 0.12476,
+      "pm2_5_range_12h": 0.12145,
+      "lat": 0.10879,
+      "lon": 0.10841,
+      "pm2_5_lag_6": 0.10614,
+      "no2_lag_24": 0.10305,
+      "relative_humidity_2m_lag_6": 0.10059,
+      "pm2_5_std_12h": 0.10018,
+      "far_source_pm25_mean_48h": 0.09871,
+      "far_source_pm25_mean_24h": 0.09802,
+      "no2_lag_2": 0.09787,
+      "pm2_5_range_6h": 0.09633,
+      "pm10_lag_6": 0.09546,
+      "pm2_5_std_6h": 0.09154,
+      "far_source_pm25_mean_12h": 0.08577,
+      "pm2_5_std_3h": 0.08145,
+      "pm2_5_lag_12": 0.08082,
+      "no2_lag_3": 0.07707,
+      "no2_lag_12": 0.07622,
+      "pm2_5_range_3h": 0.07613,
+      "relative_humidity_2m_lag_3": 0.07278,
+      "pm10_lag_12": 0.07271,
+      "no2_lag_6": 0.05672,
+      "hour_sin": 0.05547,
+      "o3": 0.05428,
+      "relative_humidity_2m_lag_2": 0.05211,
+      "upwind_pm25_advection_1h": 0.05079,
+      "hour_cos": 0.04614,
+      "far_source_pm25_lag_24h": 0.04225,
+      "upwind_pm25_advection_2h": 0.03734,
+      "relative_humidity_2m_lag_1": 0.03389,
+      "upwind_pm25_advection_3h": 0.03281,
+      "relative_humidity_2m": 0.02394,
+      "relative_humidity_2m_lag_24": 0.02287,
+      "temperature_2m": 0.02141,
+      "v_wind": 0.01866,
+      "u_wind": 0.01739,
+      "month_sin": 0.01705,
+      "precipitation": 0.01316,
+      "relative_humidity_2m_lag_12": 0.01214,
+      "wind_speed_ms": 0.01072,
+      "month_cos": 0.00744,
+      "dayofweek_sin": 0.00298,
+      "dayofweek_cos": 0.00227
+    }
+  },
+  "strategy_b_variance_spearman": {
+    "quasi_constant_removed": [],
+    "correlated_removed": {
+      "pm10": {
+        "kept": "pm2_5",
+        "abs_rho": 0.9658
+      },
+      "pm2_5_mean_3h": {
+        "kept": "pm2_5",
+        "abs_rho": 0.9655
+      },
+      "pm2_5_lag_1": {
+        "kept": "pm2_5",
+        "abs_rho": 0.9507
+      },
+      "gran_low_6h": {
+        "kept": "pm2_5_mean_6h",
+        "abs_rho": 0.9323
+      },
+      "gran_up_6h": {
+        "kept": "pm2_5_mean_6h",
+        "abs_rho": 0.9641
+      },
+      "pm2_5_lag_2": {
+        "kept": "pm2_5_mean_6h",
+        "abs_rho": 0.97
+      },
+      "pm10_lag_2": {
+        "kept": "pm10_lag_1",
+        "abs_rho": 0.9545
+      },
+      "pm2_5_lag_3": {
+        "kept": "pm2_5_mean_6h",
+        "abs_rho": 0.9662
+      },
+      "pm10_lag_3": {
+        "kept": "pm2_5_mean_6h",
+        "abs_rho": 0.9343
+      },
+      "pm2_5_mean_12h": {
+        "kept": "gran_up_12h",
+        "abs_rho": 0.9346
+      },
+      "pm10_lag_24": {
+        "kept": "pm2_5_lag_24",
+        "abs_rho": 0.9659
+      },
+      "no2_lag_1": {
+        "kept": "no2",
+        "abs_rho": 0.9552
+      },
+      "pm2_5_range_12h": {
+        "kept": "gran_up_12h",
+        "abs_rho": 0.9238
+      },
+      "pm2_5_std_6h": {
+        "kept": "pm2_5_range_6h",
+        "abs_rho": 0.9961
+      },
+      "pm2_5_lag_6": {
+        "kept": "pm10_lag_6",
+        "abs_rho": 0.9657
+      },
+      "pm2_5_range_3h": {
+        "kept": "pm2_5_std_3h",
+        "abs_rho": 0.9993
+      },
+      "pm10_lag_12": {
+        "kept": "pm2_5_lag_12",
+        "abs_rho": 0.9658
+      },
+      "relative_humidity_2m_lag_2": {
+        "kept": "relative_humidity_2m_lag_3",
+        "abs_rho": 0.9233
+      },
+      "no2_lag_3": {
+        "kept": "no2_lag_2",
+        "abs_rho": 0.9551
+      },
+      "relative_humidity_2m": {
+        "kept": "relative_humidity_2m_lag_1",
+        "abs_rho": 0.9233
+      },
+      "far_source_pm25_mean_48h": {
+        "kept": "far_source_pm25_mean_24h",
+        "abs_rho": 0.9523
+      }
+    },
+    "survivors_abs_rho_target": {
+      "pm2_5": 0.7796,
+      "pm10_lag_1": 0.6793,
+      "pm2_5_mean_6h": 0.6251,
+      "gran_low_12h": 0.5564,
+      "so2": 0.5471,
+      "no2": 0.5436,
+      "gran_up_12h": 0.5353,
+      "pm2_5_lag_24": 0.5323,
+      "co": 0.5251,
+      "spatial_pm25_gradient": 0.4962,
+      "no2_lag_24": 0.4447,
+      "lon": 0.4357,
+      "relative_humidity_2m_lag_6": 0.4349,
+      "pm2_5_std_12h": 0.4038,
+      "pm2_5_range_6h": 0.3914,
+      "no2_lag_2": 0.3694,
+      "pm10_lag_6": 0.3674,
+      "pm2_5_slope_6h": 0.3669,
+      "relative_humidity_2m_lag_3": 0.3631,
+      "pm2_5_std_3h": 0.3618,
+      "gran_slope_12h": 0.3317,
+      "pm2_5_change_3h": 0.3203,
+      "pm2_5_lag_12": 0.3178,
+      "upwind_pm25_advection_1h": 0.2794,
+      "hour_sin": 0.2769,
+      "relative_humidity_2m_lag_1": 0.2411,
+      "no2_lag_12": 0.2386,
+      "upwind_pm25_advection_2h": 0.2204,
+      "hour_cos": 0.2077,
+      "far_source_pm25_lag_24h": 0.1761,
+      "far_source_pm25_mean_24h": 0.165,
+      "upwind_pm25_advection_3h": 0.1631,
+      "month_sin": 0.15,
+      "relative_humidity_2m_lag_24": 0.1495,
+      "no2_lag_6": 0.1489,
+      "precipitation": 0.1489,
+      "temperature_2m": 0.109,
+      "lat": 0.1008,
+      "relative_humidity_2m_lag_12": 0.0979,
+      "wind_speed_ms": 0.0905,
+      "u_wind": 0.0792,
+      "month_cos": 0.0383,
+      "v_wind": 0.0314,
+      "dayofweek_cos": 0.023,
+      "far_source_pm25_mean_12h": 0.0097,
+      "dayofweek_sin": 0.0076,
+      "o3": 0.0041
+    }
+  },
+  "strategy_c_permutation": {
+    "top": [
+      "pm2_5",
+      "hour_sin",
+      "pm10",
+      "hour_cos",
+      "pm2_5_mean_3h",
+      "pm2_5_change_3h",
+      "gran_low_6h",
+      "relative_humidity_2m_lag_3",
+      "pm2_5_slope_6h",
+      "no2",
+      "lon",
+      "relative_humidity_2m_lag_2",
+      "gran_up_6h",
+      "pm10_lag_1",
+      "relative_humidity_2m_lag_6",
+      "pm10_lag_2",
+      "upwind_pm25_advection_1h",
+      "pm2_5_std_3h",
+      "gran_up_12h",
+      "pm2_5_lag_1",
+      "o3",
+      "pm2_5_mean_6h",
+      "pm2_5_mean_12h",
+      "relative_humidity_2m",
+      "relative_humidity_2m_lag_1",
+      "gran_low_12h",
+      "pm10_lag_24",
+      "pm2_5_range_3h",
+      "no2_lag_1",
+      "pm2_5_lag_24"
+    ],
+    "holdout": {
+      "cut": "2024-12-19T05:00:00.000000",
+      "fit_rows": 62138,
+      "holdout_rows": 15606,
+      "n_repeats": 5
+    },
+    "importance": {
+      "pm2_5": {
+        "mean": 0.11508,
+        "std": 0.00103
+      },
+      "hour_sin": {
+        "mean": 0.04046,
+        "std": 0.00093
+      },
+      "pm10": {
+        "mean": 0.0259,
+        "std": 0.00216
+      },
+      "hour_cos": {
+        "mean": 0.01482,
+        "std": 0.00193
+      },
+      "pm2_5_mean_3h": {
+        "mean": 0.0138,
+        "std": 0.00092
+      },
+      "pm2_5_change_3h": {
+        "mean": 0.01244,
+        "std": 0.00152
+      },
+      "gran_low_6h": {
+        "mean": 0.00874,
+        "std": 0.00097
+      },
+      "relative_humidity_2m_lag_3": {
+        "mean": 0.00774,
+        "std": 0.00162
+      },
+      "pm2_5_slope_6h": {
+        "mean": 0.00632,
+        "std": 0.00043
+      },
+      "no2": {
+        "mean": 0.00624,
+        "std": 0.00177
+      },
+      "lon": {
+        "mean": 0.00622,
+        "std": 0.00118
+      },
+      "relative_humidity_2m_lag_2": {
+        "mean": 0.0056,
+        "std": 0.0007
+      },
+      "gran_up_6h": {
+        "mean": 0.0056,
+        "std": 0.00067
+      },
+      "pm10_lag_1": {
+        "mean": 0.00508,
+        "std": 0.00093
+      },
+      "relative_humidity_2m_lag_6": {
+        "mean": 0.00496,
+        "std": 0.00103
+      },
+      "pm10_lag_2": {
+        "mean": 0.00298,
+        "std": 0.00074
+      },
+      "upwind_pm25_advection_1h": {
+        "mean": 0.00284,
+        "std": 0.00095
+      },
+      "pm2_5_std_3h": {
+        "mean": 0.00284,
+        "std": 0.00115
+      },
+      "gran_up_12h": {
+        "mean": 0.00266,
+        "std": 0.00064
+      },
+      "pm2_5_lag_1": {
+        "mean": 0.00264,
+        "std": 0.00154
+      },
+      "o3": {
+        "mean": 0.00242,
+        "std": 0.00164
+      },
+      "pm2_5_mean_6h": {
+        "mean": 0.00228,
+        "std": 0.00121
+      },
+      "pm2_5_mean_12h": {
+        "mean": 0.00214,
+        "std": 0.0006
+      },
+      "relative_humidity_2m": {
+        "mean": 0.002,
+        "std": 0.00079
+      },
+      "relative_humidity_2m_lag_1": {
+        "mean": 0.00178,
+        "std": 0.00097
+      },
+      "gran_low_12h": {
+        "mean": 0.00168,
+        "std": 0.00089
+      },
+      "pm10_lag_24": {
+        "mean": 0.0016,
+        "std": 0.00084
+      },
+      "pm2_5_range_3h": {
+        "mean": 0.00148,
+        "std": 0.00062
+      },
+      "no2_lag_1": {
+        "mean": 0.00132,
+        "std": 0.00082
+      },
+      "pm2_5_lag_24": {
+        "mean": 0.0012,
+        "std": 0.00133
+      },
+      "pm2_5_range_12h": {
+        "mean": 0.00108,
+        "std": 0.00045
+      },
+      "temperature_2m": {
+        "mean": 0.001,
+        "std": 0.00149
+      },
+      "spatial_pm25_gradient": {
+        "mean": 0.00096,
+        "std": 0.00074
+      },
+      "relative_humidity_2m_lag_12": {
+        "mean": 0.00094,
+        "std": 0.00096
+      },
+      "pm2_5_std_6h": {
+        "mean": 0.00086,
+        "std": 0.00056
+      },
+      "wind_speed_ms": {
+        "mean": 0.00082,
+        "std": 0.00086
+      },
+      "precipitation": {
+        "mean": 0.00078,
+        "std": 0.00084
+      },
+      "v_wind": {
+        "mean": 0.00064,
+        "std": 0.00122
+      },
+      "lat": {
+        "mean": 0.00062,
+        "std": 0.00124
+      },
+      "far_source_pm25_lag_24h": {
+        "mean": 0.0006,
+        "std": 0.00076
+      },
+      "pm2_5_lag_2": {
+        "mean": 0.00058,
+        "std": 0.00056
+      },
+      "pm2_5_range_6h": {
+        "mean": 0.00056,
+        "std": 0.00067
+      },
+      "no2_lag_3": {
+        "mean": 0.00044,
+        "std": 0.00062
+      },
+      "pm2_5_std_12h": {
+        "mean": 0.00032,
+        "std": 0.00026
+      },
+      "month_sin": {
+        "mean": 2e-05,
+        "std": 0.00052
+      },
+      "far_source_pm25_mean_24h": {
+        "mean": -0.0,
+        "std": 0.00081
+      },
+      "no2_lag_24": {
+        "mean": -4e-05,
+        "std": 0.00079
+      },
+      "pm2_5_lag_12": {
+        "mean": -6e-05,
+        "std": 0.0016
+      },
+      "pm2_5_lag_3": {
+        "mean": -0.0001,
+        "std": 0.00131
+      },
+      "dayofweek_cos": {
+        "mean": -0.00012,
+        "std": 0.00013
+      },
+      "far_source_pm25_mean_12h": {
+        "mean": -0.00018,
+        "std": 0.00055
+      },
+      "relative_humidity_2m_lag_24": {
+        "mean": -0.00022,
+        "std": 0.00074
+      },
+      "no2_lag_12": {
+        "mean": -0.00024,
+        "std": 0.00132
+      },
+      "month_cos": {
+        "mean": -0.00024,
+        "std": 0.0008
+      },
+      "pm10_lag_3": {
+        "mean": -0.00034,
+        "std": 0.00079
+      },
+      "pm2_5_lag_6": {
+        "mean": -0.00042,
+        "std": 0.0001
+      },
+      "no2_lag_2": {
+        "mean": -0.00056,
+        "std": 0.00064
+      },
+      "gran_slope_12h": {
+        "mean": -0.00062,
+        "std": 0.00114
+      },
+      "co": {
+        "mean": -0.00068,
+        "std": 0.00096
+      },
+      "dayofweek_sin": {
+        "mean": -0.0008,
+        "std": 0.00083
+      },
+      "upwind_pm25_advection_3h": {
+        "mean": -0.00102,
+        "std": 0.00106
+      },
+      "far_source_pm25_mean_48h": {
+        "mean": -0.00112,
+        "std": 0.00068
+      },
+      "u_wind": {
+        "mean": -0.00112,
+        "std": 0.00072
+      },
+      "no2_lag_6": {
+        "mean": -0.00144,
+        "std": 0.00079
+      },
+      "upwind_pm25_advection_2h": {
+        "mean": -0.0021,
+        "std": 0.0012
+      },
+      "pm10_lag_6": {
+        "mean": -0.00212,
+        "std": 0.00102
+      },
+      "pm10_lag_12": {
+        "mean": -0.00212,
+        "std": 0.00159
+      },
+      "so2": {
+        "mean": -0.00444,
+        "std": 0.00161
+      }
+    }
+  },
+  "union": [
+    "pm2_5",
+    "pm10",
+    "no2",
+    "so2",
+    "o3",
+    "co",
+    "temperature_2m",
+    "relative_humidity_2m",
+    "wind_speed_ms",
+    "precipitation",
+    "lat",
+    "lon",
+    "pm2_5_lag_1",
+    "pm2_5_lag_2",
+    "pm2_5_lag_3",
+    "pm2_5_lag_6",
+    "pm2_5_lag_12",
+    "pm2_5_lag_24",
+    "pm10_lag_1",
+    "pm10_lag_2",
+    "pm10_lag_3",
+    "pm10_lag_6",
+    "pm10_lag_24",
+    "no2_lag_1",
+    "no2_lag_2",
+    "no2_lag_6",
+    "no2_lag_12",
+    "no2_lag_24",
+    "relative_humidity_2m_lag_1",
+    "relative_humidity_2m_lag_2",
+    "relative_humidity_2m_lag_3",
+    "relative_humidity_2m_lag_6",
+    "relative_humidity_2m_lag_12",
+    "relative_humidity_2m_lag_24",
+    "pm2_5_mean_3h",
+    "pm2_5_std_3h",
+    "pm2_5_range_3h",
+    "pm2_5_mean_6h",
+    "pm2_5_range_6h",
+    "pm2_5_mean_12h",
+    "pm2_5_std_12h",
+    "pm2_5_range_12h",
+    "pm2_5_change_3h",
+    "pm2_5_slope_6h",
+    "hour_sin",
+    "hour_cos",
+    "dayofweek_sin",
+    "dayofweek_cos",
+    "month_sin",
+    "month_cos",
+    "u_wind",
+    "v_wind",
+    "upwind_pm25_advection_1h",
+    "upwind_pm25_advection_2h",
+    "upwind_pm25_advection_3h",
+    "spatial_pm25_gradient",
+    "far_source_pm25_mean_12h",
+    "far_source_pm25_mean_24h",
+    "far_source_pm25_lag_24h",
+    "gran_low_6h",
+    "gran_up_6h",
+    "gran_low_12h",
+    "gran_up_12h",
+    "gran_slope_12h"
+  ],
+  "n_union": 64,
+  "pairing": {
+    "pairs": [
+      [
+        "hour_sin",
+        "hour_cos"
+      ],
+      [
+        "dayofweek_sin",
+        "dayofweek_cos"
+      ],
+      [
+        "month_sin",
+        "month_cos"
+      ]
+    ],
+    "rule": "a sin/cos pair is one unit: if either enters the union both do; RFE drops whole units ranked by summed importance, skipping a pair when that would leave fewer than top_k columns",
+    "union_paired": [
+      "pm2_5",
+      "pm10",
+      "no2",
+      "so2",
+      "o3",
+      "co",
+      "temperature_2m",
+      "relative_humidity_2m",
+      "wind_speed_ms",
+      "precipitation",
+      "lat",
+      "lon",
+      "pm2_5_lag_1",
+      "pm2_5_lag_2",
+      "pm2_5_lag_3",
+      "pm2_5_lag_6",
+      "pm2_5_lag_12",
+      "pm2_5_lag_24",
+      "pm10_lag_1",
+      "pm10_lag_2",
+      "pm10_lag_3",
+      "pm10_lag_6",
+      "pm10_lag_24",
+      "no2_lag_1",
+      "no2_lag_2",
+      "no2_lag_6",
+      "no2_lag_12",
+      "no2_lag_24",
+      "relative_humidity_2m_lag_1",
+      "relative_humidity_2m_lag_2",
+      "relative_humidity_2m_lag_3",
+      "relative_humidity_2m_lag_6",
+      "relative_humidity_2m_lag_12",
+      "relative_humidity_2m_lag_24",
+      "pm2_5_mean_3h",
+      "pm2_5_std_3h",
+      "pm2_5_range_3h",
+      "pm2_5_mean_6h",
+      "pm2_5_range_6h",
+      "pm2_5_mean_12h",
+      "pm2_5_std_12h",
+      "pm2_5_range_12h",
+      "pm2_5_change_3h",
+      "pm2_5_slope_6h",
+      "hour_sin",
+      "hour_cos",
+      "dayofweek_sin",
+      "dayofweek_cos",
+      "month_sin",
+      "month_cos",
+      "u_wind",
+      "v_wind",
+      "upwind_pm25_advection_1h",
+      "upwind_pm25_advection_2h",
+      "upwind_pm25_advection_3h",
+      "spatial_pm25_gradient",
+      "far_source_pm25_mean_12h",
+      "far_source_pm25_mean_24h",
+      "far_source_pm25_lag_24h",
+      "gran_low_6h",
+      "gran_up_6h",
+      "gran_low_12h",
+      "gran_up_12h",
+      "gran_slope_12h"
+    ],
+    "n_union_paired": 64,
+    "added_to_union": []
+  },
+  "rfe_ranking": {
+    "pm2_5": 1,
+    "pm10": 1,
+    "no2": 1,
+    "so2": 1,
+    "o3": 1,
+    "co": 1,
+    "temperature_2m": 1,
+    "pm2_5_lag_1": 1,
+    "pm10_lag_1": 1,
+    "no2_lag_2": 1,
+    "no2_lag_6": 1,
+    "no2_lag_12": 1,
+    "no2_lag_24": 1,
+    "relative_humidity_2m_lag_3": 1,
+    "pm2_5_mean_3h": 1,
+    "pm2_5_mean_6h": 1,
+    "pm2_5_change_3h": 1,
+    "pm2_5_slope_6h": 1,
+    "hour_sin": 1,
+    "hour_cos": 1,
+    "spatial_pm25_gradient": 1,
+    "far_source_pm25_mean_24h": 1,
+    "gran_low_6h": 1,
+    "gran_up_6h": 1,
+    "gran_slope_12h": 1,
+    "lat": 38,
+    "precipitation": 37,
+    "dayofweek_sin": 36,
+    "dayofweek_cos": 36,
+    "relative_humidity_2m": 35,
+    "pm10_lag_6": 34,
+    "lon": 33,
+    "pm2_5_range_6h": 32,
+    "relative_humidity_2m_lag_24": 31,
+    "pm2_5_lag_6": 30,
+    "pm2_5_lag_3": 29,
+    "pm10_lag_3": 28,
+    "relative_humidity_2m_lag_12": 27,
+    "upwind_pm25_advection_2h": 26,
+    "pm2_5_range_3h": 25,
+    "pm10_lag_2": 24,
+    "pm2_5_std_12h": 23,
+    "wind_speed_ms": 22,
+    "relative_humidity_2m_lag_1": 21,
+    "pm2_5_lag_24": 20,
+    "pm2_5_range_12h": 19,
+    "upwind_pm25_advection_3h": 18,
+    "far_source_pm25_mean_12h": 17,
+    "pm10_lag_24": 16,
+    "no2_lag_1": 15,
+    "pm2_5_mean_12h": 14,
+    "upwind_pm25_advection_1h": 13,
+    "month_sin": 12,
+    "month_cos": 12,
+    "v_wind": 11,
+    "relative_humidity_2m_lag_2": 10,
+    "pm2_5_lag_2": 9,
+    "far_source_pm25_lag_24h": 8,
+    "pm2_5_std_3h": 7,
+    "u_wind": 6,
+    "pm2_5_lag_12": 5,
+    "gran_up_12h": 4,
+    "gran_low_12h": 3,
+    "relative_humidity_2m_lag_6": 2
+  },
+  "final_rf_importance": {
+    "pm2_5": 0.11285,
+    "pm10": 0.08457,
+    "no2": 0.03981,
+    "so2": 0.03541,
+    "o3": 0.03014,
+    "co": 0.02859,
+    "temperature_2m": 0.03014,
+    "pm2_5_lag_1": 0.04251,
+    "pm10_lag_1": 0.03944,
+    "no2_lag_2": 0.028,
+    "no2_lag_6": 0.03107,
+    "no2_lag_12": 0.03348,
+    "no2_lag_24": 0.02859,
+    "relative_humidity_2m_lag_3": 0.03098,
+    "pm2_5_mean_3h": 0.06266,
+    "pm2_5_mean_6h": 0.03197,
+    "pm2_5_change_3h": 0.03785,
+    "pm2_5_slope_6h": 0.03298,
+    "hour_sin": 0.04935,
+    "hour_cos": 0.02609,
+    "spatial_pm25_gradient": 0.03428,
+    "far_source_pm25_mean_24h": 0.02853,
+    "gran_low_6h": 0.03226,
+    "gran_up_6h": 0.03629,
+    "gran_slope_12h": 0.03218
+  },
+  "selected_features_unpaired": [
+    "pm2_5",
+    "pm10",
+    "pm2_5_mean_3h",
+    "hour_sin",
+    "pm2_5_lag_1",
+    "no2",
+    "pm2_5_change_3h",
+    "pm10_lag_1",
+    "so2",
+    "no2_lag_12",
+    "spatial_pm25_gradient",
+    "pm2_5_slope_6h",
+    "gran_slope_12h",
+    "gran_low_12h",
+    "relative_humidity_2m_lag_3",
+    "gran_low_6h",
+    "pm2_5_mean_6h",
+    "gran_up_6h",
+    "no2_lag_6",
+    "o3",
+    "temperature_2m",
+    "no2_lag_2",
+    "co",
+    "no2_lag_24",
+    "far_source_pm25_mean_24h"
+  ],
+  "rfe_ranking_unpaired": {
+    "pm2_5": 1,
+    "pm10": 1,
+    "no2": 1,
+    "so2": 1,
+    "o3": 1,
+    "co": 1,
+    "temperature_2m": 1,
+    "relative_humidity_2m": 34,
+    "wind_speed_ms": 20,
+    "precipitation": 38,
+    "lat": 39,
+    "lon": 33,
+    "pm2_5_lag_1": 1,
+    "pm2_5_lag_2": 16,
+    "pm2_5_lag_3": 28,
+    "pm2_5_lag_6": 27,
+    "pm2_5_lag_12": 5,
+    "pm2_5_lag_24": 10,
+    "pm10_lag_1": 1,
+    "pm10_lag_2": 24,
+    "pm10_lag_3": 29,
+    "pm10_lag_6": 32,
+    "pm10_lag_24": 19,
+    "no2_lag_1": 14,
+    "no2_lag_2": 1,
+    "no2_lag_6": 1,
+    "no2_lag_12": 1,
+    "no2_lag_24": 1,
+    "relative_humidity_2m_lag_1": 21,
+    "relative_humidity_2m_lag_2": 11,
+    "relative_humidity_2m_lag_3": 1,
+    "relative_humidity_2m_lag_6": 2,
+    "relative_humidity_2m_lag_12": 25,
+    "relative_humidity_2m_lag_24": 30,
+    "pm2_5_mean_3h": 1,
+    "pm2_5_std_3h": 7,
+    "pm2_5_range_3h": 22,
+    "pm2_5_mean_6h": 1,
+    "pm2_5_range_6h": 31,
+    "pm2_5_mean_12h": 8,
+    "pm2_5_std_12h": 26,
+    "pm2_5_range_12h": 18,
+    "pm2_5_change_3h": 1,
+    "pm2_5_slope_6h": 1,
+    "hour_sin": 1,
+    "hour_cos": 3,
+    "dayofweek_sin": 37,
+    "dayofweek_cos": 40,
+    "month_sin": 35,
+    "month_cos": 36,
+    "u_wind": 6,
+    "v_wind": 12,
+    "upwind_pm25_advection_1h": 13,
+    "upwind_pm25_advection_2h": 23,
+    "upwind_pm25_advection_3h": 17,
+    "spatial_pm25_gradient": 1,
+    "far_source_pm25_mean_12h": 15,
+    "far_source_pm25_mean_24h": 1,
+    "far_source_pm25_lag_24h": 9,
+    "gran_low_6h": 1,
+    "gran_up_6h": 1,
+    "gran_low_12h": 1,
+    "gran_up_12h": 4,
+    "gran_slope_12h": 1
+  },
+  "selected_in_strategies": {
+    "pm2_5": [
+      "a",
+      "b",
+      "c"
+    ],
+    "pm10": [
+      "a",
+      "c"
+    ],
+    "pm2_5_mean_3h": [
+      "a",
+      "c"
+    ],
+    "hour_sin": [
+      "b",
+      "c"
+    ],
+    "pm2_5_lag_1": [
+      "a",
+      "c"
+    ],
+    "no2": [
+      "a",
+      "b",
+      "c"
+    ],
+    "pm10_lag_1": [
+      "a",
+      "b",
+      "c"
+    ],
+    "pm2_5_change_3h": [
+      "a",
+      "b",
+      "c"
+    ],
+    "gran_up_6h": [
+      "a",
+      "c"
+    ],
+    "so2": [
+      "a",
+      "b"
+    ],
+    "spatial_pm25_gradient": [
+      "a",
+      "b"
+    ],
+    "no2_lag_12": [
+      "b"
+    ],
+    "pm2_5_slope_6h": [
+      "a",
+      "b",
+      "c"
+    ],
+    "gran_low_6h": [
+      "a",
+      "c"
+    ],
+    "gran_slope_12h": [
+      "a",
+      "b"
+    ],
+    "pm2_5_mean_6h": [
+      "a",
+      "b",
+      "c"
+    ],
+    "no2_lag_6": [
+      "b"
+    ],
+    "relative_humidity_2m_lag_3": [
+      "b",
+      "c"
+    ],
+    "o3": [
+      "b",
+      "c"
+    ],
+    "temperature_2m": [
+      "b"
+    ],
+    "co": [
+      "a",
+      "b"
+    ],
+    "no2_lag_24": [
+      "a",
+      "b"
+    ],
+    "far_source_pm25_mean_24h": [
+      "b"
+    ],
+    "no2_lag_2": [
+      "b"
+    ],
+    "hour_cos": [
+      "b",
+      "c"
+    ]
+  }
+}
