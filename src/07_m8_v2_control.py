@@ -39,6 +39,7 @@ import csv
 import hashlib
 import importlib
 import json
+import platform
 import shutil
 import subprocess
 import sys
@@ -67,7 +68,8 @@ BENCHMARK = "models/all_models_benchmark.csv"
 SEEDS = (42, 43, 44)
 METRICS = ("Macro_F1", "Balanced_Accuracy", "High_Risk_Recall", "MAOE",
            "Severe_Jumping_Error_Rate", "Avg_Asymmetric_Cost")
-CONTRACT_COLUMNS = ["model", "split", "seed", *METRICS, "n_samples"]
+# docs/spec_v3.md v3.2: 11 columns, feature_set second
+CONTRACT_COLUMNS = ["model", "feature_set", "split", "seed", *METRICS, "n_samples"]
 
 
 def sha256(path: Path) -> str:
@@ -76,6 +78,22 @@ def sha256(path: Path) -> str:
         for block in iter(lambda: handle.read(1 << 20), b""):
             digest.update(block)
     return digest.hexdigest()
+
+
+def text_sha256(path: Path) -> str:
+    """Hash of a text file with Windows line endings folded to \n, so a checkout on
+    Windows (core.autocrlf) and one on macOS/Linux give the same value."""
+    return hashlib.sha256(Path(path).read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+
+
+def environment() -> dict:
+    """Library versions. Random forests are not bit-identical across versions, so the
+    numbers in this file belong to this environment."""
+    import pandas
+    import sklearn
+    return {"python": platform.python_version(), "numpy": np.__version__,
+            "pandas": pandas.__version__, "sklearn": sklearn.__version__,
+            "platform": platform.platform(terse=True)}
 
 
 def write_json(path: Path, payload: dict) -> None:
@@ -89,7 +107,7 @@ def git_commit(root: Path) -> str:
 
 
 def code_hashes(root: Path) -> dict:
-    return {name: sha256(root / "src" / name) for name in
+    return {name: text_sha256(root / "src" / name) for name in
             ("07_m8_v2_control.py", "05_reg_to_cls.py", "utils_metrics.py", "config.py")}
 
 
@@ -103,7 +121,7 @@ def check_manifest(root: Path) -> dict:
     if actual != entry["sha256"]:
         raise SystemExit(f"{V2_TABLE} fingerprint {actual[:12]} does not match the registered "
                          f"{entry['sha256'][:12]}; ask member 1 before training M8")
-    return {"features_final_v2": actual, "selected_features_v2": sha256(root / V2_FEATURES)}
+    return {"features_final_v2": actual, "selected_features_v2": text_sha256(root / V2_FEATURES)}
 
 
 def load_v2(root: Path):
@@ -181,6 +199,8 @@ def step_validation(root: Path, n_jobs: int) -> int:
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "git_commit": git_commit(root),
         "code_sha256": code_hashes(root),
+        "hash_note": "text files hashed with CRLF folded to LF",
+        "environment": environment(),
         "input_sha256": hashes,
         "hyperparameters": params,
         "hyperparameter_source": SELECTION,
@@ -213,10 +233,15 @@ def step_test(root: Path, n_jobs: int) -> int:
     if record.get("test_evaluation_count", 0) >= 1:
         raise SystemExit("M8 has already been evaluated on test once. It will not run again.")
     hashes = check_manifest(root)
-    if hashes != record["input_sha256"]:
+    if hashes["features_final_v2"] != record["input_sha256"]["features_final_v2"]:
         raise SystemExit("The v2 files changed since the validation step. Re-run step 1 first.")
-    if sha256(root / "src" / "07_m8_v2_control.py") != record["code_sha256"]["07_m8_v2_control.py"]:
+    if text_sha256(root / "src" / "07_m8_v2_control.py") != \
+            record["code_sha256"]["07_m8_v2_control.py"]:
         raise SystemExit("This script changed since the validation step. Re-run step 1 first.")
+    if record.get("environment") and record["environment"] != environment():
+        raise SystemExit("Library versions differ from the validation step "
+                         f"({record['environment']} vs {environment()}); results would not "
+                         "be comparable. Run both steps in one environment.")
     parts, features = load_v2(root)
     train, val, test = (parts[s] for s in ("train", "val", "test"))
     reg = fit(record["hyperparameters"], 42,
@@ -271,19 +296,18 @@ def step_benchmark(root: Path) -> int:
     path = root / BENCHMARK
     with open(path, encoding="utf-8-sig", newline="") as handle:
         rows = list(csv.DictReader(handle))
-        header = list(rows[0].keys()) if rows else CONTRACT_COLUMNS
-    if header[:len(CONTRACT_COLUMNS)] != CONTRACT_COLUMNS:
+    header = list(rows[0].keys()) if rows else CONTRACT_COLUMNS
+    if set(header) - set(CONTRACT_COLUMNS) or set(CONTRACT_COLUMNS) - set(header) - {"feature_set"}:
         raise SystemExit(f"unexpected benchmark columns: {header}")
     for row in rows:
-        row.setdefault("feature_set", "v1")
         if not row.get("feature_set"):
             row["feature_set"] = "v1"
     rows = [r for r in rows if r["model"] != "M8"]
-    rows.append({"model": "M8", "split": "test", "seed": "42",
+    rows.append({"model": "M8", "feature_set": "v2", "split": "test", "seed": "42",
                  **{k: f"{float(metrics[k]):.4f}" for k in METRICS},
-                 "n_samples": str(record["test_n_samples"]), "feature_set": "v2"})
+                 "n_samples": str(record["test_n_samples"])})
     with open(path, "w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=CONTRACT_COLUMNS + ["feature_set"])
+        writer = csv.DictWriter(handle, fieldnames=CONTRACT_COLUMNS)
         writer.writeheader()
         writer.writerows(rows)
     print(f"{BENCHMARK}: feature_set column present, M8 row written ({len(rows)} rows)")

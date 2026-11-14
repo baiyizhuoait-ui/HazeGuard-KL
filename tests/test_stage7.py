@@ -34,6 +34,8 @@ analysis = load_module("system_analysis", "src/07_system_analysis.py")
 BENCHMARK_COLUMNS = ["model", "split", "seed", "Macro_F1", "Balanced_Accuracy",
                      "High_Risk_Recall", "MAOE", "Severe_Jumping_Error_Rate",
                      "Avg_Asymmetric_Cost", "n_samples"]
+# docs/spec_v3.md v3.2 adds feature_set as the second column
+BENCHMARK_COLUMNS_V32 = BENCHMARK_COLUMNS[:1] + ["feature_set"] + BENCHMARK_COLUMNS[1:]
 
 
 class OnsetLogic(unittest.TestCase):
@@ -92,12 +94,23 @@ class SavedInputs(unittest.TestCase):
             self.assertTrue((probs[f"proba_{split}"].argmax(axis=1)
                              == stage5[f"pred_m6_{split}"]).all())
 
+    def test_calibrated_interval_lines_up_with_the_predictions(self):
+        path = MODELS / "stage5_intervals_calibrated.npz"
+        if not path.exists():
+            self.skipTest("interval calibration not merged")
+        cal, probs = np.load(path), np.load(MODELS / "ordinal_probs_val_test.npz")
+        for split in ("val", "test"):
+            self.assertTrue((cal[f"ts_{split}"] == probs[f"ts_{split}"]).all())
+            self.assertTrue((cal[f"station_id_{split}"] == probs[f"station_id_{split}"]).all())
+            interval = cal[f"interval_{split}"]
+            self.assertTrue((interval[:, 0] <= interval[:, 1]).all())
+            self.assertTrue((interval[:, 1] <= interval[:, 2]).all())
+
     def test_benchmark_has_the_contract_columns(self):
         with open(MODELS / "all_models_benchmark.csv", encoding="utf-8-sig") as handle:
             rows = list(csv.DictReader(handle))
         header = list(rows[0].keys())
-        self.assertEqual(header[:len(BENCHMARK_COLUMNS)], BENCHMARK_COLUMNS)
-        self.assertIn(header[len(BENCHMARK_COLUMNS):], ([], ["feature_set"]))
+        self.assertIn(header, (BENCHMARK_COLUMNS, BENCHMARK_COLUMNS_V32))
         if "feature_set" in header:          # M8 is the only v2 row (KD-01)
             for row in rows:
                 self.assertEqual(row["feature_set"], "v2" if row["model"] == "M8" else "v1")
