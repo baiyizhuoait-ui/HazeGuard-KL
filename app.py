@@ -19,8 +19,10 @@ Design rules
 
 from __future__ import annotations
 
+import html as html_lib
 import json
 import sys
+import time
 from pathlib import Path
 
 import matplotlib
@@ -88,9 +90,131 @@ ADVICE = {
 # Reserved status colours for the four ordered levels. They are always shown
 # together with the level label, never as the only cue.
 LEVEL_COLORS = ["#0ca30c", "#fab219", "#ec835a", "#d03b3b"]
-INK, INK_2, GRID, AXIS, SURFACE = "#0b0b0b", "#52514e", "#e1e0d9", "#c3c2b7", "#fcfcfb"
-BLUE, ORANGE = "#2a78d6", "#eb6834"
+LEVEL_CHIP_INK = ["#ffffff", "#0b0b0b", "#0b0b0b", "#ffffff"]
+PALETTES = {
+    "light": dict(INK="#0b0b0b", INK_2="#52514e", GRID="#e1e0d9", AXIS="#c3c2b7",
+                  SURFACE="#fcfcfb", PAGE="#f5f5f2", CARD="#ffffff",
+                  BORDER="rgba(11,11,11,0.10)", BLUE="#2a78d6", ORANGE="#eb6834"),
+    "dark": dict(INK="#f0efec", INK_2="#c3c2b7", GRID="#2c2c2a", AXIS="#4a4a46",
+                 SURFACE="#1a1a19", PAGE="#101010", CARD="#1a1a19",
+                 BORDER="rgba(255,255,255,0.12)", BLUE="#3987e5", ORANGE="#d95926"),
+}
+INK = INK_2 = GRID = AXIS = SURFACE = PAGE = CARD = BORDER = BLUE = ORANGE = ""
 ROLE_MARKERS = {"receptor": "o", "corridor": "s", "source": "^"}
+
+
+def apply_palette(dark: bool) -> None:
+    """Point the chart colours at the light or dark palette for this run."""
+    globals().update(PALETTES["dark" if dark else "light"])
+    matplotlib.rcParams.update({
+        "text.color": INK, "axes.labelcolor": INK_2, "xtick.color": INK_2,
+        "ytick.color": INK_2, "axes.edgecolor": AXIS, "figure.facecolor": SURFACE,
+        "axes.facecolor": SURFACE, "savefig.facecolor": SURFACE})
+
+
+apply_palette(False)
+
+# ---------------------------------------------------------------------------
+# Language. Headings, labels and controls are bilingual; long method notes and
+# the text inside charts stay in English, the language of the report.
+# ---------------------------------------------------------------------------
+ZH = {
+    "Replay controls": "回放控制", "Period": "时段", "Receptor node": "受体格点",
+    "Go to": "跳转方式", "High-risk episode": "高危事件", "Date and hour": "日期与小时",
+    "Episode (highest peak first)": "事件（按峰值从高到低）", "Date": "日期",
+    "Hour (local time)": "小时（当地时间）", "Decision rule": "判定规则",
+    "Test (Mar to Oct 2026)": "测试段（2026 年 3–10 月）",
+    "Validation (Jul 2025 to Mar 2026)": "验证段（2025 年 7 月–2026 年 3 月）",
+    "Dark mode": "深色模式", "Language": "语言", "Display": "显示",
+    "Risk now and in 3 h": "当前风险与 3 小时预测", "Probability and interval": "概率与区间",
+    "Model comparison": "模型对比", "Explanation and generalisation": "解释与泛化",
+    "Method and limits": "方法与局限",
+    "PM2.5 now": "当前 PM2.5", "Forecast level in 3 h": "3 小时后预测等级",
+    "Forecast PM2.5 in 3 h": "3 小时后预测浓度", "What happened (replay)": "实际结果（回放）",
+    "Low confidence": "可信度低", "Moderate confidence": "可信度中等",
+    "High confidence": "可信度高", "Forecast for": "预测时刻", "issued": "发布于",
+    "Play": "播放", "Pause": "暂停", "Download this window (CSV)": "下载当前时段（CSV）",
+    "Major episodes at this node": "该格点的重大事件", "Replay": "回放",
+    "peak": "峰值", "Missed": "漏报", "Alert at onset": "起始时才报警",
+    "Alert after onset": "起始后才报警",
+    "What is unusual right now": "此刻有什么异常", "Feature": "特征", "Value now": "当前值",
+    "Percentile in training history": "在训练期历史中的分位",
+    "Early-warning record on the test split": "测试段预警记录",
+    "High-risk onsets": "高危起始次数", "Alert before onset": "起始前已报警",
+    "24 h mean lags by": "24 小时均值滞后", "Fresh alerts confirmed": "新发警报被证实",
+    "Four-level probability": "四级概率",
+    "Concentration and prediction interval": "浓度与预测区间",
+    "Concentration and tree spread": "浓度与树间离散度",
+    "Are the probabilities calibrated?": "概率是否校准？",
+    "Threshold trade-off (validation split only)": "阈值权衡（仅验证段）",
+    "M8 · v2 control for known defect KD-01": "M8 · 已知缺陷 KD-01 的 v2 对照",
+    "Three decisions on the same M6 probabilities (test)": "同一 M6 概率上的三种决策（测试段）",
+    "Where the concentration forecast is off (M5, test)": "浓度预测偏在哪里（M5，测试段）",
+    "Asymmetric cost matrix": "非对称代价矩阵", "Leave-one-node-out": "留一格点验证",
+    "Seasonal slices of the 2026 hold-out": "2026 年留出段的分季节结果",
+    "How the system is put together": "系统是怎么搭起来的",
+    "Known limits": "已知局限", "Limit": "局限", "What it affects": "影响", "Evidence": "依据",
+}
+ADVICE_ZH = {
+    0: "可正常进行户外活动。", 1: "敏感人群应减少长时间户外运动。",
+    2: "减少户外活动，关闭门窗。", 3: "避免户外活动；必须外出时佩戴 N95 口罩。",
+}
+
+
+def lang() -> str:
+    return st.session_state.get("lang", "en")
+
+
+def tr(text: str) -> str:
+    return ZH.get(text, text) if lang() == "zh" else text
+
+
+def L(en: str, zh: str) -> str:
+    return zh if lang() == "zh" else en
+
+
+def inject_css() -> None:
+    st.markdown(f"""<style>
+    #MainMenu, footer, [data-testid="stAppDeployButton"], [data-testid="stMainMenu"],
+    [data-testid="stDecoration"] {{ display: none !important; }}
+    .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {{
+        background: {PAGE}; color: {INK}; }}
+    [data-testid="stSidebar"] {{ background: {CARD}; border-right: 1px solid {BORDER}; }}
+    .block-container {{ padding-top: 2.2rem; max-width: 1320px; }}
+    [data-testid="stMarkdownContainer"], [data-testid="stWidgetLabel"],
+    [data-testid="stMetricValue"], .stApp h1, .stApp h2, .stApp h3 {{ color: {INK}; }}
+    [data-testid="stCaptionContainer"], [data-testid="stMetricLabel"] {{ color: {INK_2}; }}
+    [data-testid="stMetric"] {{ background: {CARD}; border: 1px solid {BORDER};
+        border-radius: 14px; padding: 16px 18px; }}
+    [data-testid="stMetricValue"] {{ font-weight: 650; letter-spacing: -0.01em; }}
+    .stApp h1 {{ font-weight: 750; letter-spacing: -0.02em; margin-bottom: 0; }}
+    .hg-banner {{ display: flex; align-items: center; gap: 18px; background: {CARD};
+        border: 1px solid {BORDER}; border-radius: 16px; padding: 18px 22px; margin: 6px 0 16px; }}
+    .hg-chip {{ font-size: 1.35rem; font-weight: 750; padding: 12px 20px; border-radius: 12px;
+        white-space: nowrap; }}
+    .hg-banner-main {{ flex: 1; min-width: 0; }}
+    .hg-banner-title {{ font-size: 1.05rem; font-weight: 650; color: {INK}; }}
+    .hg-banner-sub {{ color: {INK_2}; margin-top: 4px; }}
+    .hg-badge {{ border: 1px solid {BORDER}; border-radius: 999px; padding: 6px 14px;
+        font-weight: 600; color: {INK}; white-space: nowrap; }}
+    .hg-tag {{ display: inline-block; border-radius: 999px; padding: 2px 10px; font-size: 0.8rem;
+        font-weight: 600; border: 1px solid {BORDER}; color: {INK}; }}
+    </style>""", unsafe_allow_html=True)
+
+
+def sync_native_theme(dark: bool) -> None:
+    """Ask Streamlit itself to switch base theme so tables and widgets follow.
+    Uses a non-public call; when it is unavailable the CSS above still applies."""
+    changed = False
+    try:
+        want = "dark" if dark else "light"
+        if st._config.get_option("theme.base") != want:
+            st._config.set_option("theme.base", want)
+            changed = True
+    except Exception:
+        changed = False
+    if changed:
+        st.rerun()
 
 
 def level_label(level: int) -> str:
@@ -273,18 +397,23 @@ def reliability_note(row: pd.Series, ref: dict) -> tuple[str, str]:
     crossed = [t for t in LEVEL_THRESHOLDS if row["q05"] < t <= row["q95"]]
     reasons = []
     if top < ref["low_top"]:
-        reasons.append(f"the most probable level has only {top:.0%} probability")
+        reasons.append(L(f"the most probable level has only {top:.0%} probability",
+                         f"最可能的等级只有 {top:.0%} 的概率"))
     if width > ref["wide"]:
-        reasons.append(f"the trees disagree by {width:.0f} µg/m³")
+        reasons.append(L(f"the trees disagree by {width:.0f} µg/m³",
+                         f"各棵树的预测相差 {width:.0f} µg/m³"))
     if crossed:
-        reasons.append("the tree spread crosses the "
-                       + " and ".join(f"{t:g}" for t in crossed) + " µg/m³ boundary")
+        cuts = " / ".join(f"{t:g}" for t in crossed)
+        reasons.append(L(f"the tree spread crosses the {cuts} µg/m³ boundary",
+                         f"树间离散范围跨过了 {cuts} µg/m³ 的等级分界"))
     if len(reasons) >= 2:
         return "Low confidence", "; ".join(reasons) + "."
     if reasons:
         return "Moderate confidence", reasons[0] + "."
-    return "High confidence", (f"the most probable level has {top:.0%} probability and the "
-                               f"tree spread ({width:.0f} µg/m³) stays inside one level.")
+    return "High confidence", L(
+        f"the most probable level has {top:.0%} probability and the tree spread "
+        f"({width:.0f} µg/m³) stays inside one level.",
+        f"最可能的等级有 {top:.0%} 的概率，树间离散范围（{width:.0f} µg/m³）没有跨过等级分界。")
 
 
 # ---------------------------------------------------------------------------
@@ -631,6 +760,237 @@ def fig_error_by_level(by_level: dict):
     return fig
 
 
+def banner(row: pd.Series, predicted: int, ref: dict, when: pd.Timestamp) -> None:
+    grade, why = reliability_note(row, ref)
+    valid = when + pd.Timedelta(hours=HORIZON_H)
+    advice = ADVICE_ZH[predicted] if lang() == "zh" else ADVICE[predicted]
+    st.markdown(f"""<div class="hg-banner" style="border-left: 8px solid {LEVEL_COLORS[predicted]}">
+      <div class="hg-chip" style="background:{LEVEL_COLORS[predicted]};color:{LEVEL_CHIP_INK[predicted]}">
+        {html_lib.escape(level_label(predicted))}</div>
+      <div class="hg-banner-main">
+        <div class="hg-banner-title">{tr("Forecast for")} {valid:%d %b %Y %H:%M}
+          · {tr("issued")} {when:%H:%M} · {html_lib.escape(advice)}</div>
+        <div class="hg-banner-sub">{html_lib.escape(why)}</div>
+      </div>
+      <div class="hg-badge">{tr(grade)}</div>
+    </div>""", unsafe_allow_html=True)
+
+
+def snap(station: pd.DataFrame, wanted: pd.Timestamp) -> pd.Timestamp:
+    """Latest row at or before the wanted time; the first row when there is none."""
+    earlier = station[station["timestamp"] <= wanted]
+    return earlier["timestamp"].iloc[-1] if len(earlier) else station["timestamp"].iloc[0]
+
+
+def playback_bar(station: pd.DataFrame, when: pd.Timestamp, rule: str) -> None:
+    """Step and play controls plus the export of the window on screen."""
+    cols = st.columns([1, 1, 1.2, 1, 1, 3.2])
+    steps = [("−1 d", -24), ("−1 h", -1), None, ("+1 h", 1), ("+1 d", 24)]
+    for col, step in zip(cols, steps):
+        if step is None:
+            playing = st.session_state.get("playing", False)
+            if col.button(tr("Pause") if playing else tr("Play"), key="play",
+                          use_container_width=True):
+                st.session_state["playing"] = not playing
+                st.rerun()
+        elif col.button(step[0], key=f"step{step[1]}", use_container_width=True):
+            st.session_state["cursor"] = snap(station, when + pd.Timedelta(hours=step[1]))
+            st.session_state["playing"] = False
+            st.rerun()
+    win = window_rows(station, when, 72)
+    keep = [c for c in ("station_id", "timestamp", "valid_time", "pm2_5", "pm2_5_mean_24h", "reg",
+                        "cal_lo", "cal_hi", RULES[rule]["column"], "y_true") if c in win]
+    cols[5].download_button(
+        tr("Download this window (CSV)"), win[keep].to_csv(index=False).encode("utf-8"),
+        file_name=f"hazeguard_{station['station_id'].iloc[0]}_{when:%Y%m%d_%H}.csv",
+        mime="text/csv", use_container_width=True)
+
+
+def autoplay(station: pd.DataFrame, when: pd.Timestamp) -> None:
+    """Advance one hour per tick while Play is on; stops at the end of the period."""
+    if not st.session_state.get("playing", False):
+        return
+    later = station[station["timestamp"] > when]
+    if not len(later):
+        st.session_state["playing"] = False
+        return
+    time.sleep(0.9)
+    st.session_state["cursor"] = later["timestamp"].iloc[0]
+    st.rerun()
+
+
+def lead_tag(lead) -> str:
+    if lead is None:
+        return tr("Missed")
+    if lead > 0:
+        return L(f"Alert {lead} h ahead", f"提前 {lead} 小时报警")
+    return tr("Alert at onset") if lead == 0 else tr("Alert after onset")
+
+
+def fig_spark(series: pd.DataFrame, onset: pd.Timestamp):
+    fig, ax = plt.subplots(figsize=(2.6, 0.85), dpi=150)
+    fig.patch.set_facecolor(CARD)
+    ax.set_facecolor(CARD)
+    ax.plot(series["timestamp"], series["pm2_5"], color=BLUE, linewidth=1.6)
+    ax.axhline(LEVEL_THRESHOLDS[1], color=AXIS, linewidth=0.8, linestyle=(0, (3, 3)))
+    ax.axvline(onset, color=INK_2, linewidth=0.8)
+    ax.set_ylim(0, max(float(series["pm2_5"].max()) * 1.1, 60))
+    ax.axis("off")
+    fig.subplots_adjust(left=0.02, right=0.98, top=0.95, bottom=0.05)
+    return fig
+
+
+def episode_cards(station: pd.DataFrame, events: list[dict], rule: str) -> None:
+    """The six highest-peak major episodes at this node, each with a replay button."""
+    major = sorted((e for e in events if e["peak_pm25"] >= LEVEL_THRESHOLDS[2]),
+                   key=lambda e: -e["peak_pm25"])[:6]
+    if not major or not station["pm2_5"].notna().any():
+        return
+    st.subheader(tr("Major episodes at this node"))
+    for start in range(0, len(major), 3):
+        for col, event in zip(st.columns(3), major[start:start + 3]):
+            onset = pd.Timestamp(event["onset"])
+            span = station[(station["timestamp"] >= onset - pd.Timedelta(hours=12))
+                           & (station["timestamp"] <= onset + pd.Timedelta(
+                               hours=min(event["duration_h"], 48) + 6))]
+            with col.container(border=True):
+                st.markdown(f"**{onset:%d %b %Y %H:%M}**")
+                show(fig_spark(span, onset))
+                st.caption(f"{tr('peak')} {event['peak_pm25']:.0f} µg/m³ · {event['duration_h']} h")
+                st.markdown(f'<span class="hg-tag">{lead_tag(event["model_lead_h"][rule])}</span>',
+                            unsafe_allow_html=True)
+                if st.button(tr("Replay"), key=f"ep_{event['onset']}", use_container_width=True):
+                    st.session_state["cursor"] = snap(station, onset - pd.Timedelta(hours=HORIZON_H))
+                    st.session_state["playing"] = False
+                    st.rerun()
+    st.caption(L("The vertical line is the onset; the dashed line is the high-risk boundary. "
+                 "Replay opens three hours before the onset.",
+                 "竖线是事件起始时刻，虚线是高危分界。回放从起始前 3 小时开始。"))
+
+
+@st.cache_data(show_spinner=False)
+def load_feature_frame() -> tuple[pd.DataFrame, list[str]] | None:
+    try:
+        names = read_json(MODELS / "selected_features.json")["selected_features"]
+        frame = pd.read_parquet(DATA / "features_final.parquet",
+                                columns=["station_id", "timestamp", "split", *names])
+    except Exception:
+        return None
+    frame["timestamp"] = _naive(frame["timestamp"])
+    frame["station_id"] = frame["station_id"].astype(str)
+    return frame, names
+
+
+def unusual_now(station_id: str, when: pd.Timestamp) -> None:
+    """Which model inputs sit in the tails of this node's training history right now.
+    A description of the inputs, not an explanation of the model."""
+    loaded = load_feature_frame()
+    if loaded is None:
+        return
+    frame, names = loaded
+    node = frame[frame["station_id"] == station_id]
+    now = node[node["timestamp"] == when]
+    history = node[node["split"] == "train"]
+    if not len(now) or not len(history):
+        return
+    rows = []
+    for name in names:
+        if name.startswith(("hour_", "month_", "dow_")):
+            continue                               # clock encodings are never "unusual"
+        value = float(now[name].iloc[0])
+        share = float((history[name] <= value).mean())
+        if share >= 0.95 or share <= 0.05:
+            rows.append({tr("Feature"): name, tr("Value now"): round(value, 2),
+                         tr("Percentile in training history"): round(100 * share, 1),
+                         "_d": abs(share - 0.5)})
+    st.subheader(tr("What is unusual right now"))
+    if not rows:
+        st.caption(L("No input is in the top or bottom 5% of this node's training history.",
+                     "当前没有输入特征落在该格点训练期历史的最高或最低 5%。"))
+        return
+    table = pd.DataFrame(rows).sort_values("_d", ascending=False).drop(columns="_d").head(6)
+    st.dataframe(table, use_container_width=True, hide_index=True)
+    st.caption(L("Inputs in the top or bottom 5% of this node's training-period values. This "
+                 "describes the inputs; it does not say what the model did with them.",
+                 "列出处于该格点训练期取值最高或最低 5% 的输入。这是对输入的描述，不代表模型如何使用它们。"))
+
+
+def tab_method() -> None:
+    st.subheader(tr("How the system is put together"))
+    st.graphviz_chart(f"""digraph G {{
+      rankdir=LR; bgcolor="transparent"; node [shape=box, style="rounded", color="{AXIS}",
+      fontcolor="{INK}", fontname="Helvetica", fontsize=11]; edge [color="{INK_2}", arrowsize=0.7];
+      src [label="Open-Meteo\nCAMS air quality + weather\n26 grid nodes, hourly"];
+      p01 [label="01 Clean panel\nM0 persistence, M1 tree"];
+      p02 [label="02 Lag, rolling and\nspatial features"];
+      p03 [label="03 Top-25 features\nv1 (official) / v2 (control)"];
+      v1 [label="M2 M3 M4 classifiers\nM5 regression to levels\nM6 ordinal forest\n(feature table v1)"];
+      m7 [label="06 M7 cost-sensitive\nthresholds on M6"];
+      m8 [label="M8 = M5 recipe\non feature table v2\n(KD-01 control)"];
+      app [label="07 Dashboard\nearly-warning analysis"];
+      src -> p01 -> p02 -> p03; p03 -> v1 -> m7 -> app; v1 -> app; p03 -> m8 -> app;
+    }}""", use_container_width=True)
+    st.caption(L("The dashboard only reads saved predictions and metrics. It never trains a "
+                 "model and never tunes anything on the test split.",
+                 "看板只读取已保存的预测与指标，不训练模型，也不在测试段上调任何参数。"))
+
+    st.subheader(tr("Known limits"))
+    rows = [{
+        tr("Limit"): L("Model product, not measurements", "模式产品，不是实测"),
+        tr("What it affects"): L("Every score is skill at predicting CAMS output for a grid cell.",
+                                 "所有成绩都是预测 CAMS 格点输出的成绩。"),
+        tr("Evidence"): "data/data_dictionary.json"}]
+    seam = load_json_or_none("seam_report.json")
+    if seam:
+        hours = " / ".join(f"{h:02d}:00" for h in seam["seam_hours_local"])
+        rows.append({
+            tr("Limit"): L(f"Forecast-run boundary at {hours}", f"起报接缝（{hours}）"),
+            tr("What it affects"): L(
+                f"Hour-to-hour change is {seam['raw_seam_ratio']} times larger there; a jump "
+                "across it cannot be foreseen from the inputs.",
+                f"接缝处的逐小时变化是其他时段的 {seam['raw_seam_ratio']} 倍；跨接缝的跳变无法从输入预知。"),
+            tr("Evidence"): "models/seam_report.json"})
+    interval = load_json_or_none("metrics_stage5_interval_calibrated.json")
+    if interval:
+        got = interval["test"]["calibrated"]["PICP"]
+        rows.append({
+            tr("Limit"): L("Interval misses its target on test", "区间在测试段未达标"),
+            tr("What it affects"): L(f"90% target, {got:.1%} achieved on the test split.",
+                                     f"目标覆盖 90%，测试段实际 {got:.1%}。"),
+            tr("Evidence"): "models/metrics_stage5_interval_calibrated.json"})
+    stage7 = load_json_or_none("metrics_stage7.json")
+    if stage7:
+        level3 = stage7["error_anatomy"]["test"]["by_true_level"].get("3")
+        if level3:
+            rows.append({
+                tr("Limit"): L("Concentration is under-predicted at peaks", "高峰时浓度被低估"),
+                tr("What it affects"): L(
+                    f"Mean error {level3['mean_error']:+.1f} µg/m³ when the outcome is level 3.",
+                    f"实际为 L3 时平均误差 {level3['mean_error']:+.1f} µg/m³。"),
+                tr("Evidence"): "models/metrics_stage7.json"})
+    rows.append({
+        tr("Limit"): L("KD-01: hour encoded with sine only (v1)", "KD-01：v1 的钟点只有正弦编码"),
+        tr("What it affects"): L("24 hours collapse to 13 values. M8 on v2 measures the effect.",
+                                 "24 个钟点只有 13 个取值；由 v2 上的 M8 量化影响。"),
+        tr("Evidence"): "docs/known_defects.json, models/metrics_m8.json"})
+    m8 = load_json_or_none("metrics_m8.json")
+    if m8 and m8.get("environment"):
+        env = m8["environment"]
+        rows.append({
+            tr("Limit"): L("M8 ran under different library versions", "M8 的运行环境与锁定版本不同"),
+            tr("What it affects"): L(
+                f"scikit-learn {env.get('sklearn')} instead of the pinned version; the measured "
+                "difference is smaller than the seed-to-seed spread.",
+                f"scikit-learn {env.get('sklearn')}，非锁定版本；实测差异小于种子间波动。"),
+            tr("Evidence"): "models/runtime_environments.json"})
+    rows.append({
+        tr("Limit"): L("The 24 h mean is a stand-in", "24 小时均值只是替身"),
+        tr("What it affects"): L("It is not the official API, so no lead over the official index "
+                                 "is claimed.", "它不是官方 API，因此不声称领先官方指数多少小时。"),
+        tr("Evidence"): "models/metrics_stage7.json (definitions)"})
+    st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+
+
 def show(fig) -> None:
     st.pyplot(fig, use_container_width=True)
     plt.close(fig)
@@ -643,13 +1003,26 @@ def missing(path: str) -> None:
 # ---------------------------------------------------------------------------
 # Sidebar
 # ---------------------------------------------------------------------------
-def sidebar(data: pd.DataFrame, stage7: dict | None) -> tuple[pd.DataFrame, pd.Timestamp, str]:
-    st.sidebar.header("Replay controls")
+def preferences() -> bool:
+    """Language and theme switches; returns True for dark mode."""
+    st.sidebar.header(tr("Display"))
+    choice = st.sidebar.radio("Language / 语言", ["English", "中文"], horizontal=True,
+                              index=1 if lang() == "zh" else 0)
+    wanted = "zh" if choice == "中文" else "en"
+    if wanted != lang():
+        st.session_state["lang"] = wanted
+        st.rerun()
+    return bool(st.sidebar.toggle(tr("Dark mode"), value=False, key="dark"))
+
+
+def sidebar(data: pd.DataFrame, stage7: dict | None):
+    st.sidebar.header(tr("Replay controls"))
     split_label = st.sidebar.radio(
-        "Period", ["Test (Mar to Oct 2026)", "Validation (Jul 2025 to Mar 2026)"], index=0)
+        tr("Period"), ["Test (Mar to Oct 2026)", "Validation (Jul 2025 to Mar 2026)"], index=0,
+        format_func=tr)
     split = "test" if split_label.startswith("Test") else "val"
     stations = sorted(data["station_id"].unique())
-    station_id = st.sidebar.selectbox("Receptor node", stations, index=0,
+    station_id = st.sidebar.selectbox(tr("Receptor node"), stations, index=0,
                                       format_func=lambda s: s.replace("_", " "))
     station = data[(data["split"] == split) & (data["station_id"] == station_id)]
     station = add_running_mean(station.sort_values("timestamp").reset_index(drop=True))
@@ -662,45 +1035,53 @@ def sidebar(data: pd.DataFrame, stage7: dict | None) -> tuple[pd.DataFrame, pd.T
     if stage7:
         events = [e for e in stage7["early_warning"][split]["events"]
                   if e["station_id"] == station_id]
-    wanted = None
+    wanted, picked = None, None
     if events:
-        mode = st.sidebar.radio("Go to", ["High-risk episode", "Date and hour"], index=0)
+        mode = st.sidebar.radio(tr("Go to"), ["High-risk episode", "Date and hour"], index=0,
+                                format_func=tr)
         if mode == "High-risk episode":
             order = sorted(range(len(events)), key=lambda i: -events[i]["peak_pm25"])
             labels = {i: (f"{pd.Timestamp(events[i]['onset']):%d %b %Y %H:%M}  ·  "
-                          f"peak {events[i]['peak_pm25']:.0f}  ·  {events[i]['duration_h']} h")
+                          f"{tr('peak')} {events[i]['peak_pm25']:.0f}  ·  {events[i]['duration_h']} h")
                       for i in order}
-            chosen = st.sidebar.selectbox("Episode (highest peak first)", order, index=0,
+            chosen = st.sidebar.selectbox(tr("Episode (highest peak first)"), order, index=0,
                                           format_func=lambda i: labels[i])
             onset = pd.Timestamp(events[chosen]["onset"])
-            wanted = onset - pd.Timedelta(hours=HORIZON_H)
-            st.sidebar.caption(f"Showing {HORIZON_H} h before the onset at {onset:%d %b %H:%M}, "
-                               "the last moment a full-horizon alert could be issued.")
+            wanted, picked = onset - pd.Timedelta(hours=HORIZON_H), ("episode", chosen)
     if wanted is None:
-        day = st.sidebar.date_input("Date", value=peak.date(), min_value=first.date(),
+        day = st.sidebar.date_input(tr("Date"), value=peak.date(), min_value=first.date(),
                                     max_value=last.date())
-        hour = st.sidebar.slider("Hour (local time)", 0, 23, int(peak.hour))
-        wanted = pd.Timestamp(day) + pd.Timedelta(hours=int(hour))
-    earlier = station[station["timestamp"] <= wanted]
-    when = (earlier["timestamp"].iloc[-1] if len(earlier) else first)
-    if when != wanted:
-        st.sidebar.caption(f"No eligible row at that hour. Showing {when:%d %b %Y %H:%M}.")
+        hour = st.sidebar.slider(tr("Hour (local time)"), 0, 23, int(peak.hour))
+        wanted, picked = pd.Timestamp(day) + pd.Timedelta(hours=int(hour)), ("date", str(day), hour)
 
-    rule = st.sidebar.selectbox("Decision rule", list(RULES), index=list(RULES).index(DEFAULT_RULE),
+    # The sidebar sets the starting point; the step, play and replay buttons move a cursor
+    # from there. A new sidebar choice resets the cursor.
+    signature = (split, station_id, picked)
+    if st.session_state.get("selection") != signature:
+        st.session_state["selection"] = signature
+        st.session_state["cursor"] = snap(station, wanted)
+        st.session_state["playing"] = False
+    when = st.session_state.get("cursor", snap(station, wanted))
+    if not (station["timestamp"] == when).any():
+        when = snap(station, wanted)
+        st.session_state["cursor"] = when
+    st.sidebar.caption(L(f"Showing {when:%d %b %Y %H:%M}.", f"当前显示 {when:%Y-%m-%d %H:%M}。"))
+
+    rule = st.sidebar.selectbox(tr("Decision rule"), list(RULES),
+                                index=list(RULES).index(DEFAULT_RULE),
                                 format_func=lambda k: RULES[k]["label"])
-    st.sidebar.caption(
+    st.sidebar.caption(L(
         "M5: regression forest cut into levels. M6: ordinal forest. "
-        "M7: M6 probabilities with cost-sensitive thresholds.")
-    st.sidebar.caption(
-        "Replay only. The app reads saved predictions; it does not refit or retune anything.")
-    return station, when, rule
+        "M7: M6 probabilities with cost-sensitive thresholds.",
+        "M5：回归森林切档。M6：有序森林。M7：在 M6 概率上使用代价敏感阈值。"))
+    st.sidebar.caption(L(
+        "Replay only. The app reads saved predictions; it does not refit or retune anything.",
+        "仅回放。看板读取已保存的预测，不重新训练或调参。"))
+    return station, when, rule, events
 
 
-# ---------------------------------------------------------------------------
-# Tabs
-# ---------------------------------------------------------------------------
 def early_warning_section(stage7: dict | None, rule: str) -> None:
-    st.subheader("Early-warning record on the test split")
+    st.subheader(tr("Early-warning record on the test split"))
     if not stage7:
         st.info("Run `python src/07_system_analysis.py` to produce "
                 "`models/metrics_stage7.json`; this section reads it.")
@@ -709,13 +1090,13 @@ def early_warning_section(stage7: dict | None, rule: str) -> None:
     mine = summary["rules"][rule]
     lag = summary["index_lag_h"]
     c1, c2, c3, c4 = st.columns(4)
-    c1.metric("High-risk onsets", f"{summary['n_onsets']}")
+    c1.metric(tr("High-risk onsets"), f"{summary['n_onsets']}")
     c1.caption("Three receptor nodes")
-    c2.metric("Alert before onset", f"{mine['share_alert_before_onset']:.0%}")
+    c2.metric(tr("Alert before onset"), f"{mine['share_alert_before_onset']:.0%}")
     c2.caption(f"{mine['share_full_horizon']:.0%} at the full {HORIZON_H} h")
-    c3.metric("24 h mean lags by", f"{lag['median']:.0f} h" if lag else "n/a")
+    c3.metric(tr("24 h mean lags by"), f"{lag['median']:.0f} h" if lag else "n/a")
     c3.caption(f"Median over {lag['n']} onsets it reached" if lag else "No comparable onset")
-    c4.metric("Fresh alerts confirmed",
+    c4.metric(tr("Fresh alerts confirmed"),
               f"{mine['alert_precision']:.0%}" if mine["alert_precision"] is not None else "n/a")
     c4.caption(f"Of {mine['alert_onsets']} alert onsets")
     show(fig_lead_counts(mine["lead_counts"]))
@@ -770,31 +1151,29 @@ def early_warning_section(stage7: dict | None, rule: str) -> None:
 
 
 def tab_risk(station: pd.DataFrame, when: pd.Timestamp, rule: str, ref: dict,
-             benchmark: pd.DataFrame | None, stage7: dict | None) -> None:
+             benchmark: pd.DataFrame | None, stage7: dict | None, events: list[dict]) -> None:
     row = station[station["timestamp"] == when].iloc[0]
     column = RULES[rule]["column"]
     predicted = int(row[column])
+    banner(row, predicted, ref, when)
     c1, c2, c3, c4 = st.columns(4)
     if pd.notna(row["pm2_5"]):
         current = int(np.searchsorted(LEVEL_THRESHOLDS, row["pm2_5"], side="right"))
-        c1.metric("PM2.5 now", f"{row['pm2_5']:.0f} µg/m³")
+        c1.metric(tr("PM2.5 now"), f"{row['pm2_5']:.0f} µg/m³")
         c1.caption(level_label(current))
     else:
-        c1.metric("PM2.5 now", "n/a")
-    c2.metric(f"Forecast level in {HORIZON_H} h", level_label(predicted))
+        c1.metric(tr("PM2.5 now"), "n/a")
+    c2.metric(tr(f"Forecast level in {HORIZON_H} h"), level_label(predicted))
     c2.caption(RULES[rule]["label"])
-    c3.metric(f"Forecast PM2.5 in {HORIZON_H} h", f"{row['reg']:.0f} µg/m³")
+    c3.metric(tr(f"Forecast PM2.5 in {HORIZON_H} h"), f"{row['reg']:.0f} µg/m³")
     if "cal_lo" in row and pd.notna(row["cal_lo"]):
         c3.caption(f"90% target interval {row['cal_lo']:.0f} to {row['cal_hi']:.0f} µg/m³")
     else:
         c3.caption(f"Tree spread {row['q05']:.0f} to {row['q95']:.0f} µg/m³")
-    c4.metric("What happened (replay)", level_label(int(row["y_true"])))
+    c4.metric(tr("What happened (replay)"), level_label(int(row["y_true"])))
     c4.caption("Forecast level was correct" if predicted == int(row["y_true"])
                else f"Forecast was off by {abs(predicted - int(row['y_true']))} level(s)")
 
-    st.markdown(f"**Advice for {level_label(predicted)}:** {ADVICE[predicted]}")
-    grade, why = reliability_note(row, ref)
-    st.info(f"**{grade}.** This forecast was issued at {when:%d %b %Y %H:%M}: {why}")
 
     win = window_rows(station, when, 72)
     show(fig_timeline(win, when, show_band=False, show_mean=True))
@@ -823,6 +1202,8 @@ def tab_risk(station: pd.DataFrame, when: pd.Timestamp, rule: str, ref: dict,
             show(fig_map(snap, when))
             st.caption("Each point is a CAMS model grid cell, not a ground monitoring station.")
 
+    episode_cards(station, events, rule)
+    unusual_now(str(row["station_id"]), when)
     early_warning_section(stage7, rule)
 
 
@@ -831,7 +1212,7 @@ def tab_probability(station: pd.DataFrame, when: pd.Timestamp, preds: pd.DataFra
     row = station[station["timestamp"] == when].iloc[0]
     thresholds = load_thresholds()
     tau = thresholds["thresholds"]
-    st.subheader("Four-level probability")
+    st.subheader(tr("Four-level probability"))
     left, right = st.columns(2)
     with left:
         show(fig_probabilities(row))
@@ -840,8 +1221,8 @@ def tab_probability(station: pd.DataFrame, when: pd.Timestamp, preds: pd.DataFra
         st.caption("M7 walks up the levels and stops at the first question that fails.")
 
     calibrated = interval_label()
-    st.subheader("Concentration and prediction interval" if calibrated
-                 else "Concentration and tree spread")
+    st.subheader(tr("Concentration and prediction interval" if calibrated
+                    else "Concentration and tree spread"))
     win = window_rows(station, when, 72)
     show(fig_timeline(win, when, show_band=True))
     if calibrated:
@@ -856,7 +1237,7 @@ def tab_probability(station: pd.DataFrame, when: pd.Timestamp, preds: pd.DataFra
                 f"{test['PICP']:.1%} of outcomes with a mean width of {test['MPIW']:.1f} µg/m³.")
 
     if stage7:
-        st.subheader("Are the probabilities calibrated?")
+        st.subheader(tr("Are the probabilities calibrated?"))
         level = st.radio("Question", [1, 2, 3], index=1, horizontal=True,
                          format_func=lambda k: f"Level at least L{k}")
         blocks = {split: stage7["calibration"][split][f"level_ge_{level}"]
@@ -879,7 +1260,7 @@ def tab_probability(station: pd.DataFrame, when: pd.Timestamp, preds: pd.DataFra
                 st.dataframe(pd.DataFrame(blocks["test"]["bins"]).assign(split="test"),
                              use_container_width=True, hide_index=True)
 
-    st.subheader("Threshold trade-off (validation split only)")
+    st.subheader(tr("Threshold trade-off (validation split only)"))
     st.caption("Move the three thresholds to see what the cost-sensitive rule trades away. "
                "This uses validation rows only; the test split is never touched here.")
     val = preds[preds["split"] == "val"]
@@ -935,11 +1316,11 @@ def tab_models(benchmark: pd.DataFrame | None, stage7: dict | None) -> None:
 
     m7 = load_json_or_none("m7_test_metrics.json")
     if m7:
-        st.subheader("Three decisions on the same M6 probabilities (test)")
+        st.subheader(tr("Three decisions on the same M6 probabilities (test)"))
         st.dataframe(pd.DataFrame(m7["metrics"]).T[list(METRICS)].style.format("{:.4f}"),
                      use_container_width=True)
     if stage7:
-        st.subheader("Where the concentration forecast is off (M5, test)")
+        st.subheader(tr("Where the concentration forecast is off (M5, test)"))
         anatomy = stage7["error_anatomy"]["test"]
         left, right = st.columns([1, 1.3])
         with left:
@@ -954,7 +1335,7 @@ def tab_models(benchmark: pd.DataFrame | None, stage7: dict | None) -> None:
             st.caption(stage7["definitions"]["error"] + " " + stage7["definitions"]["trend"]
                        + " Persistence MAE is the error of repeating the current value.")
 
-    st.subheader("Asymmetric cost matrix")
+    st.subheader(tr("Asymmetric cost matrix"))
     cost = pd.DataFrame(DEFAULT_COST_MATRIX,
                         index=[f"true {level_label(k)}" for k in range(4)],
                         columns=[f"pred {level_label(k)}" for k in range(4)])
@@ -964,7 +1345,7 @@ def tab_models(benchmark: pd.DataFrame | None, stage7: dict | None) -> None:
 
 def m8_section() -> None:
     """M8 against its own v1 counterpart only: same recipe, different feature table."""
-    st.subheader("M8 · v2 control for known defect KD-01")
+    st.subheader(tr("M8 · v2 control for known defect KD-01"))
     defects = ROOT / "docs" / "known_defects.json"
     kd = None
     if defects.exists():
@@ -1021,7 +1402,7 @@ def tab_explain() -> None:
                 else:
                     missing(f"figures/{name}")
 
-    st.subheader("Leave-one-node-out")
+    st.subheader(tr("Leave-one-node-out"))
     loso = load_table("loso_results.csv")
     if loso is None:
         missing("models/loso_results.csv")
@@ -1032,7 +1413,7 @@ def tab_explain() -> None:
         with st.expander("Table view"):
             st.dataframe(loso, use_container_width=True, hide_index=True)
 
-    st.subheader("Seasonal slices of the 2026 hold-out")
+    st.subheader(tr("Seasonal slices of the 2026 hold-out"))
     seasonal = load_table("seasonal_metrics.csv")
     if seasonal is None:
         missing("models/seasonal_metrics.csv")
@@ -1045,9 +1426,15 @@ def tab_explain() -> None:
 # ---------------------------------------------------------------------------
 def main() -> None:
     st.set_page_config(page_title="HazeGuard-KL", layout="wide")
+    dark = preferences()
+    sync_native_theme(dark)
+    apply_palette(dark)
+    inject_css()
     st.title("HazeGuard-KL")
-    st.caption(f"Greater Kuala Lumpur PM2.5 risk level, {HORIZON_H} hours ahead. "
-               "Inputs are CAMS model products from Open-Meteo, not ground measurements.")
+    st.caption(L(f"Greater Kuala Lumpur PM2.5 risk level, {HORIZON_H} hours ahead. "
+                 "Inputs are CAMS model products from Open-Meteo, not ground measurements.",
+                 f"大吉隆坡 PM2.5 风险等级，提前 {HORIZON_H} 小时。"
+                 "输入为 Open-Meteo 提供的 CAMS 模式产品，不是地面实测。"))
 
     preds = load_predictions()
     obs = load_observations()
@@ -1060,21 +1447,25 @@ def main() -> None:
         st.error(problem)
 
     stage7 = load_json_or_none("metrics_stage7.json")
-    station, when, rule = sidebar(data, stage7)
+    station, when, rule, events = sidebar(data, stage7)
     benchmark = load_table("all_models_benchmark.csv")
     ref = reliability_reference(preds)
+    playback_bar(station, when, rule)
 
-    t1, t2, t3, t4 = st.tabs([
-        f"Risk now and in {HORIZON_H} h", "Probability and spread",
-        "Model comparison", "Explanation and generalisation"])
+    t1, t2, t3, t4, t5 = st.tabs([
+        tr(f"Risk now and in {HORIZON_H} h"), tr("Probability and interval"),
+        tr("Model comparison"), tr("Explanation and generalisation"), tr("Method and limits")])
     with t1:
-        tab_risk(station, when, rule, ref, benchmark, stage7)
+        tab_risk(station, when, rule, ref, benchmark, stage7, events)
     with t2:
         tab_probability(station, when, preds, stage7)
     with t3:
         tab_models(benchmark, stage7)
     with t4:
         tab_explain()
+    with t5:
+        tab_method()
+    autoplay(station, when)
 
 
 if __name__ == "__main__":
