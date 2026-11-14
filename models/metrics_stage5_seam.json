@@ -1,0 +1,94 @@
+{
+  "generated_at": "2026-11-14T05:33:28.715958+00:00",
+  "git_commit": "5146bc4778297ced0774961a1cae3a6f23093391",
+  "code_sha256": "00e41dc76aa9a988d0ce950eb68aee9f86e8cf5b631e3cd98f0f5e828d105d86",
+  "input_sha256": {
+    "data/features_final.parquet": "64285f40e81c72ab4872d282d52be68401078e8c33dec50134d93e7877d2f55b",
+    "models/selected_features.json": "2d11fd961aedd1fc57ab3036038bfc1d67e0e797cb40fc3e1b2362b568c80d61",
+    "models/metrics_stage5.json": "422486feb1793fc0bcab4cb2523780a548c04c407b35152189e7151bfd45dbfe",
+    "data/feature_manifest.json": "82312de90faa22f00c707ece6e89874117a52463e2f8b8ddf1924d781340f419",
+    "models/stage5_predictions.npz": "1e39eded352d9597eff4c4a85bb49cdca63dbeea32eb9def9c9ad5828826a2c7",
+    "models/ordinal_probs_val_test.npz": "72f3ae5c2b5be13e2f2b8464624272c47592cca26277758dd18ffb3725ba065e"
+  },
+  "model": "M5 official v1 RandomForestRegressor, frozen seed 42",
+  "prediction": "reg_val/reg_test: saved forest mean concentration, before level thresholds",
+  "feature_set": "v1",
+  "unit": "ug/m3",
+  "target": "CAMS PM2.5 at feature time +3h",
+  "timezone": "Asia/Kuala_Lumpur (naive local timestamps)",
+  "groups": {
+    "cross_08": "issue hours 05-07; target hours 08-10",
+    "cross_20": "issue hours 17-19; target hours 20-22",
+    "other_hours": "all remaining issue hours; excludes both seam windows",
+    "not_cross_20": "all issue hours except 17-19; includes cross_08 and other_hours"
+  },
+  "group_overlap": "First three groups partition each split; not_cross_20 is their comparison aggregate.",
+  "rows": [
+    {
+      "split": "val",
+      "group": "cross_08",
+      "n_samples": 2088,
+      "MAE": 6.295613737069147
+    },
+    {
+      "split": "val",
+      "group": "cross_20",
+      "n_samples": 2079,
+      "MAE": 12.204282402280223
+    },
+    {
+      "split": "val",
+      "group": "other_hours",
+      "n_samples": 12489,
+      "MAE": 4.981499771045604
+    },
+    {
+      "split": "val",
+      "group": "not_cross_20",
+      "n_samples": 14577,
+      "MAE": 5.169732600918497
+    },
+    {
+      "split": "test",
+      "group": "cross_08",
+      "n_samples": 2079,
+      "MAE": 10.749801059571572
+    },
+    {
+      "split": "test",
+      "group": "cross_20",
+      "n_samples": 2082,
+      "MAE": 13.734526735450517
+    },
+    {
+      "split": "test",
+      "group": "other_hours",
+      "n_samples": 12486,
+      "MAE": 6.680867278206513
+    },
+    {
+      "split": "test",
+      "group": "not_cross_20",
+      "n_samples": 14565,
+      "MAE": 7.261664623311762
+    }
+  ],
+  "comparison": {
+    "val": {
+      "cross_20_minus_all_other_MAE": 7.034549801361726,
+      "cross_20_over_all_other_MAE": 2.360718308740361
+    },
+    "test": {
+      "cross_20_minus_all_other_MAE": 6.472862112138755,
+      "cross_20_over_all_other_MAE": 1.891374422795463
+    }
+  },
+  "new_model_fits": 0,
+  "new_model_test_predictions": 0,
+  "csv_sha256": "7e40e54e9ef409c510c2326d187835ba9491d8121b9f7fa95917ffec88b4cc81",
+  "limitations": [
+    "Post-hoc descriptive slicing of previously evaluated validation/test predictions.",
+    "Raw MAE differences do not establish causality or statistical significance.",
+    "No adjustment for concentration, season or serial/spatial dependence; target is a CAMS model product."
+  ]
+}
