@@ -3,17 +3,17 @@
   "feature_set": "v2",
   "role": "control for known defect KD-01; not part of the v1 main table",
   "recipe": "M5_val_tuned (RandomForestRegressor, tree mean, cut points searched on validation seed 42 and fixed for seeds 43/44)",
-  "generated_at": "2026-11-14T03:53:40.178824+00:00",
-  "git_commit": "b81d2770464eff56962190dc8c56e8b2f3fcdab6",
+  "generated_at": "2026-11-14T03:36:52.989975+00:00",
+  "git_commit": "7556f24d78b9ef158f794b72d8c26f26186efaa9",
   "code_sha256": {
-    "07_m8_v2_control.py": "24dae78106caf84eeb7f2f9dfd43493c5287fa7c4526211e881c4727a229b002",
+    "07_m8_v2_control.py": "7f7a80a258d3bd5901c9a46d9b1ecd4f5c992135a8afac4b53e4fa3538f7bb1c",
     "05_reg_to_cls.py": "de9e119d0af089f15a1898f68b68c0e10a4f5f1cf2d13577702f5f4a9deb21f1",
     "utils_metrics.py": "b0bcc02975ba7d23ad1d503bba40c2d4c86a0cdffa835613d71a4da5e95749f3",
     "config.py": "362b8e51c41d5f31af2ed83fdaf82caeb493f802f3ff313f6e0b5ba0b44e9e7c"
   },
   "input_sha256": {
     "features_final_v2": "cadbe163b43917c421070298f1de9f978358274989362e80a258043fd360c78a",
-    "selected_features_v2": "f7ca32e3dec4a0a56c538e990821ffafa54649422d0bb1e536a7c92befa46922"
+    "selected_features_v2": "08f71faf05e6238429441909407ca5313bfd809fc01dcb97da8fa683096aadcf"
   },
   "hyperparameters": {
     "n_estimators": 100,
@@ -63,118 +63,118 @@
     {
       "seed": 42,
       "M8": {
-        "Macro_F1": 0.7247,
-        "Balanced_Accuracy": 0.7344,
-        "High_Risk_Recall": 0.8614,
-        "MAOE": 0.2611,
-        "Severe_Jumping_Error_Rate": 0.0074,
-        "Avg_Asymmetric_Cost": 0.5522,
+        "Macro_F1": 0.7252,
+        "Balanced_Accuracy": 0.7349,
+        "High_Risk_Recall": 0.861,
+        "MAOE": 0.2607,
+        "Severe_Jumping_Error_Rate": 0.0072,
+        "Avg_Asymmetric_Cost": 0.5523,
         "n_samples": 16656,
         "n_high_risk": 4842,
-        "diag_High_Risk_Exact_Recall": 0.6714,
+        "diag_High_Risk_Exact_Recall": 0.6722,
         "diag_Level3_Recall": 0.7299
       },
       "M8_fixed_cuts": {
-        "Macro_F1": 0.7172,
-        "Balanced_Accuracy": 0.6995,
-        "High_Risk_Recall": 0.8094,
-        "MAOE": 0.2547,
-        "Severe_Jumping_Error_Rate": 0.0065,
-        "Avg_Asymmetric_Cost": 0.5892,
+        "Macro_F1": 0.7176,
+        "Balanced_Accuracy": 0.6997,
+        "High_Risk_Recall": 0.8096,
+        "MAOE": 0.2541,
+        "Severe_Jumping_Error_Rate": 0.0063,
+        "Avg_Asymmetric_Cost": 0.5885,
         "n_samples": 16656,
         "n_high_risk": 4842,
-        "diag_High_Risk_Exact_Recall": 0.6227,
-        "diag_Level3_Recall": 0.6625
+        "diag_High_Risk_Exact_Recall": 0.6231,
+        "diag_Level3_Recall": 0.6619
       }
     },
     {
       "seed": 43,
       "M8": {
-        "Macro_F1": 0.7242,
-        "Balanced_Accuracy": 0.7339,
-        "High_Risk_Recall": 0.8602,
-        "MAOE": 0.2616,
-        "Severe_Jumping_Error_Rate": 0.0076,
-        "Avg_Asymmetric_Cost": 0.557,
+        "Macro_F1": 0.7253,
+        "Balanced_Accuracy": 0.735,
+        "High_Risk_Recall": 0.8614,
+        "MAOE": 0.2606,
+        "Severe_Jumping_Error_Rate": 0.0074,
+        "Avg_Asymmetric_Cost": 0.5549,
         "n_samples": 16656,
         "n_high_risk": 4842,
-        "diag_High_Risk_Exact_Recall": 0.6702,
-        "diag_Level3_Recall": 0.7247
+        "diag_High_Risk_Exact_Recall": 0.6722,
+        "diag_Level3_Recall": 0.7242
       },
       "M8_fixed_cuts": {
-        "Macro_F1": 0.7193,
-        "Balanced_Accuracy": 0.7012,
-        "High_Risk_Recall": 0.8094,
-        "MAOE": 0.2523,
-        "Severe_Jumping_Error_Rate": 0.0061,
-        "Avg_Asymmetric_Cost": 0.5854,
+        "Macro_F1": 0.7177,
+        "Balanced_Accuracy": 0.6999,
+        "High_Risk_Recall": 0.809,
+        "MAOE": 0.2537,
+        "Severe_Jumping_Error_Rate": 0.0064,
+        "Avg_Asymmetric_Cost": 0.5886,
         "n_samples": 16656,
         "n_high_risk": 4842,
-        "diag_High_Risk_Exact_Recall": 0.6241,
-        "diag_Level3_Recall": 0.6648
+        "diag_High_Risk_Exact_Recall": 0.6216,
+        "diag_Level3_Recall": 0.6619
       }
     },
     {
       "seed": 44,
       "M8": {
-        "Macro_F1": 0.7234,
-        "Balanced_Accuracy": 0.7325,
-        "High_Risk_Recall": 0.8591,
+        "Macro_F1": 0.7233,
+        "Balanced_Accuracy": 0.7328,
+        "High_Risk_Recall": 0.8598,
         "MAOE": 0.2622,
-        "Severe_Jumping_Error_Rate": 0.007,
+        "Severe_Jumping_Error_Rate": 0.0073,
         "Avg_Asymmetric_Cost": 0.559,
         "n_samples": 16656,
         "n_high_risk": 4842,
-        "diag_High_Risk_Exact_Recall": 0.6694,
+        "diag_High_Risk_Exact_Recall": 0.6687,
         "diag_Level3_Recall": 0.7224
       },
       "M8_fixed_cuts": {
-        "Macro_F1": 0.7191,
-        "Balanced_Accuracy": 0.7016,
-        "High_Risk_Recall": 0.8106,
-        "MAOE": 0.2537,
-        "Severe_Jumping_Error_Rate": 0.0065,
-        "Avg_Asymmetric_Cost": 0.5863,
+        "Macro_F1": 0.7187,
+        "Balanced_Accuracy": 0.7014,
+        "High_Risk_Recall": 0.8108,
+        "MAOE": 0.2534,
+        "Severe_Jumping_Error_Rate": 0.0062,
+        "Avg_Asymmetric_Cost": 0.5866,
         "n_samples": 16656,
         "n_high_risk": 4842,
-        "diag_High_Risk_Exact_Recall": 0.6264,
-        "diag_Level3_Recall": 0.6653
+        "diag_High_Risk_Exact_Recall": 0.6245,
+        "diag_Level3_Recall": 0.663
       }
     }
   ],
   "validation_mean_std": {
     "Macro_F1": {
-      "mean": 0.7241,
-      "std": 0.000656
+      "mean": 0.7246,
+      "std": 0.001127
     },
     "Balanced_Accuracy": {
-      "mean": 0.7336,
-      "std": 0.000985
+      "mean": 0.734233,
+      "std": 0.001242
     },
     "High_Risk_Recall": {
-      "mean": 0.860233,
-      "std": 0.00115
+      "mean": 0.860733,
+      "std": 0.000833
     },
     "MAOE": {
-      "mean": 0.261633,
-      "std": 0.000551
+      "mean": 0.261167,
+      "std": 0.000896
     },
     "Severe_Jumping_Error_Rate": {
-      "mean": 0.007333,
-      "std": 0.000306
+      "mean": 0.0073,
+      "std": 0.0001
     },
     "Avg_Asymmetric_Cost": {
-      "mean": 0.556067,
-      "std": 0.003495
+      "mean": 0.5554,
+      "std": 0.003378
     }
   },
   "validation_delta_vs_M5_val_tuned": {
-    "Macro_F1": 0.004567,
-    "Balanced_Accuracy": 0.0102,
-    "High_Risk_Recall": 0.0002,
-    "MAOE": -0.002767,
-    "Severe_Jumping_Error_Rate": 0.001233,
-    "Avg_Asymmetric_Cost": -0.031066
+    "Macro_F1": 0.005067,
+    "Balanced_Accuracy": 0.010833,
+    "High_Risk_Recall": 0.0007,
+    "MAOE": -0.003233,
+    "Severe_Jumping_Error_Rate": 0.0012,
+    "Avg_Asymmetric_Cost": -0.031733
   },
   "m5_reference": {
     "source": "models/metrics_stage5.json",
@@ -223,8 +223,54 @@
       55.0
     ]
   },
-  "seed42_validation_prediction_sha256": "b9628d545ac787181faca1e3070b8ed13c61a9928027b04c67add39b0c7128ae",
-  "test_evaluation_count": 0,
-  "test_metrics_seed42": null,
-  "note": "Validation only so far. Test labels have not been read."
+  "seed42_validation_prediction_sha256": "14b7ef982d5546908a093c4c92d6997208a61bca2b5571cd3a760b320ca0306c",
+  "test_evaluation_count": 1,
+  "test_metrics_seed42": {
+    "Macro_F1": 0.7109,
+    "Balanced_Accuracy": 0.7177,
+    "High_Risk_Recall": 0.877,
+    "MAOE": 0.2852,
+    "Severe_Jumping_Error_Rate": 0.0106,
+    "Avg_Asymmetric_Cost": 0.6711,
+    "n_samples": 16647,
+    "n_high_risk": 6848,
+    "diag_High_Risk_Exact_Recall": 0.689,
+    "diag_Level3_Recall": 0.7593
+  },
+  "note": "Single test pass. Cut points and hyperparameters were fixed before it.",
+  "test_started_at": "2026-11-14T03:55:10.197511+00:00",
+  "test_n_samples": 16647,
+  "test_delta_vs_M5_val_tuned": {
+    "Macro_F1": 0.0031,
+    "Balanced_Accuracy": 0.006,
+    "High_Risk_Recall": -0.0018,
+    "MAOE": -0.0021,
+    "Severe_Jumping_Error_Rate": 0.0015,
+    "Avg_Asymmetric_Cost": -0.0372
+  },
+  "test_finished_at": "2026-11-14T03:55:10.254165+00:00",
+  "predictions_file": "models/m8_predictions.npz",
+  "environment": {
+    "python": "3.10.11",
+    "numpy": "1.24.3",
+    "pandas": "2.3.3",
+    "sklearn": "1.7.2",
+    "platform": "Windows"
+  },
+  "environment_note": "Recorded after the run from the runner's report (the script version used did not log versions). Differs from the project lock (sklearn 1.9.0, numpy 2.4.6, pandas 3.0.3) used for M5. A validation-only rerun of the same script on another machine gave Macro_F1 0.7241 and Avg_Asymmetric_Cost 0.5561 against 0.7246 and 0.5554 here; the environment effect is about a tenth of the v2-minus-v1 effect. The test split was evaluated once, here, and is not rerun.",
+  "crosscheck_validation_other_machine": {
+    "source": "member 1, main 4562af0 models/metrics_m8.json (validation only)",
+    "Macro_F1": 0.7241,
+    "Balanced_Accuracy": 0.7336,
+    "High_Risk_Recall": 0.8602,
+    "MAOE": 0.2616,
+    "Severe_Jumping_Error_Rate": 0.0073,
+    "Avg_Asymmetric_Cost": 0.5561,
+    "val_tuned_thresholds": [
+      17.0,
+      33.0,
+      53.0
+    ]
+  },
+  "hash_note": "code and selected_features_v2 hashes in this record were taken on a Windows CRLF checkout; with CRLF folded to LF they equal the repository files"
 }

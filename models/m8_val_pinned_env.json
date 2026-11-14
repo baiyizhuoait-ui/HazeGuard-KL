@@ -1,0 +1,239 @@
+{
+  "model": "M8",
+  "feature_set": "v2",
+  "role": "validation-only replication of M8 in the pinned environment (Python 3.14.6 / scikit-learn 1.9.0); used to separate the library-version effect from the feature-table effect. The official M8 record is models/metrics_m8.json.",
+  "recipe": "M5_val_tuned (RandomForestRegressor, tree mean, cut points searched on validation seed 42 and fixed for seeds 43/44)",
+  "generated_at": "2026-11-14T03:53:40.178824+00:00",
+  "git_commit": "b81d2770464eff56962190dc8c56e8b2f3fcdab6",
+  "code_sha256": {
+    "07_m8_v2_control.py": "24dae78106caf84eeb7f2f9dfd43493c5287fa7c4526211e881c4727a229b002",
+    "05_reg_to_cls.py": "de9e119d0af089f15a1898f68b68c0e10a4f5f1cf2d13577702f5f4a9deb21f1",
+    "utils_metrics.py": "b0bcc02975ba7d23ad1d503bba40c2d4c86a0cdffa835613d71a4da5e95749f3",
+    "config.py": "362b8e51c41d5f31af2ed83fdaf82caeb493f802f3ff313f6e0b5ba0b44e9e7c"
+  },
+  "input_sha256": {
+    "features_final_v2": "cadbe163b43917c421070298f1de9f978358274989362e80a258043fd360c78a",
+    "selected_features_v2": "f7ca32e3dec4a0a56c538e990821ffafa54649422d0bb1e536a7c92befa46922"
+  },
+  "hyperparameters": {
+    "n_estimators": 100,
+    "max_depth": 14,
+    "min_samples_leaf": 10,
+    "max_features": 0.5
+  },
+  "hyperparameter_source": "models/stage5_selection.json",
+  "features": [
+    "pm2_5",
+    "pm10",
+    "pm2_5_mean_3h",
+    "hour_sin",
+    "pm2_5_lag_1",
+    "no2",
+    "pm10_lag_1",
+    "pm2_5_change_3h",
+    "gran_up_6h",
+    "so2",
+    "spatial_pm25_gradient",
+    "no2_lag_12",
+    "pm2_5_slope_6h",
+    "gran_low_6h",
+    "gran_slope_12h",
+    "pm2_5_mean_6h",
+    "no2_lag_6",
+    "relative_humidity_2m_lag_3",
+    "o3",
+    "temperature_2m",
+    "co",
+    "no2_lag_24",
+    "far_source_pm25_mean_24h",
+    "no2_lag_2",
+    "hour_cos"
+  ],
+  "seeds": [
+    42,
+    43,
+    44
+  ],
+  "val_tuned_thresholds": [
+    17.0,
+    33.0,
+    53.0
+  ],
+  "validation_seed_runs": [
+    {
+      "seed": 42,
+      "M8": {
+        "Macro_F1": 0.7247,
+        "Balanced_Accuracy": 0.7344,
+        "High_Risk_Recall": 0.8614,
+        "MAOE": 0.2611,
+        "Severe_Jumping_Error_Rate": 0.0074,
+        "Avg_Asymmetric_Cost": 0.5522,
+        "n_samples": 16656,
+        "n_high_risk": 4842,
+        "diag_High_Risk_Exact_Recall": 0.6714,
+        "diag_Level3_Recall": 0.7299
+      },
+      "M8_fixed_cuts": {
+        "Macro_F1": 0.7172,
+        "Balanced_Accuracy": 0.6995,
+        "High_Risk_Recall": 0.8094,
+        "MAOE": 0.2547,
+        "Severe_Jumping_Error_Rate": 0.0065,
+        "Avg_Asymmetric_Cost": 0.5892,
+        "n_samples": 16656,
+        "n_high_risk": 4842,
+        "diag_High_Risk_Exact_Recall": 0.6227,
+        "diag_Level3_Recall": 0.6625
+      }
+    },
+    {
+      "seed": 43,
+      "M8": {
+        "Macro_F1": 0.7242,
+        "Balanced_Accuracy": 0.7339,
+        "High_Risk_Recall": 0.8602,
+        "MAOE": 0.2616,
+        "Severe_Jumping_Error_Rate": 0.0076,
+        "Avg_Asymmetric_Cost": 0.557,
+        "n_samples": 16656,
+        "n_high_risk": 4842,
+        "diag_High_Risk_Exact_Recall": 0.6702,
+        "diag_Level3_Recall": 0.7247
+      },
+      "M8_fixed_cuts": {
+        "Macro_F1": 0.7193,
+        "Balanced_Accuracy": 0.7012,
+        "High_Risk_Recall": 0.8094,
+        "MAOE": 0.2523,
+        "Severe_Jumping_Error_Rate": 0.0061,
+        "Avg_Asymmetric_Cost": 0.5854,
+        "n_samples": 16656,
+        "n_high_risk": 4842,
+        "diag_High_Risk_Exact_Recall": 0.6241,
+        "diag_Level3_Recall": 0.6648
+      }
+    },
+    {
+      "seed": 44,
+      "M8": {
+        "Macro_F1": 0.7234,
+        "Balanced_Accuracy": 0.7325,
+        "High_Risk_Recall": 0.8591,
+        "MAOE": 0.2622,
+        "Severe_Jumping_Error_Rate": 0.007,
+        "Avg_Asymmetric_Cost": 0.559,
+        "n_samples": 16656,
+        "n_high_risk": 4842,
+        "diag_High_Risk_Exact_Recall": 0.6694,
+        "diag_Level3_Recall": 0.7224
+      },
+      "M8_fixed_cuts": {
+        "Macro_F1": 0.7191,
+        "Balanced_Accuracy": 0.7016,
+        "High_Risk_Recall": 0.8106,
+        "MAOE": 0.2537,
+        "Severe_Jumping_Error_Rate": 0.0065,
+        "Avg_Asymmetric_Cost": 0.5863,
+        "n_samples": 16656,
+        "n_high_risk": 4842,
+        "diag_High_Risk_Exact_Recall": 0.6264,
+        "diag_Level3_Recall": 0.6653
+      }
+    }
+  ],
+  "validation_mean_std": {
+    "Macro_F1": {
+      "mean": 0.7241,
+      "std": 0.000656
+    },
+    "Balanced_Accuracy": {
+      "mean": 0.7336,
+      "std": 0.000985
+    },
+    "High_Risk_Recall": {
+      "mean": 0.860233,
+      "std": 0.00115
+    },
+    "MAOE": {
+      "mean": 0.261633,
+      "std": 0.000551
+    },
+    "Severe_Jumping_Error_Rate": {
+      "mean": 0.007333,
+      "std": 0.000306
+    },
+    "Avg_Asymmetric_Cost": {
+      "mean": 0.556067,
+      "std": 0.003495
+    }
+  },
+  "validation_delta_vs_M5_val_tuned": {
+    "Macro_F1": 0.004567,
+    "Balanced_Accuracy": 0.0102,
+    "High_Risk_Recall": 0.0002,
+    "MAOE": -0.002767,
+    "Severe_Jumping_Error_Rate": 0.001233,
+    "Avg_Asymmetric_Cost": -0.031066
+  },
+  "m5_reference": {
+    "source": "models/metrics_stage5.json",
+    "feature_set": "v1",
+    "validation_mean_std": {
+      "Macro_F1": {
+        "mean": 0.7195333333333332,
+        "std": 0.001665332799572954
+      },
+      "Balanced_Accuracy": {
+        "mean": 0.7234000000000002,
+        "std": 0.0020808652046684787
+      },
+      "High_Risk_Recall": {
+        "mean": 0.8600333333333333,
+        "std": 0.0010692676621563539
+      },
+      "MAOE": {
+        "mean": 0.26439999999999997,
+        "std": 0.001708800749063513
+      },
+      "Severe_Jumping_Error_Rate": {
+        "mean": 0.0061,
+        "std": 0.00026457513110645926
+      },
+      "Avg_Asymmetric_Cost": {
+        "mean": 0.5871333333333334,
+        "std": 0.003758102358017058
+      }
+    },
+    "test_seed42": {
+      "Macro_F1": 0.7078,
+      "Balanced_Accuracy": 0.7117,
+      "High_Risk_Recall": 0.8788,
+      "MAOE": 0.2873,
+      "Severe_Jumping_Error_Rate": 0.0091,
+      "Avg_Asymmetric_Cost": 0.7083,
+      "n_samples": 16647,
+      "n_high_risk": 6848,
+      "diag_High_Risk_Exact_Recall": 0.6853,
+      "diag_Level3_Recall": 0.7085
+    },
+    "val_tuned_thresholds": [
+      17.0,
+      33.0,
+      55.0
+    ]
+  },
+  "seed42_validation_prediction_sha256": "b9628d545ac787181faca1e3070b8ed13c61a9928027b04c67add39b0c7128ae",
+  "test_evaluation_count": 0,
+  "test_metrics_seed42": null,
+  "note": "Validation only, no test pass. Kept so that the M5 -> M8 comparison can be made inside one environment; see models/runtime_environments.json.",
+  "superseded_by": "models/metrics_m8.json",
+  "runtime": {
+    "python": "3.14.6",
+    "scikit_learn": "1.9.0",
+    "numpy": "2.4.6",
+    "pandas": "3.0.3",
+    "scipy": "1.18.0",
+    "joblib": "1.5.3"
+  }
+}
