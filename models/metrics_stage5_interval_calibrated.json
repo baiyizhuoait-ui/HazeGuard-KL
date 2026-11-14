@@ -1,0 +1,115 @@
+{
+  "method": "validation absolute residual about frozen M5 tree median",
+  "nominal_coverage": 0.9,
+  "half_width": 13.820877192982458,
+  "calibration_sha256": "219fb81218dd30139314e7ec8b6ae9aacfa377cbe94cbf0a83f7c636ee689ba2",
+  "unit": "ug/m3",
+  "new_model_fits": 0,
+  "new_model_test_predictions": 0,
+  "limitations": [
+    "Post-selection calibration: validation was also used for model selection.",
+    "Temporally dependent data: exchangeability and 90% future coverage are not guaranteed.",
+    "Original test coverage was already known; this is a post-hoc extension, not a new blind test."
+  ],
+  "val": {
+    "raw_tree_spread": {
+      "PICP": 0.7179995196926032,
+      "MPIW": 16.47881955312277,
+      "n_samples": 16656
+    },
+    "calibrated": {
+      "PICP": 0.9000960614793467,
+      "MPIW": 27.08278525907782,
+      "n_samples": 16656
+    },
+    "by_node": {
+      "KL_City": {
+        "raw_tree_spread": {
+          "PICP": 0.6970461095100865,
+          "MPIW": 20.402425983853554,
+          "n_samples": 5552
+        },
+        "calibrated": {
+          "PICP": 0.8451008645533141,
+          "MPIW": 27.530985811698173,
+          "n_samples": 5552
+        }
+      },
+      "Port_Klang": {
+        "raw_tree_spread": {
+          "PICP": 0.7451368876080692,
+          "MPIW": 10.732993792702672,
+          "n_samples": 5552
+        },
+        "calibrated": {
+          "PICP": 0.9827089337175793,
+          "MPIW": 26.21745250463833,
+          "n_samples": 5552
+        }
+      },
+      "Sepang": {
+        "raw_tree_spread": {
+          "PICP": 0.7118155619596542,
+          "MPIW": 18.30103888281208,
+          "n_samples": 5552
+        },
+        "calibrated": {
+          "PICP": 0.872478386167147,
+          "MPIW": 27.49991746089695,
+          "n_samples": 5552
+        }
+      }
+    }
+  },
+  "test": {
+    "raw_tree_spread": {
+      "PICP": 0.7182675557157446,
+      "MPIW": 20.787659945934625,
+      "n_samples": 16647
+    },
+    "calibrated": {
+      "PICP": 0.8341442902625098,
+      "MPIW": 27.425517435591466,
+      "n_samples": 16647
+    },
+    "by_node": {
+      "KL_City": {
+        "raw_tree_spread": {
+          "PICP": 0.6864299873851144,
+          "MPIW": 25.08144978760066,
+          "n_samples": 5549
+        },
+        "calibrated": {
+          "PICP": 0.7561722832942872,
+          "MPIW": 27.614449925886053,
+          "n_samples": 5549
+        }
+      },
+      "Port_Klang": {
+        "raw_tree_spread": {
+          "PICP": 0.7572535591998558,
+          "MPIW": 15.591355357983868,
+          "n_samples": 5549
+        },
+        "calibrated": {
+          "PICP": 0.9306181293926834,
+          "MPIW": 27.067202881146482,
+          "n_samples": 5549
+        }
+      },
+      "Sepang": {
+        "raw_tree_spread": {
+          "PICP": 0.7111191205622635,
+          "MPIW": 21.690174692219347,
+          "n_samples": 5549
+        },
+        "calibrated": {
+          "PICP": 0.8156424581005587,
+          "MPIW": 27.594899499741864,
+          "n_samples": 5549
+        }
+      }
+    }
+  },
+  "intervals_sha256": "8428f0be577e3b20218ece5018ecb92bcb47a602e88d798198f0f14510121f95"
+}

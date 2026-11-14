@@ -1,0 +1,25 @@
+{
+  "nominal_coverage": 0.9,
+  "half_width": 13.820877192982458,
+  "n_calibration": 16656,
+  "order_statistic_rank": 14992,
+  "center": "median of M5 individual tree predictions",
+  "lower_bound": "max(0, median - half_width)",
+  "upper_bound": "median + half_width",
+  "unit": "ug/m3",
+  "calibration_split": "val",
+  "pooling": "all three receptor nodes",
+  "frozen_at_utc": "2026-11-13T13:43:39.851314+00:00",
+  "source_model": "M5 RandomForestRegressor",
+  "input_sha256": {
+    "features_final": "64285f40e81c72ab4872d282d52be68401078e8c33dec50134d93e7877d2f55b",
+    "selected_features": "2d11fd961aedd1fc57ab3036038bfc1d67e0e797cb40fc3e1b2362b568c80d61"
+  },
+  "source_code_sha256": "7e9929cc436ab702140379e2000092e9d86f0162763da8da6b9cc6d7cee8dbad",
+  "saved_predictions_sha256": "1e39eded352d9597eff4c4a85bb49cdca63dbeea32eb9def9c9ad5828826a2c7",
+  "limitations": [
+    "Post-selection calibration: validation was also used for model selection.",
+    "Temporally dependent data: exchangeability and 90% future coverage are not guaranteed.",
+    "Original test coverage was already known; this is a post-hoc extension, not a new blind test."
+  ]
+}
