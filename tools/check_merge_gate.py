@@ -200,7 +200,8 @@ def feature_pair_check(branch: str) -> tuple[bool, str] | None:
             bad.append(f"{a}/{b} 只进了一个")
     if bad:
         waiver = _waiver_for("周期特征配对")
-        if waiver and "selected_features_v2.json" in paths:
+        has_v2 = any(x.endswith("selected_features_v2.json") for x in paths)
+        if waiver and has_v2:
             return True, (f"WAIVED（{waiver}）：v1 缺配对，v2 已修正并登记，"
                           f"见 docs/known_defects.json")
         return False, "；".join(bad) + f"（共 {len(feats)} 个特征）"
