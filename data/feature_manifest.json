@@ -1,0 +1,31 @@
+{
+  "note": "特征表有两版。v1 是 M0~M7 全部已登记成绩所对应的版本；v2 补了 hour_cos，仅用于 M8 对照。任何一版的内容变化都必须先在这里登记，否则 verify_data 会报错。",
+  "version": "v1",
+  "tables": {
+    "data/features_final.parquet": {
+      "version": "v1",
+      "sha256": "64285f40e81c72ab4872d282d52be68401078e8c33dec50134d93e7877d2f55b",
+      "rows": 111056,
+      "used_by": [
+        "M0",
+        "M1",
+        "M2",
+        "M3",
+        "M4",
+        "M5",
+        "M6",
+        "M7"
+      ],
+      "periodic_encoding": "hour_sin only (known defect KD-01)"
+    },
+    "data/features_final_v2.parquet": {
+      "version": "v2",
+      "sha256": "cadbe163b43917c421070298f1de9f978358274989362e80a258043fd360c78a",
+      "rows": 111056,
+      "used_by": [
+        "M8 (pending)"
+      ],
+      "periodic_encoding": "hour_sin + hour_cos"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "note": "已登记的技术债。闸门遇到这里的条目会显示 WAIVED 而不是 FAIL，但必须在报告里如实披露。登记前先问：这条缺陷有没有被量化、有没有缓解措施。",
+  "items": [
+    {
+      "id": "KD-01",
+      "check": "周期特征配对",
+      "scope": "models/selected_features.json",
+      "description": "v1 特征表只含 hour_sin，24 个钟点塌成 13 个取值，11 组两两同值；其中 04/08 与 16/20 两组正好落在 CAMS 起报接缝（08:00、20:00）上。",
+      "why_accepted": "M0~M7 的全部已登记成绩都基于 v1。改表要重跑 04/05/06 全套并重出图表与看板，代价远大于 0.005 的 Macro-F1 差异。",
+      "mitigation": "models/selected_features_v2.json 与 data/features_final_v2.parquet 已修正并登记指纹；M8 在 v2 上量化该缺陷的影响。",
+      "approved_by": "7 号提议、1 号确认",
+      "declared": "2026-11-14",
+      "review_by": "报告定稿前复查一次，确认 M8 已写入"
+    }
+  ]
+}

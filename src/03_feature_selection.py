@@ -12,9 +12,11 @@
   RFE 按单元淘汰（单元重要性 = 两列之和），最后恰好 25 列。不成对的旧版 Top-25 也照算，作消融对照。
 消融：同一默认 RF、3 个种子，在 val 上评估六项指标（src/utils_metrics.py），附 M0 持续性；
   ① 原始 → ② + 滞后/滚动 → ③ + 空间（近场与远场）→ ④ + 粒化 →
-  ⑤ 旧版 Top-25（不成对）→ ⑥ ⑤ + 缺的那半个周期项 → ⑦ ⑤ + 邻域均值 → ⑧ ⑤ + 两者 → ⑨ 成对 Top-25（交付）。
-邻域均值（只用于消融，不进候选）：按大圆距离取最近 3 个格点（不含自身），同一时刻 PM2.5 的简单平均，
-  不用上风向权重；插值/缺失行不算；可用邻居取平均，一个都没有时用本格点当前值。
+  ⑤ 旧版 Top-25（不成对）→ ⑥ ⑤ + 缺的那半个周期项 → ⑦ ⑤ + 最近 3 格点均值（压缩版，对照）→ ⑧ ⑤ + 两者 →
+  ⑨ 成对 Top-25（交付）→ ⑩ ⑨ + 邻域 50 列 → ⑪ ⑤ + 邻域 50 列 → ⑫ ⑤ + 周期项 + 邻域 50 列。
+邻域特征（QN-002 Q3-2，只用于消融，不进候选、不进最终表）：对另外 25 个格点（不含自身），按大圆距离
+  从近到远排成 nbr01..nbr25，各取 t 时刻 PM2.5 和该格点的 pm2_5_change_3h，共 50 列，不平均、不加权；
+  插值/缺失小时记 NaN（同 2 号屏蔽规则），不填补，交给随机森林的原生缺失值处理。
 
 features_final.parquet 只含 receptor ∧ 合格行，Top-25 全部为有限值（4 号读取时会校验）。
 空间列缺失按下面的规则填，都不拟合任何参数；选择与消融都在填补后的数据上做：
@@ -55,7 +57,7 @@ KEYS, ID_COLS = ["station_id", "timestamp"], ["station_id", "timestamp", "region
 TARGETS = ["target_pm25_3h", "target_level_3h"]
 FAR_MEAN = re.compile(r"far_source_pm25_mean_(\d+)h")
 PAIRS = [("hour_sin", "hour_cos"), ("dayofweek_sin", "dayofweek_cos"), ("month_sin", "month_cos")]
-NBR_K, NBR = 3, "nbr_pm25_mean_k3"
+NBR_K, NBR = 3, "nbr_pm25_mean_k3"     # 对照：最近 3 格点均值（主实现是 50 列原始值）
 
 
 def sha256(path: Path) -> str:
@@ -180,26 +182,52 @@ def paired_rfe(X, y, k):
     return list(final_imp.sort_values(ascending=False).index), final_imp, ranking
 
 
-def neighbour_mean(df, k=NBR_K):
-    """Simple mean of PM2.5 at the same hour over the k nearest grid cells (great-circle, self excluded)."""
+def neighbour_features(df, keep):
+    """QN-002 Q3-2: for each kept receptor row, the raw state of every other grid cell at hour t.
+
+    Cells are ordered by great-circle distance from the receptor (self excluded): nbr01 is the nearest.
+    Per cell: PM2.5 at t (hours flagged interpolated or missing set to NaN, as in stage 2) and the stage 2
+    column pm2_5_change_3h of that cell. No averaging, no upwind weights, no filling (RF handles NaN).
+    """
     st = df.drop_duplicates("station_id").set_index("station_id")[["lat", "lon", "role"]]
     la, lo = np.radians(st["lat"].to_numpy(float)), np.radians(st["lon"].to_numpy(float))
     d = 6371.0 * 2 * np.arcsin(np.sqrt(np.sin((la[:, None] - la) / 2) ** 2
                                        + np.cos(la[:, None]) * np.cos(la) * np.sin((lo[:, None] - lo) / 2) ** 2))
     clean = df["pm2_5"].where(df["qc_interpolated"].eq(0) & df["is_missing"].eq(0))
-    wide = df.assign(_x=clean).pivot(index="timestamp", columns="station_id", values="_x")
-    mean, n_avail, info = pd.Series(np.nan, index=df.index), pd.Series(0, index=df.index), {}
+    wide_pm = df.assign(_x=clean).pivot(index="timestamp", columns="station_id", values="_x")
+    wide_ch = df.pivot(index="timestamp", columns="station_id", values="pm2_5_change_3h")
+    n_other = len(st) - 1
+    cols = [f"nbr{r:02d}_{v}" for r in range(1, n_other + 1) for v in ("pm2_5", "change_3h")]
+    sub = df.loc[keep, ["station_id", "timestamp"]]
+    out, info = pd.DataFrame(np.nan, index=sub.index, columns=cols), {}
     for i, sid in enumerate(st.index):
-        if st["role"].iloc[i] != "receptor":
+        rows = sub["station_id"].eq(sid).to_numpy()
+        if st["role"].iloc[i] != "receptor" or not rows.any():
             continue
-        order = [j for j in np.argsort(d[i]) if j != i][:k]
+        order = [j for j in np.argsort(d[i]) if j != i]
         nb = list(st.index[order])
-        rows = df["station_id"].eq(sid).to_numpy()
-        vals = wide[nb].reindex(df.loc[rows, "timestamp"])
-        mean[rows] = vals.mean(axis=1).to_numpy()
-        n_avail[rows] = vals.notna().sum(axis=1).to_numpy()
-        info[sid] = {"neighbours": nb, "distance_km": [round(float(d[i, j]), 1) for j in order]}
-    return mean, n_avail, info
+        ts = sub.loc[rows, "timestamp"]
+        block = np.empty((int(rows.sum()), 2 * n_other))
+        block[:, 0::2] = wide_pm[nb].reindex(ts).to_numpy()
+        block[:, 1::2] = wide_ch[nb].reindex(ts).to_numpy()
+        out.loc[rows, cols] = block
+        info[sid] = [{"rank": r + 1, "station_id": nb[r], "distance_km": round(float(d[i, j]), 1)}
+                     for r, j in enumerate(order)]
+    return out, info
+
+
+def neighbour_by_cell(df, keep):
+    """Layout check for QN-002: one fixed column per grid cell (26 x 2), the receptor's own cell left NaN."""
+    clean = df["pm2_5"].where(df["qc_interpolated"].eq(0) & df["is_missing"].eq(0))
+    wide = {"pm2_5": df.assign(_x=clean).pivot(index="timestamp", columns="station_id", values="_x"),
+            "change_3h": df.pivot(index="timestamp", columns="station_id", values="pm2_5_change_3h")}
+    sub = df.loc[keep, ["station_id", "timestamp"]]
+    out = {}
+    for sid in wide["pm2_5"].columns:
+        own = sub["station_id"].eq(sid).to_numpy()
+        for kind, w in wide.items():
+            out[f"cell_{sid}_{kind}"] = np.where(own, np.nan, w[sid].reindex(sub["timestamp"]).to_numpy())
+    return pd.DataFrame(out, index=sub.index)
 
 
 def ablate(tr, va, cols, evaluate):
@@ -263,7 +291,6 @@ def main():
     df = pd.read_parquet(feat, columns=list(dict.fromkeys(
         ID_COLS + TARGETS + present + base + ["qc_interpolated", "is_missing"])))
     elig, ok = eligibility(args.repo, df)
-    df[NBR], nbr_avail, nbr_info = neighbour_mean(df)
     gran = pd.read_parquet(gran_path)
     gran_meta = json.loads(pq.read_schema(gran_path).metadata[b"hazeguard"])
     if not (df[KEYS].to_numpy() == gran[KEYS].to_numpy()).all():
@@ -274,16 +301,21 @@ def main():
     df = pd.concat([df, gran[gran_cols]], axis=1)
 
     keep = df["role"].eq("receptor").to_numpy() & ok
-    rec, nbr_avail = df[keep].copy(), nbr_avail[keep]
+    nbr_raw, nbr_info = neighbour_features(df, keep)
+    nbr_cols = list(nbr_raw.columns)
+    nbr_cell = neighbour_by_cell(df, keep)
+    cell_cols = list(nbr_cell.columns)
+    rec = pd.concat([df[keep], nbr_raw, nbr_cell], axis=1)
     new = [c for c in base if c in audit["new_columns"]]
     spatial = [c for c in new if c.startswith(SPATIAL)]
     filled = fill_spatial(rec, spatial)
     split = rec["split"].astype(str)
-    no_nbr = rec[NBR].isna()
-    rec.loc[no_nbr, NBR] = rec.loc[no_nbr, "pm2_5"]
+    near = rec[[f"nbr{r:02d}_pm2_5" for r in range(1, NBR_K + 1)]]
+    rec[NBR] = near.mean(axis=1).fillna(rec["pm2_5"])          # 对照行：最近 3 格点均值，全缺用本格点值
     nbr_counts = {s: {"rows": int(split.eq(s).sum()),
-                      "some_neighbour_missing": int((split.eq(s) & (nbr_avail < NBR_K)).sum()),
-                      "no_neighbour_used_own_value": int((split.eq(s) & no_nbr).sum())}
+                      "rows_with_any_missing_neighbour_value": int((split.eq(s) & rec[nbr_cols].isna().any(axis=1)).sum()),
+                      "missing_fraction_of_50_columns": round(float(rec.loc[split.eq(s), nbr_cols].isna().mean().mean()), 6),
+                      "control_mean_rows_with_no_neighbour": int((split.eq(s) & near.isna().all(axis=1)).sum())}
                   for s in ("train", "val", "test")}
     tr = rec[split.eq("train")].sort_values(KEYS[::-1], kind="stable")
     va = rec[split.eq("val")].sort_values(KEYS[::-1], kind="stable")
@@ -317,15 +349,21 @@ def main():
                   "4 + Granulation": raw + temporal + spatial + gran_unique,
                   f"5 Top-{TOP_K} unpaired (previous)": selected_v1,
                   f"6 Previous + {half}": selected_v1 + halves,
-                  "7 Previous + neighbour mean": selected_v1 + [NBR],
-                  f"8 Previous + {half} + neighbour mean": selected_v1 + halves + [NBR],
-                  f"9 Top-{TOP_K} paired (delivered)": selected}
+                  "7 Previous + nearest-3 mean (compressed, control)": selected_v1 + [NBR],
+                  f"8 Previous + {half} + nearest-3 mean (compressed)": selected_v1 + halves + [NBR],
+                  f"9 Top-{TOP_K} paired (delivered)": selected,
+                  f"10 Delivered + {len(nbr_cols)} neighbour columns": selected + nbr_cols,
+                  f"11 Previous + {len(nbr_cols)} neighbour columns": selected_v1 + nbr_cols,
+                  f"12 Previous + {half} + {len(nbr_cols)} neighbour columns": selected_v1 + halves + nbr_cols}
     groups = {}
     for name, cols in group_cols.items():
         groups[name] = ablate(tr, va, cols, evaluate_predictions)
         print(f"{name:42s} n={len(cols):3d}  " + "  ".join(
             f"{k}={groups[name]['mean'][k]:.4f}±{groups[name]['std'][k]:.4f}"
             for k in ("Macro_F1", "High_Risk_Recall", "Avg_Asymmetric_Cost")))
+    layout_check = ablate(tr, va, selected_v1 + cell_cols, evaluate_predictions)
+    print(f"{'layout check: previous + ' + str(len(cell_cols)) + ' per-cell columns':42s}  " + "  ".join(
+        f"{k}={layout_check['mean'][k]:.4f}" for k in ("Macro_F1", "High_Risk_Recall", "Avg_Asymmetric_Cost")))
     m0 = evaluate_predictions(va["target_level_3h"], np.searchsorted(LEVEL_THRESHOLDS, va["pm2_5"], side="right"))
     plot_ablation(groups, m0, args.out / "figures" / "fig_feature_ablation.png")
 
@@ -379,11 +417,22 @@ def main():
                "high_risk_recall_definition": "union: P(pred in {2,3} | true in {2,3})",
                "ablation": groups, "metrics_persistence_M0_val": m0,
                "neighbour_feature": {
-                   "column": NBR, "used_in": "ablation rows 7 and 8 only, not a selection candidate",
-                   "definition": f"simple mean of pm2_5 at the same hour t over the {NBR_K} nearest grid cells "
-                                 "by great-circle distance, excluding the cell itself; no upwind weights",
-                   "missing_rule": "hours flagged qc_interpolated or is_missing are excluded; mean of the "
-                                   "available neighbours; if none is available, the cell's own pm2_5 at t",
+                   "main": {"columns": nbr_cols, "n_columns": len(nbr_cols),
+                            "used_in": "ablation rows 10, 11 and 12 only; not a selection candidate, not in features_final",
+                            "definition": "for each receptor, all other grid cells (self excluded) ordered by great-circle "
+                                          "distance, nbr01 = nearest; per cell two raw values at hour t: pm2_5 and the "
+                                          "stage 2 column pm2_5_change_3h (x(t) - x(t-3)); no averaging, no upwind weights",
+                            "missing_rule": "hours flagged qc_interpolated or is_missing are NaN (stage 2 masking rule, "
+                                            "interpolation may use future endpoints); the column is kept, the value is "
+                                            "not interpolated in time and not set to 0; the random forest handles NaN "
+                                            "natively at each split"},
+                   "layout_check": {"definition": f"same raw values with one fixed column per grid cell "
+                                                  f"({len(cell_cols)} columns, the receptor's own cell left NaN), "
+                                                  "added to the previous Top-25; not plotted",
+                                    "result": layout_check},
+                   "control": {"column": NBR, "used_in": "ablation rows 7 and 8 (compressed version)",
+                               "definition": f"simple mean of nbr01..nbr{NBR_K:02d}_pm2_5 (the {NBR_K} nearest cells)",
+                               "missing_rule": "mean of the available values; if none, the cell's own pm2_5 at t"},
                    "neighbours_by_receptor": nbr_info, "row_counts_eligible_receptor": nbr_counts},
                "factor_rows": {"previous_top25": selected_v1, "missing_cyclic_half": halves}}
     (args.out / "models").mkdir(parents=True, exist_ok=True)

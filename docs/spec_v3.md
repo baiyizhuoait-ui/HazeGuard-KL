@@ -165,6 +165,23 @@ temperature_2m, no2_lag_2, co, no2_lag_24, far_source_pm25_mean_24h
 
 注意里面**没有** `upwind_pm25_advection_*`，这是 2.2 那条结论的直接证据。
 
+### 3.3b 特征表有两个版本（v1 / v2），不要混用
+
+| 文件 | 版本 | 周期编码 | 谁在用 | SHA256 前 12 位 |
+|---|---|---|---|---|
+| `data/features_final.parquet` | v1（**官方**） | 只有 `hour_sin`（已知缺陷 KD-01） | M0~M7 全部已登记成绩 | `64285f40e81c` |
+| `data/features_final_v2.parquet` | v2（对照） | `hour_sin` + `hour_cos` | 仅 M8 | `cadbe163b439` |
+
+两份表的指纹登记在 `data/feature_manifest.json`，`verify_data` 会逐份比对；
+**任何一份内容变化但没先改登记，校验直接 FAIL**。这条是为了防"表被换掉、模型还是旧的"。
+
+为什么官方版仍是 v1：M2~M7 的成绩、图表、看板、benchmark 全部基于 v1，
+换表要重跑 04/05/06 并重出全套产物。缺陷影响已量化（Macro-F1 0.7107 → 0.7157，
+代价 0.6497 → 0.6369），由 M8 承担对照，作为 KD-01 登记在 `docs/known_defects.json`。
+
+**报告里必须写明**：主表用 v1、M8 用 v2、v1 缺 `hour_cos` 是已知缺陷。
+不能只写"我们用 Top-25"，那会掩盖版本差异。
+
 ### 3.4 空间缺失与填补规则（必须写进报告）
 
 02 的受体空间特征缺失率：train 9.76%、val 9.74%、test 4.52%。03 在选特征阶段做了填补，规则**不带任何可调参数**：

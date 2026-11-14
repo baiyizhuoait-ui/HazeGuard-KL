@@ -3,7 +3,8 @@ HazeGuard-KL / Member 05
 
 Local project
   This folder contains main plus selected read-only dependencies from members 03/04.
-  No remote branch has been pushed or merged.
+  The original stage-05 delivery was merged through PR #5.
+  The interval-calibration supplement below is delivered through a separate PR for review.
   The stage-05 delivery ZIP contains only member-05 files, not upstream files.
 
 Requirements
@@ -53,6 +54,8 @@ Interface cautions
   Timestamps are Kuala Lumpur local feature times; target time is timestamp + 3h.
   Row identity is timestamp plus station_id, not timestamp alone.
   Tree prediction percentiles are uncalibrated spread, not guaranteed 90% coverage.
+  For calibrated display, use interval_calibration.json and 05_interval_calibration.py.
+  Target coverage is 90%; observed test coverage is 83.41%, not a 90% guarantee.
   The target is a CAMS model product, not ground monitoring truth.
 
 Submission preparation
@@ -66,3 +69,35 @@ Readability update
   See models/metrics_stage5.json -> refactor for the old/new comparison checks.
   Original training hashes remain in code_sha256; refactor.code_sha256 describes current code.
   The updated delivery archives have _readable in their filenames.
+
+Interval calibration supplement (2026-11-13)
+  python -m unittest discover -s tests -p "test_stage5*.py" -v
+  python src/05_interval_calibration.py
+  Calibration has already run; the second command blocks overwriting its records.
+  No retraining or new model predictions on test are needed.
+  New files:
+    src/05_interval_calibration.py
+    tests/test_stage5_interval.py
+    models/interval_calibration.json
+    models/metrics_stage5_interval_calibrated.json
+    models/stage5_intervals_calibrated.npz
+  Calibration half-width: 13.820877192982458 ug/m3, fitted only on validation.
+  Interval: [max(0, tree median - half_width), tree median + half_width].
+  Validation PICP: 71.80% -> 90.01%; test PICP: 71.83% -> 83.41%.
+  Test mean width: 20.79 -> 27.43 ug/m3.
+  See handover section 9 for the member-07 interface and reporting limits.
+  Original metrics, model weights, NPZ predictions and figures are retained.
+
+Adaptive interval supplement (2026-11-13, recommended over fixed width)
+  src/05_interval_adaptive.py supplies fit_calibration / apply_calibration.
+  Selected on three chronological validation blocks, then frozen before test scoring.
+  models/interval_calibration_adaptive.json stores frozen parameters and selection evidence.
+  models/metrics_stage5_interval_adaptive.json stores overall and per-node results.
+  models/stage5_intervals_adaptive.npz stores interval_val/test and row identity.
+  The tests are in tests/test_stage5_interval_adaptive.py.
+  Test PICP: raw tree spread 71.83%, fixed-width calibration 83.41%, adaptive width 87.97%.
+  Test mean width: 20.79, 27.43, 32.11 ug/m3 respectively.
+  Adaptive width improves observed coverage, but is not guaranteed 90%.
+  Original weights, level thresholds and classification results remain unchanged.
+  Integrate the adaptive supplement into main after reviewing its PR.
+  See handover section 10 for the integration snippet and validation limits.

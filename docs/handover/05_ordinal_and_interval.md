@@ -187,3 +187,158 @@ M5 树间区间 test PICP=0.7183、MPIW=20.7877 µg/m³，不支持“90% 真实
 
 `metrics_stage5.json` 保留原始训练时的 `code_sha256`，新增 `refactor` 字段登记当前代码和核对结果。
 原版交付包保留；本次交付包文件名带 `_readable`。
+
+## 9. 2026-11-13 区间校准补充：给 7 号
+
+README 的“90% 预测区间”与原来的树间分散带存在口径差异。
+原方法取单棵树预测的 5/50/95 百分位，没有用实际浓度误差校准覆盖率。
+本补充只处理浓度区间；模型、分档阈值、原始分类结果及原有审计文件保留。
+
+### 方法与实际结果
+
+按反馈采用一个预先固定的简单方案，不比较多种方案后择优：
+
+1. 取 M5 每条验证预测的树中位数 `m`，算绝对残差 `abs(y-m)`。
+2. 对 n=16,656 个残差，取第 `ceil((n+1)*0.90)=14,992` 小的数。
+3. 冻结半宽 `w=13.820877192982458 µg/m³`。
+4. 新区间为 `[max(0,m-w), m+w]`。PM2.5 非负，截断负下界不损失有效目标的覆盖。
+5. 冻结后直接应用于已有测试预测，报告覆盖率与宽度，不用测试目标反调 w。
+
+| 切分 | 原树间带 PICP | 校准后 PICP | 原平均宽度 | 校准后平均宽度 |
+|---|---:|---:|---:|---:|
+| val | 71.80% | 90.01% | 16.48 | 27.08 |
+| test | 71.83% | 83.41% | 20.79 | 27.43 |
+
+宽度单位均为 µg/m³。验证集是计算宽度的数据，90.01% 属于样本内校准检查，不能当作泛化成绩。
+新区间围绕中位数重新构造，并非逐条在原带两侧加同样的补偿量；不保证包含每条原树间带。
+对每个预测，中位数不变、未截断的总宽度固定；靠近零时会缩短。
+
+测试集分节点覆盖：KL_City 75.62%、Port_Klang 93.06%、Sepang 81.56%。
+这是全节点混合校准，不能声称每个节点都达到 90%。
+
+### 产物与接入
+
+- `src/05_interval_calibration.py`：计算、冻结、应用校准；不调用 fit 或模型 predict。
+- `models/interval_calibration.json`：冻结的半宽、名义覆盖率、输入与代码摘要。
+- `models/metrics_stage5_interval_calibrated.json`：总体和分节点的前后对比。
+- `models/stage5_intervals_calibrated.npz`：`interval_val/test` 为 (n,3)，列依次为下界、中位数、上界。
+  `ts_val/test` 和 `station_id_val/test` 是行标识；时间仍为特征时刻 t，展示目标时刻要加 3 小时。
+- `tests/test_stage5_interval.py`：有限样本分位点、冻结宽度推理、非负截断和异常输入检查。
+
+离线页面可直接读新区间 NPZ。对新输入，先在 sys.path 中加入 src，再按原有特征顺序准备 X：
+
+```python
+import importlib
+import json
+from pathlib import Path
+import numpy as np
+
+R = importlib.import_module("05_reg_to_cls")
+I = importlib.import_module("05_interval_calibration")
+cal = json.loads(Path("models/interval_calibration.json").read_text(encoding="utf-8"))
+median = np.median(R.tree_predictions(rf_regressor, X), axis=1)
+band = I.apply_calibration(median, cal)  # 下界 / 中位数 / 上界
+```
+
+这里必须用 M5 回归森林的树中位数，不能把 M6 等级概率或 M5 的均值当作校准中心。
+更换模型或输入数据后需要重新校准，不能复用旧半宽。
+原 `fig_interval_band.png` 仍是明确标注的未经校准树间带；展示新区间时读取新 NPZ 绘制，不能给原图换标签冒充。
+
+### 报告与页面必须保留的限制
+
+建议页面标签：“90% 目标覆盖率区间（验证集校准；历史测试覆盖 83.41%）”。
+7 号负责的总 README 应同步这个事实；本次未改共享 README 或 app.py。
+
+不能写“已保证真实 90%”。测试期覆盖仍不足，且区间更宽，需同时报告 PICP 与 MPIW。
+时间序列存在时间和空间相关性，不能直接套用独立可交换数据的严格覆盖保证。
+原验证集也用于选模型，因此这是选参后的经验残差校准，不具备全新独立校准集的条件。
+原测试成绩此前已知，本补充是事后扩展，不应包装成一次全新的盲测；没有拿测试覆盖率选宽度。
+如要进一步研究动态校准，应预先规定更新规则，等 t+3h 目标真正可用后才更新，并使用新时期评估。
+数据目标仍是 CAMS 模型产品，不是地面监测真值。
+
+方法参考：[MAPIE 绝对残差分数](https://mapie.readthedocs.io/en/stable/content/conformal-prediction/conformity-scores/)，
+[可交换性与时间/分布变化限制](https://mapie.readthedocs.io/en/stable/content/exchangeability-testing/)。
+
+## 10. 后续改善：按树间分散程度自适应校准宽度
+
+本节是固定半宽校准的改进版本。原始版本与第 9 节结果保留用于比较。
+
+### 为什么尝试这个方法
+
+所有时刻共用 13.82 µg/m³ 半宽，不能随预测的分散程度调整。
+改用 `s=max((q95-q05)/2,1)` 作为尺度代理，在验证集计算 `abs(y-q50)/s` 的 90% 有限样本分位数 `k`，
+新区间为 `[max(0,q50-k*s), q50+k*s]`。
+这里借鉴标准化残差校准思路，用树百分位半宽作为尺度代理；不是把树百分位直接解释成真实浓度概率，
+也没有训练分位数随机森林或额外的误差模型。
+
+### 选择方案的过程：只用验证期
+
+验证期按独立时间戳划成四块，前 1/4 初始化校准，依次预测后续三个时间块。
+每块静态方案只用该块开始前已可获得的历史标签；要求历史样本特征时刻+3h早于块起点。
+三个向前验证块共 12,492 条，不包含原测试集。
+固定候选为全局绝对残差、分节点绝对残差、树间尺度标准化、树带加性扩张。
+另外比较一个分节点最近 30 天的滚动方案，作为有标签持续回传条件下的研究方案，不参与静态方案选择。
+
+| 方案 | 向前验证覆盖率 | 平均宽度 µg/m³ | 平均区间评分（越低越好） |
+|---|---:|---:|---:|
+| 固定全局半宽 | 89.25% | 25.98 | 46.22 |
+| 分节点固定半宽 | 88.86% | 26.00 | 43.43 |
+| 树间尺度标准化 | 89.47% | 24.97 | 35.25 |
+| 树带加性扩张 | 89.63% | 23.31 | 35.94 |
+| 分节点滚动 30 天 | 89.75% | 27.32 | 43.22 |
+
+区间评分定义为 `width + 20*max(lower-y,0) + 20*max(y-upper,0)`，同时惩罚过宽和漏覆盖。
+在四种静态校准方案中按汇总平均评分选出树间尺度标准化，没有根据原测试成绩挑方案。
+滚动方案使用当时已经揭示的标签，而静态方案在每块起点冻结，部署条件不同。
+不能仅凭滚动覆盖率高一点就声称它更好或已可实时部署；本实验假定目标在 3 小时后可用，尚未验证上游实际延迟。
+
+### 冻结后复核已有测试预测
+
+全验证集冻结得到 `k=1.5452243600022562`，尺度下限固定为 `1.0 µg/m³`。
+固定后仅对选出的方案复核缓存测试预测，没有再尝试其它方案或按测试结果调 k。
+
+| 方案 | test PICP | test MPIW µg/m³ |
+|---|---:|---:|
+| 原树间带 | 71.83% | 20.79 |
+| 全局固定半宽校准 | 83.41% | 27.43 |
+| 自适应宽度校准 | 87.97% | 32.11 |
+
+相对固定半宽，覆盖率增加约 4.56 个百分点，同时平均宽度增加约 17.1%。
+前向验证中自适应区间较窄，完整测试中却更宽，应分别报告，不能挑一个阶段的宽度做宣传。
+测试分节点覆盖率：KL_City 84.77%、Port_Klang 91.19%、Sepang 87.96%。
+仍未达到全局或逐节点 90%，不改变第 9 节关于时间依赖、验证集曾用于选参、事后扩展及 CAMS 目标的限制。
+
+### 给 7 号的自适应版本接入
+
+```python
+import importlib
+import json
+from pathlib import Path
+import numpy as np
+
+R = importlib.import_module("05_reg_to_cls")
+A = importlib.import_module("05_interval_adaptive")
+cal = json.loads(Path("models/interval_calibration_adaptive.json").read_text(encoding="utf-8"))
+tree_values = R.tree_predictions(rf_regressor, X)
+quantiles = np.quantile(tree_values, [.05, .5, .95], axis=1).T
+band = A.apply_calibration(quantiles, cal)  # 下界 / 中位数 / 上界
+```
+
+页面建议标签：“90% 目标覆盖率自适应区间；历史测试实测覆盖 87.97%”。
+离线回放改读 `models/stage5_intervals_adaptive.npz`；模型、特征顺序和时刻含义沿用原接口。
+更换回归模型后必须重新校准；不要把旧固定半宽的 JSON 传给自适应函数。
+原 `metrics_stage5.json` 和两张图仍记录原始实验，不代表新版区间。
+
+新产物：
+- `src/05_interval_adaptive.py`、`tests/test_stage5_interval_adaptive.py`
+- `models/interval_calibration_adaptive.json`（内嵌完整验证方案比较与选择记录）
+- `models/metrics_stage5_interval_adaptive.json`
+- `models/stage5_intervals_adaptive.npz`
+
+局部研究脚本与结果分别位于工作区 `tmp/study_haze_intervals.py`、
+`tmp/apply_haze_interval_adaptive.py` 和 `output/HazeGuard-KL_interval_methods_validation_20261113.json`。
+这两个研究脚本保留在本地；方案比较 JSON 已随本次 PR 提供。
+新模块只负责计算区间，不依赖研究脚本运行。
+研究脚本与应用脚本均保留冻结记录；已有结果禁止直接覆盖。
+
+参考：[MAPIE 标准化残差分数](https://mapie.readthedocs.io/en/stable/content/conformal-prediction/conformity-scores/)。
