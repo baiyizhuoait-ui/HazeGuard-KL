@@ -1,0 +1,253 @@
+{
+  "model": "M8",
+  "feature_set": "v2",
+  "role": "control for known defect KD-01; not part of the v1 main table",
+  "recipe": "M5_val_tuned (RandomForestRegressor, tree mean, cut points searched on validation seed 42 and fixed for seeds 43/44)",
+  "generated_at": "2026-11-14T03:36:52.989975+00:00",
+  "git_commit": "7556f24d78b9ef158f794b72d8c26f26186efaa9",
+  "code_sha256": {
+    "07_m8_v2_control.py": "7f7a80a258d3bd5901c9a46d9b1ecd4f5c992135a8afac4b53e4fa3538f7bb1c",
+    "05_reg_to_cls.py": "de9e119d0af089f15a1898f68b68c0e10a4f5f1cf2d13577702f5f4a9deb21f1",
+    "utils_metrics.py": "b0bcc02975ba7d23ad1d503bba40c2d4c86a0cdffa835613d71a4da5e95749f3",
+    "config.py": "362b8e51c41d5f31af2ed83fdaf82caeb493f802f3ff313f6e0b5ba0b44e9e7c"
+  },
+  "input_sha256": {
+    "features_final_v2": "cadbe163b43917c421070298f1de9f978358274989362e80a258043fd360c78a",
+    "selected_features_v2": "08f71faf05e6238429441909407ca5313bfd809fc01dcb97da8fa683096aadcf"
+  },
+  "hyperparameters": {
+    "n_estimators": 100,
+    "max_depth": 14,
+    "min_samples_leaf": 10,
+    "max_features": 0.5
+  },
+  "hyperparameter_source": "models/stage5_selection.json",
+  "features": [
+    "pm2_5",
+    "pm10",
+    "pm2_5_mean_3h",
+    "hour_sin",
+    "pm2_5_lag_1",
+    "no2",
+    "pm10_lag_1",
+    "pm2_5_change_3h",
+    "gran_up_6h",
+    "so2",
+    "spatial_pm25_gradient",
+    "no2_lag_12",
+    "pm2_5_slope_6h",
+    "gran_low_6h",
+    "gran_slope_12h",
+    "pm2_5_mean_6h",
+    "no2_lag_6",
+    "relative_humidity_2m_lag_3",
+    "o3",
+    "temperature_2m",
+    "co",
+    "no2_lag_24",
+    "far_source_pm25_mean_24h",
+    "no2_lag_2",
+    "hour_cos"
+  ],
+  "seeds": [
+    42,
+    43,
+    44
+  ],
+  "val_tuned_thresholds": [
+    17.0,
+    33.0,
+    53.0
+  ],
+  "validation_seed_runs": [
+    {
+      "seed": 42,
+      "M8": {
+        "Macro_F1": 0.7252,
+        "Balanced_Accuracy": 0.7349,
+        "High_Risk_Recall": 0.861,
+        "MAOE": 0.2607,
+        "Severe_Jumping_Error_Rate": 0.0072,
+        "Avg_Asymmetric_Cost": 0.5523,
+        "n_samples": 16656,
+        "n_high_risk": 4842,
+        "diag_High_Risk_Exact_Recall": 0.6722,
+        "diag_Level3_Recall": 0.7299
+      },
+      "M8_fixed_cuts": {
+        "Macro_F1": 0.7176,
+        "Balanced_Accuracy": 0.6997,
+        "High_Risk_Recall": 0.8096,
+        "MAOE": 0.2541,
+        "Severe_Jumping_Error_Rate": 0.0063,
+        "Avg_Asymmetric_Cost": 0.5885,
+        "n_samples": 16656,
+        "n_high_risk": 4842,
+        "diag_High_Risk_Exact_Recall": 0.6231,
+        "diag_Level3_Recall": 0.6619
+      }
+    },
+    {
+      "seed": 43,
+      "M8": {
+        "Macro_F1": 0.7253,
+        "Balanced_Accuracy": 0.735,
+        "High_Risk_Recall": 0.8614,
+        "MAOE": 0.2606,
+        "Severe_Jumping_Error_Rate": 0.0074,
+        "Avg_Asymmetric_Cost": 0.5549,
+        "n_samples": 16656,
+        "n_high_risk": 4842,
+        "diag_High_Risk_Exact_Recall": 0.6722,
+        "diag_Level3_Recall": 0.7242
+      },
+      "M8_fixed_cuts": {
+        "Macro_F1": 0.7177,
+        "Balanced_Accuracy": 0.6999,
+        "High_Risk_Recall": 0.809,
+        "MAOE": 0.2537,
+        "Severe_Jumping_Error_Rate": 0.0064,
+        "Avg_Asymmetric_Cost": 0.5886,
+        "n_samples": 16656,
+        "n_high_risk": 4842,
+        "diag_High_Risk_Exact_Recall": 0.6216,
+        "diag_Level3_Recall": 0.6619
+      }
+    },
+    {
+      "seed": 44,
+      "M8": {
+        "Macro_F1": 0.7233,
+        "Balanced_Accuracy": 0.7328,
+        "High_Risk_Recall": 0.8598,
+        "MAOE": 0.2622,
+        "Severe_Jumping_Error_Rate": 0.0073,
+        "Avg_Asymmetric_Cost": 0.559,
+        "n_samples": 16656,
+        "n_high_risk": 4842,
+        "diag_High_Risk_Exact_Recall": 0.6687,
+        "diag_Level3_Recall": 0.7224
+      },
+      "M8_fixed_cuts": {
+        "Macro_F1": 0.7187,
+        "Balanced_Accuracy": 0.7014,
+        "High_Risk_Recall": 0.8108,
+        "MAOE": 0.2534,
+        "Severe_Jumping_Error_Rate": 0.0062,
+        "Avg_Asymmetric_Cost": 0.5866,
+        "n_samples": 16656,
+        "n_high_risk": 4842,
+        "diag_High_Risk_Exact_Recall": 0.6245,
+        "diag_Level3_Recall": 0.663
+      }
+    }
+  ],
+  "validation_mean_std": {
+    "Macro_F1": {
+      "mean": 0.7246,
+      "std": 0.001127
+    },
+    "Balanced_Accuracy": {
+      "mean": 0.734233,
+      "std": 0.001242
+    },
+    "High_Risk_Recall": {
+      "mean": 0.860733,
+      "std": 0.000833
+    },
+    "MAOE": {
+      "mean": 0.261167,
+      "std": 0.000896
+    },
+    "Severe_Jumping_Error_Rate": {
+      "mean": 0.0073,
+      "std": 0.0001
+    },
+    "Avg_Asymmetric_Cost": {
+      "mean": 0.5554,
+      "std": 0.003378
+    }
+  },
+  "validation_delta_vs_M5_val_tuned": {
+    "Macro_F1": 0.005067,
+    "Balanced_Accuracy": 0.010833,
+    "High_Risk_Recall": 0.0007,
+    "MAOE": -0.003233,
+    "Severe_Jumping_Error_Rate": 0.0012,
+    "Avg_Asymmetric_Cost": -0.031733
+  },
+  "m5_reference": {
+    "source": "models/metrics_stage5.json",
+    "feature_set": "v1",
+    "validation_mean_std": {
+      "Macro_F1": {
+        "mean": 0.7195333333333332,
+        "std": 0.001665332799572954
+      },
+      "Balanced_Accuracy": {
+        "mean": 0.7234000000000002,
+        "std": 0.0020808652046684787
+      },
+      "High_Risk_Recall": {
+        "mean": 0.8600333333333333,
+        "std": 0.0010692676621563539
+      },
+      "MAOE": {
+        "mean": 0.26439999999999997,
+        "std": 0.001708800749063513
+      },
+      "Severe_Jumping_Error_Rate": {
+        "mean": 0.0061,
+        "std": 0.00026457513110645926
+      },
+      "Avg_Asymmetric_Cost": {
+        "mean": 0.5871333333333334,
+        "std": 0.003758102358017058
+      }
+    },
+    "test_seed42": {
+      "Macro_F1": 0.7078,
+      "Balanced_Accuracy": 0.7117,
+      "High_Risk_Recall": 0.8788,
+      "MAOE": 0.2873,
+      "Severe_Jumping_Error_Rate": 0.0091,
+      "Avg_Asymmetric_Cost": 0.7083,
+      "n_samples": 16647,
+      "n_high_risk": 6848,
+      "diag_High_Risk_Exact_Recall": 0.6853,
+      "diag_Level3_Recall": 0.7085
+    },
+    "val_tuned_thresholds": [
+      17.0,
+      33.0,
+      55.0
+    ]
+  },
+  "seed42_validation_prediction_sha256": "14b7ef982d5546908a093c4c92d6997208a61bca2b5571cd3a760b320ca0306c",
+  "test_evaluation_count": 1,
+  "test_metrics_seed42": {
+    "Macro_F1": 0.7109,
+    "Balanced_Accuracy": 0.7177,
+    "High_Risk_Recall": 0.877,
+    "MAOE": 0.2852,
+    "Severe_Jumping_Error_Rate": 0.0106,
+    "Avg_Asymmetric_Cost": 0.6711,
+    "n_samples": 16647,
+    "n_high_risk": 6848,
+    "diag_High_Risk_Exact_Recall": 0.689,
+    "diag_Level3_Recall": 0.7593
+  },
+  "note": "Single test pass. Cut points and hyperparameters were fixed before it.",
+  "test_started_at": "2026-11-14T03:55:10.197511+00:00",
+  "test_n_samples": 16647,
+  "test_delta_vs_M5_val_tuned": {
+    "Macro_F1": 0.0031,
+    "Balanced_Accuracy": 0.006,
+    "High_Risk_Recall": -0.0018,
+    "MAOE": -0.0021,
+    "Severe_Jumping_Error_Rate": 0.0015,
+    "Avg_Asymmetric_Cost": -0.0372
+  },
+  "test_finished_at": "2026-11-14T03:55:10.254165+00:00",
+  "predictions_file": "models/m8_predictions.npz"
+}
