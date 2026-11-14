@@ -1,5 +1,5 @@
 model,feature_set,split,seed,Macro_F1,Balanced_Accuracy,High_Risk_Recall,MAOE,Severe_Jumping_Error_Rate,Avg_Asymmetric_Cost,n_samples
-M1,v1,test,42,0.662,0.6443,0.7693,0.322,0.0218,0.8905,16728
+M1,v1,test,42,0.6658,0.6473,0.7675,0.3199,0.0210,0.9047,16647
 M2_Nominal_RF,v1,test,42,0.7014,0.6824,0.8094,0.2813,0.0138,0.77,16647
 M3_Balanced_RF,v1,test,42,0.7018,0.7206,0.8873,0.3003,0.0146,0.6512,16647
 M4_Boosting,v1,test,42,0.7005,0.6871,0.8332,0.2858,0.0135,0.725,16647
