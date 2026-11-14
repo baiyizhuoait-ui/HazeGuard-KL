@@ -153,7 +153,35 @@ def load_predictions() -> pd.DataFrame:
         frames.append(frame)
     out = pd.concat(frames, ignore_index=True)
     out["valid_time"] = out["timestamp"] + pd.Timedelta(hours=HORIZON_H)
+    calibrated = MODELS / "stage5_intervals_calibrated.npz"
+    if calibrated.exists():
+        cal = np.load(calibrated)
+        rows = []
+        for split in ("val", "test"):
+            interval = cal[f"interval_{split}"]
+            rows.append(pd.DataFrame({
+                "station_id": cal[f"station_id_{split}"].astype(str),
+                "timestamp": pd.to_datetime(cal[f"ts_{split}"]),
+                "cal_lo": interval[:, 0], "cal_mid": interval[:, 1], "cal_hi": interval[:, 2]}))
+        out = out.merge(pd.concat(rows, ignore_index=True), on=["station_id", "timestamp"],
+                        how="left", validate="one_to_one")
     return out
+
+
+def interval_label() -> tuple[str, str] | None:
+    """Short legend label and the coverage note for member 5's calibrated interval."""
+    record = load_json_or_none("metrics_stage5_interval_calibrated.json")
+    if not record:
+        return None
+    nominal = record.get("nominal_coverage", 0.9)
+    test = record["test"]["calibrated"]
+    val = record["val"]["calibrated"]
+    label = f"{nominal:.0%} target-coverage interval (calibrated on validation)"
+    note = (f"Interval: {nominal:.0%} target coverage, calibrated on the validation split "
+            f"({val['PICP']:.1%} there). On the test split it covered {test['PICP']:.1%} of "
+            f"outcomes with a mean width of {test['MPIW']:.1f} µg/m³, so the 90% target is not "
+            "met on unseen data. Method and limits: models/interval_calibration.json.")
+    return label, note
 
 
 def add_running_mean(station: pd.DataFrame) -> pd.DataFrame:
@@ -315,12 +343,16 @@ def fig_timeline(win: pd.DataFrame, when: pd.Timestamp, show_band: bool,
                        label=("CAMS run boundary ("
                               + ", ".join(f"{h:02d}:00" for h in boundaries) + ")")
                        if i == 0 else None)
-    values = [win["reg"].max(), win["q95"].max() if show_band else np.nan,
+    values = [win["reg"].max(),
+              (win["cal_hi"].max() if "cal_hi" in win else win["q95"].max()) if show_band else np.nan,
               win["pm2_5"].max(), win["target_pm25_3h"].max()]
     ymax = float(np.nanmax(values)) * 1.12 if np.isfinite(np.nanmax(values)) else 60.0
     if show_band:
-        ax.fill_between(win["valid_time"], win["q05"], win["q95"], color=ORANGE,
-                        alpha=0.18, linewidth=0, label="Tree spread, 5th to 95th percentile")
+        calibrated = interval_label() if "cal_lo" in win and win["cal_lo"].notna().any() else None
+        lo, hi = ("cal_lo", "cal_hi") if calibrated else ("q05", "q95")
+        ax.fill_between(win["valid_time"], win[lo], win[hi], color=ORANGE, alpha=0.18,
+                        linewidth=0,
+                        label=calibrated[0] if calibrated else "Tree spread, 5th to 95th percentile")
     if win["pm2_5"].notna().any():
         ax.plot(win["timestamp"], win["pm2_5"], color=BLUE, linewidth=2,
                 label="Observed PM2.5")
@@ -752,7 +784,10 @@ def tab_risk(station: pd.DataFrame, when: pd.Timestamp, rule: str, ref: dict,
     c2.metric(f"Forecast level in {HORIZON_H} h", level_label(predicted))
     c2.caption(RULES[rule]["label"])
     c3.metric(f"Forecast PM2.5 in {HORIZON_H} h", f"{row['reg']:.0f} µg/m³")
-    c3.caption(f"Tree spread {row['q05']:.0f} to {row['q95']:.0f} µg/m³")
+    if "cal_lo" in row and pd.notna(row["cal_lo"]):
+        c3.caption(f"90% target interval {row['cal_lo']:.0f} to {row['cal_hi']:.0f} µg/m³")
+    else:
+        c3.caption(f"Tree spread {row['q05']:.0f} to {row['q95']:.0f} µg/m³")
     c4.metric("What happened (replay)", level_label(int(row["y_true"])))
     c4.caption("Forecast level was correct" if predicted == int(row["y_true"])
                else f"Forecast was off by {abs(predicted - int(row['y_true']))} level(s)")
@@ -804,16 +839,21 @@ def tab_probability(station: pd.DataFrame, when: pd.Timestamp, preds: pd.DataFra
         st.dataframe(cumulative_table(row, tau), use_container_width=True, hide_index=True)
         st.caption("M7 walks up the levels and stops at the first question that fails.")
 
-    st.subheader("Concentration and tree spread")
+    calibrated = interval_label()
+    st.subheader("Concentration and prediction interval" if calibrated
+                 else "Concentration and tree spread")
     win = window_rows(station, when, 72)
     show(fig_timeline(win, when, show_band=True))
-    stage5 = load_json_or_none("metrics_stage5.json")
-    if stage5 and "interval" in stage5:
-        test = stage5["interval"]["test"]
-        st.warning(
-            f"The band is the spread between the trees of the M5 forest. It is not a "
-            f"calibrated prediction interval: on the test split it covered "
-            f"{test['PICP']:.1%} of outcomes with a mean width of {test['MPIW']:.1f} µg/m³.")
+    if calibrated:
+        st.warning(calibrated[1])
+    else:
+        stage5 = load_json_or_none("metrics_stage5.json")
+        if stage5 and "interval" in stage5:
+            test = stage5["interval"]["test"]
+            st.warning(
+                f"The band is the spread between the trees of the M5 forest. It is not a "
+                f"calibrated prediction interval: on the test split it covered "
+                f"{test['PICP']:.1%} of outcomes with a mean width of {test['MPIW']:.1f} µg/m³.")
 
     if stage7:
         st.subheader("Are the probabilities calibrated?")

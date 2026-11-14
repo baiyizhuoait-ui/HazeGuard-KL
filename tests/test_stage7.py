@@ -92,6 +92,18 @@ class SavedInputs(unittest.TestCase):
             self.assertTrue((probs[f"proba_{split}"].argmax(axis=1)
                              == stage5[f"pred_m6_{split}"]).all())
 
+    def test_calibrated_interval_lines_up_with_the_predictions(self):
+        path = MODELS / "stage5_intervals_calibrated.npz"
+        if not path.exists():
+            self.skipTest("interval calibration not merged")
+        cal, probs = np.load(path), np.load(MODELS / "ordinal_probs_val_test.npz")
+        for split in ("val", "test"):
+            self.assertTrue((cal[f"ts_{split}"] == probs[f"ts_{split}"]).all())
+            self.assertTrue((cal[f"station_id_{split}"] == probs[f"station_id_{split}"]).all())
+            interval = cal[f"interval_{split}"]
+            self.assertTrue((interval[:, 0] <= interval[:, 1]).all())
+            self.assertTrue((interval[:, 1] <= interval[:, 2]).all())
+
     def test_benchmark_has_the_contract_columns(self):
         with open(MODELS / "all_models_benchmark.csv", encoding="utf-8-sig") as handle:
             rows = list(csv.DictReader(handle))
