@@ -1,0 +1,9 @@
+split,group,n_samples,MAE
+val,cross_08,2088,6.29561373707
+val,cross_20,2079,12.2042824023
+val,other_hours,12489,4.98149977105
+val,not_cross_20,14577,5.16973260092
+test,cross_08,2079,10.7498010596
+test,cross_20,2082,13.7345267355
+test,other_hours,12486,6.68086727821
+test,not_cross_20,14565,7.26166462331
