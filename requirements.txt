@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 # HazeGuard-KL 依赖
-# 环境：Python 3.11 – 3.13；本项目为传统机器学习，无需 GPU
+# 环境：Python 3.11 – 3.14；本项目为传统机器学习，无需 GPU
+# 这套锁定版本由 1 号（Python 3.14.6 / scikit-learn 1.9.0）产出并验证主表全部结果。
+# 例外：M8 的测试集在 Python 3.10.11 / scikit-learn 1.7.2 上跑（3.10 装不上 1.9.0），
+# 两套环境的差异已测量并记录在 models/runtime_environments.json，Macro-F1 差 0.0005。
 
 pandas==3.0.3
 numpy==2.4.6

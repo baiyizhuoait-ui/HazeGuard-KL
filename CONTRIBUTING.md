@@ -7,7 +7,7 @@
 开工之前请读完，尤其第 3 节和第 5 节。
 
 **这份文档只管"怎么协作"，不管"每个人做什么"。** 每个模块的具体任务、接口、验收标准
-写在 `docs/spec_v3.md`（阶段执行规范 v3.2）。两份文档冲突时，以 `spec_v3.md` 的任务定义为准、
+写在 `docs/spec_v3.md`（阶段执行规范 v3.4）。两份文档冲突时，以 `spec_v3.md` 的任务定义为准、
 以本文档的流程规定为准。
 
 > 早期那份技术规范 v2.0（Word 文档）写在开工前，里面还是"8 个监测站 + 6 个模型 + FCM/GPSO/SHAP"，
@@ -204,6 +204,7 @@ feature_set          （只出现在 all_models_benchmark.csv，取值 v1 / v2�
 | 高危 | `y ∈ {2, 3}` |
 | 风速 | 用 `wind_speed_ms`（m/s），不要用 `wind_speed_kmh` |
 | 时间 | `Asia/Kuala_Lumpur`；面板落盘为 `datetime64[us]`，契约按前缀 `datetime64` 校验 |
+| 运行环境 | 产物 json 必须带 `runtime`（python 与各库版本）。已有产物统一登记在 `models/runtime_environments.json`；换环境重跑同一模型，必须同时记下两套环境与差值 |
 | 空间单元 | `station_id` 指 CAMS 格点，**不是监测站**，别在图表里写 "station/measured" |
 | 图内文字 | 英文（中文字体在服务器上容易变方块） |
 | 报告正文 | 学术英文；`docs/` 和 `CONTRIBUTING.md` 用中文 |

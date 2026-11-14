@@ -1,0 +1,150 @@
+{
+  "note": "两条 M8 记录：models/metrics_m8.json 是官方记录（7 号环境，验证集 + 测试集，同一次运行）；models/m8_val_pinned_env.json 是 1 号在锁定环境下只跑验证集的复算记录，用于把库版本效应从特征表效应里分离出来。本文件汇总两套环境与三步测量，供 README 与报告引用。",
+  "environments": {
+    "member_1": {
+      "python": "3.14.6",
+      "scikit_learn": "1.9.0",
+      "numpy": "2.4.6",
+      "pandas": "3.0.3",
+      "scipy": "1.18.0",
+      "joblib": "1.5.3",
+      "produces": "01 全部产物、02/03 复核、M8 验证集复算",
+      "matches_requirements": true
+    },
+    "member_5": {
+      "python": "3.12.14",
+      "scikit_learn": "1.9.0",
+      "numpy": "2.4.6",
+      "pandas": "3.0.3",
+      "produces": "M5 / M6",
+      "source": "models/metrics_stage5.json -> runtime"
+    },
+    "member_7": {
+      "python": "3.10.11",
+      "scikit_learn": "1.7.2",
+      "numpy": "1.24.3",
+      "pandas": "2.3.3",
+      "produces": "M8（验证集 + 测试集，同一次运行）",
+      "matches_requirements": false,
+      "why": "Python 3.10 装不上 requirements 锁定的 scikit-learn 1.9.0"
+    }
+  },
+  "gaps": [
+    "metrics_stage1/2/3/4、cost_thresholds.json、m7_test_metrics.json 都没有 runtime 字段",
+    "metrics_m8.json 本身也没有 runtime 字段，其环境以本文件为准（7 号下次提交可补）",
+    "能确认的是：凡记录了环境的产物，scikit-learn 都是 1.9.0；Python 有 3.12.14 与 3.14.6 两种，第 1 步证明这两种 Python 版本给出相同结果"
+  ],
+  "measurement": {
+    "step_1_python_version_does_not_move_the_numbers": {
+      "what": "M5 在 Python 3.12.14 下跑（metrics_stage5.json 有记录）；在 3.14.6 下用同一脚本、同一表、同一种子重跑",
+      "registered_M5_val": {
+        "Macro_F1": 0.7195,
+        "Balanced_Accuracy": 0.7234,
+        "High_Risk_Recall": 0.86,
+        "MAOE": 0.2644,
+        "Severe_Jumping_Error_Rate": 0.0061,
+        "Avg_Asymmetric_Cost": 0.5871
+      },
+      "replicated_M5_val": {
+        "Macro_F1": 0.7195,
+        "Balanced_Accuracy": 0.7234,
+        "High_Risk_Recall": 0.86,
+        "MAOE": 0.2644,
+        "Severe_Jumping_Error_Rate": 0.0061,
+        "Avg_Asymmetric_Cost": 0.5871
+      },
+      "max_abs_difference": 0.0,
+      "reading": "逐位相同。库版本相同的前提下，Python 3.12 与 3.14 不改变结果，所以 1 号的复算可以当同环境参照",
+      "source": "models/m5_env_replication.json",
+      "caution": "这条只证明 M5 可复现，不能外推成「主表所有模型都在 3.14.6 产出」——M1~M4、M7 的 json 没有环境记录，无法证实"
+    },
+    "step_2_feature_effect_same_env": {
+      "what": "同在 1.9.0（3.14.6）内，只把 v1 换成 v2",
+      "M5_v1": {
+        "Macro_F1": 0.7195,
+        "Balanced_Accuracy": 0.7234,
+        "High_Risk_Recall": 0.86,
+        "MAOE": 0.2644,
+        "Severe_Jumping_Error_Rate": 0.0061,
+        "Avg_Asymmetric_Cost": 0.5871
+      },
+      "M8_v2": {
+        "Macro_F1": 0.7241,
+        "Balanced_Accuracy": 0.7336,
+        "High_Risk_Recall": 0.8602,
+        "MAOE": 0.2616,
+        "Severe_Jumping_Error_Rate": 0.0073,
+        "Avg_Asymmetric_Cost": 0.5561
+      },
+      "delta": {
+        "Macro_F1": 0.0046,
+        "Balanced_Accuracy": 0.0102,
+        "High_Risk_Recall": 0.0002,
+        "MAOE": -0.0028,
+        "Severe_Jumping_Error_Rate": 0.0012,
+        "Avg_Asymmetric_Cost": -0.0311
+      },
+      "source": "models/m5_env_replication.json + models/m8_val_pinned_env.json"
+    },
+    "step_3_library_version_effect": {
+      "what": "同一个 M8（v2、同一配方、同一切点规则），1.9.0 与 1.7.2 各一次",
+      "member_1_1_9_0_val": {
+        "Macro_F1": 0.7241,
+        "Balanced_Accuracy": 0.7336,
+        "High_Risk_Recall": 0.8602,
+        "MAOE": 0.2616,
+        "Severe_Jumping_Error_Rate": 0.0073,
+        "Avg_Asymmetric_Cost": 0.5561
+      },
+      "member_7_1_7_2_val": {
+        "Macro_F1": 0.7246,
+        "Balanced_Accuracy": 0.7342,
+        "High_Risk_Recall": 0.8607,
+        "MAOE": 0.2612,
+        "Severe_Jumping_Error_Rate": 0.0073,
+        "Avg_Asymmetric_Cost": 0.5554
+      },
+      "delta_val": {
+        "Macro_F1": 0.0005,
+        "Avg_Asymmetric_Cost": 0.0007
+      },
+      "own_seed_std_Macro_F1": {
+        "1_7_2": 0.0011,
+        "1_9_0": 0.0007
+      },
+      "reading": "环境差异 0.0005 小于两个环境下 M8 各自的种子标准差（0.0011 / 0.0007），与种子噪声同量级，不构成方向性影响",
+      "source": "models/metrics_m8.json + models/m8_val_pinned_env.json"
+    }
+  },
+  "test_result": {
+    "note": "测试集只跑过一次，在 7 号环境（1.7.2）。不重跑。",
+    "M8_test": {
+      "Macro_F1": 0.7109,
+      "Balanced_Accuracy": 0.7177,
+      "High_Risk_Recall": 0.877,
+      "MAOE": 0.2852,
+      "Severe_Jumping_Error_Rate": 0.0106,
+      "Avg_Asymmetric_Cost": 0.6711
+    },
+    "M5_test_reference": {
+      "Macro_F1": 0.7078,
+      "High_Risk_Recall": 0.8788,
+      "MAOE": 0.2873,
+      "Severe_Jumping_Error_Rate": 0.0091,
+      "Avg_Asymmetric_Cost": 0.7083,
+      "source": "models/metrics_stage5.json -> test_metrics_seed42"
+    },
+    "delta_test": {
+      "Macro_F1": 0.0031,
+      "High_Risk_Recall": -0.0018,
+      "MAOE": -0.0021,
+      "Severe_Jumping_Error_Rate": 0.0015,
+      "Avg_Asymmetric_Cost": -0.0372
+    },
+    "reading": "测试集上 F1 +0.0031、平均代价 −0.0372，但高危召回 −0.0018、跳级 +0.0015。增益集中在代价与 F1，最要紧的漏报率没有改善，报告里不能只报前两项"
+  },
+  "conclusion": {
+    "keep_existing_test_result": true,
+    "wording_for_report": "环境差异（Macro-F1 0.0005、平均代价 0.0007）与 M8 自身的种子标准差同量级（0.0011 / 0.0007），且比特征表效应（Macro-F1 +0.0046、平均代价 −0.0311）小约一个数量级；因此保留既有测试集结果，并在报告中声明运行环境。"
+  }
+}
