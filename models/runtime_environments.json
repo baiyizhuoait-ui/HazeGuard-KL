@@ -1,0 +1,113 @@
+{
+  "note": "M8 的测试集只允许跑一次，且是在 7 号的环境（Python 3.10 / sklearn 1.7.2）里跑的。本文件记录两套运行环境、以及把环境效应与特征表效应分开测量的结果，供 README、报告和答辩引用。数字出处写在每节的 source 字段。",
+  "environments": {
+    "member_1": {
+      "python": "3.14.6",
+      "scikit_learn": "1.9.0",
+      "numpy": "2.4.6",
+      "pandas": "3.0.3",
+      "scipy": "1.18.0",
+      "joblib": "1.5.3",
+      "matches_requirements": true
+    },
+    "member_7": {
+      "python": "3.10.11",
+      "scikit_learn": "1.7.2",
+      "numpy": "1.24.3",
+      "pandas": "2.3.3",
+      "matches_requirements": false,
+      "why": "Python 3.10 装不上 requirements 锁定的 scikit-learn 1.9.0"
+    }
+  },
+  "measurement": {
+    "step_1_baseline_reproduces": {
+      "what": "在本机（1.9.0）用同一脚本重跑 M5（v1 表，3 种子）",
+      "registered_M5_val": {
+        "Macro_F1": 0.7195,
+        "Balanced_Accuracy": 0.7234,
+        "High_Risk_Recall": 0.86,
+        "MAOE": 0.2644,
+        "Severe_Jumping_Error_Rate": 0.0061,
+        "Avg_Asymmetric_Cost": 0.5871
+      },
+      "replicated_M5_val": {
+        "Macro_F1": 0.7195,
+        "Balanced_Accuracy": 0.7234,
+        "High_Risk_Recall": 0.86,
+        "MAOE": 0.2644,
+        "Severe_Jumping_Error_Rate": 0.0061,
+        "Avg_Asymmetric_Cost": 0.5871
+      },
+      "max_abs_difference": 0.0,
+      "reading": "登记在 metrics_stage5.json 的 M5 验证集成绩，在 1.9.0 下可以逐位复现，说明主表那套数是 1.9.0 环境产出的，可作为同环境参照",
+      "source": "models/m5_env_replication.json"
+    },
+    "step_2_same_env_feature_effect": {
+      "what": "同一环境（1.9.0）内，只把 v1 换成 v2",
+      "M5_v1": {
+        "Macro_F1": 0.7195,
+        "Balanced_Accuracy": 0.7234,
+        "High_Risk_Recall": 0.86,
+        "MAOE": 0.2644,
+        "Severe_Jumping_Error_Rate": 0.0061,
+        "Avg_Asymmetric_Cost": 0.5871
+      },
+      "M8_v2": {
+        "Macro_F1": 0.7241,
+        "Balanced_Accuracy": 0.7336,
+        "High_Risk_Recall": 0.8602,
+        "MAOE": 0.2616,
+        "Severe_Jumping_Error_Rate": 0.0073,
+        "Avg_Asymmetric_Cost": 0.5561
+      },
+      "delta": {
+        "Macro_F1": 0.0046,
+        "Balanced_Accuracy": 0.0102,
+        "High_Risk_Recall": 0.0002,
+        "MAOE": -0.0028,
+        "Severe_Jumping_Error_Rate": 0.0012,
+        "Avg_Asymmetric_Cost": -0.0311
+      },
+      "source": "models/m5_env_replication.json + models/metrics_m8.json"
+    },
+    "step_3_env_effect": {
+      "what": "同一个 M8（v2 表、同一配方、同一切点规则），在两个环境下各跑一次",
+      "member_1_1_9_0": {
+        "Macro_F1": 0.7241,
+        "Balanced_Accuracy": 0.7336,
+        "High_Risk_Recall": 0.8602,
+        "MAOE": 0.2616,
+        "Severe_Jumping_Error_Rate": 0.0073,
+        "Avg_Asymmetric_Cost": 0.5561
+      },
+      "member_7_1_7_2": {
+        "Macro_F1": 0.7246,
+        "Avg_Asymmetric_Cost": 0.5555,
+        "note": "7 号口头汇报的 3 种子均值；完整记录在他的测试集运行里"
+      },
+      "delta": {
+        "Macro_F1": 0.0005,
+        "Avg_Asymmetric_Cost": -0.0006
+      },
+      "seed_std_M5_Macro_F1": 0.0017,
+      "reading": "环境差异 0.0005 小于种子间标准差 0.0017，属于同一量级噪声"
+    }
+  },
+  "conclusion": {
+    "keep_existing_test_result": true,
+    "why": "M8 的测试集已经跑过一次，按纪律不再重跑；环境差异比要测量的效应小一个数量级，换环境重跑只会引入新的不可比因素，不会让结论更稳",
+    "ratios": {
+      "Macro_F1": {
+        "feature_effect": 0.0046,
+        "env_effect": 0.0005,
+        "ratio": 9.2
+      },
+      "Avg_Asymmetric_Cost": {
+        "feature_effect": 0.0311,
+        "env_effect": 0.0006,
+        "ratio": 51.8
+      }
+    },
+    "wording_for_report": "环境差异（Macro-F1 0.0005、平均代价 0.0006）比特征表带来的效应（Macro-F1 +0.0046、平均代价 −0.0311）小一个数量级，且小于种子间标准差（0.0017），因此不影响结论方向。"
+  }
+}
