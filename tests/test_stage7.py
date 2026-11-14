@@ -34,6 +34,8 @@ analysis = load_module("system_analysis", "src/07_system_analysis.py")
 BENCHMARK_COLUMNS = ["model", "split", "seed", "Macro_F1", "Balanced_Accuracy",
                      "High_Risk_Recall", "MAOE", "Severe_Jumping_Error_Rate",
                      "Avg_Asymmetric_Cost", "n_samples"]
+# docs/spec_v3.md v3.2 adds feature_set as the second column
+BENCHMARK_COLUMNS_V32 = BENCHMARK_COLUMNS[:1] + ["feature_set"] + BENCHMARK_COLUMNS[1:]
 
 
 class OnsetLogic(unittest.TestCase):
@@ -108,8 +110,7 @@ class SavedInputs(unittest.TestCase):
         with open(MODELS / "all_models_benchmark.csv", encoding="utf-8-sig") as handle:
             rows = list(csv.DictReader(handle))
         header = list(rows[0].keys())
-        self.assertEqual(header[:len(BENCHMARK_COLUMNS)], BENCHMARK_COLUMNS)
-        self.assertIn(header[len(BENCHMARK_COLUMNS):], ([], ["feature_set"]))
+        self.assertIn(header, (BENCHMARK_COLUMNS, BENCHMARK_COLUMNS_V32))
         if "feature_set" in header:          # M8 is the only v2 row (KD-01)
             for row in rows:
                 self.assertEqual(row["feature_set"], "v2" if row["model"] == "M8" else "v1")
