@@ -249,5 +249,28 @@
     "Avg_Asymmetric_Cost": -0.0372
   },
   "test_finished_at": "2026-11-14T03:55:10.254165+00:00",
-  "predictions_file": "models/m8_predictions.npz"
+  "predictions_file": "models/m8_predictions.npz",
+  "environment": {
+    "python": "3.10.11",
+    "numpy": "1.24.3",
+    "pandas": "2.3.3",
+    "sklearn": "1.7.2",
+    "platform": "Windows"
+  },
+  "environment_note": "Recorded after the run from the runner's report (the script version used did not log versions). Differs from the project lock (sklearn 1.9.0, numpy 2.4.6, pandas 3.0.3) used for M5. A validation-only rerun of the same script on another machine gave Macro_F1 0.7241 and Avg_Asymmetric_Cost 0.5561 against 0.7246 and 0.5554 here; the environment effect is about a tenth of the v2-minus-v1 effect. The test split was evaluated once, here, and is not rerun.",
+  "crosscheck_validation_other_machine": {
+    "source": "member 1, main 4562af0 models/metrics_m8.json (validation only)",
+    "Macro_F1": 0.7241,
+    "Balanced_Accuracy": 0.7336,
+    "High_Risk_Recall": 0.8602,
+    "MAOE": 0.2616,
+    "Severe_Jumping_Error_Rate": 0.0073,
+    "Avg_Asymmetric_Cost": 0.5561,
+    "val_tuned_thresholds": [
+      17.0,
+      33.0,
+      53.0
+    ]
+  },
+  "hash_note": "code and selected_features_v2 hashes in this record were taken on a Windows CRLF checkout; with CRLF folded to LF they equal the repository files"
 }

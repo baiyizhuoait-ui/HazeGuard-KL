@@ -7,7 +7,7 @@
 开工之前请读完，尤其第 3 节和第 5 节。
 
 **这份文档只管"怎么协作"，不管"每个人做什么"。** 每个模块的具体任务、接口、验收标准
-写在 `docs/spec_v3.md`（阶段执行规范 v3.0）。两份文档冲突时，以 `spec_v3.md` 的任务定义为准、
+写在 `docs/spec_v3.md`（阶段执行规范 v3.2）。两份文档冲突时，以 `spec_v3.md` 的任务定义为准、
 以本文档的流程规定为准。
 
 > 早期那份技术规范 v2.0（Word 文档）写在开工前，里面还是"8 个监测站 + 6 个模型 + FCM/GPSO/SHAP"，
@@ -30,7 +30,7 @@
 | **4号** | 名义 RF、类权重与提升法 | `src/04_rf_and_boosting.py`、`src/04_complexity_experiments.py` | `models/rf_nominal.joblib`、`models/rf_balanced.joblib`、`models/boosting.joblib`、`models/metrics_stage4.json`、`figures/fig_rf_complexity_curve.png`、`figures/fig_window_sensitivity.png`、`figures/fig_boosting_vs_rf.png`、`docs/handover/04_nominal_rf_and_boosting.md`、`reports/sec2_6_models.md` |
 | **5号** | 回归分级与有序随机森林（两种保序范式） | `src/05_reg_to_cls.py`、`src/05_ordinal_rf.py` | `models/rf_regressor.joblib`、`models/ordinal_rf.joblib`、`models/ordinal_probs_val_test.npz`、`models/metrics_stage5.json`、`figures/fig_ordinal_error_distribution.png`、`figures/fig_interval_band.png`、`docs/handover/05_ordinal_and_interval.md`、`reports/sec2_6_and_2_7.md` |
 | **6号** | 代价敏感阈值、可解释性与泛化评估 | `src/06_cost_thresholds.py`、`src/06_interpretability.py`、`src/06_generalization_study.py` | `models/cost_thresholds.json`、`models/all_models_benchmark.csv`、`models/loso_results.csv`、`models/seasonal_metrics.csv`、`figures/fig_perm_importance.png`、`figures/fig_pdp_wind_humidity.png`、`figures/fig_roc_high_risk.png`、`figures/fig_confusion_matrices_comparison.png` |
-| **7号** | 交互系统与示范报告总成 | `app.py`、`src/07_compile_report.py` | `reports/HazeGuard_KL_Demonstration_Report.md`、`requirements.txt`（定稿）、`README.md`（定稿） |
+| **7号** | 交互系统与示范报告总成 | `app.py`、`src/07_compile_report.py`、`src/07_m8_v2_control.py` | `reports/HazeGuard_KL_Demonstration_Report.md`、`models/metrics_m8.json`、`requirements.txt`（定稿）、`README.md`（定稿） |
 
 ### 报告章节归属（避免两人写同一节）
 
@@ -190,6 +190,7 @@ Severe_Jumping_Error_Rate
 Avg_Asymmetric_Cost
 n_samples
 n_high_risk
+feature_set          （只出现在 all_models_benchmark.csv，取值 v1 / v2）
 ```
 
 不要写 `macro_f1`、`MacroF1`、`f1_macro`、`highrisk_recall` 这些变体。
