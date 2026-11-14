@@ -50,11 +50,11 @@ Three filters were applied to the training rows:
 2. a quasi-constant filter (no column removed), then greedy Spearman pruning at |ρ| > 0.92, which kept 47 columns;
 3. permutation importance on an internal holdout (the last 20% of training time, from 19 December 2024, 15,606 rows), with a default random forest fitted on the 62,138 earlier rows (leaving a three-hour gap) and scored by macro-F1, keeping the top 30.
 
-Their union of 64 columns was reduced to 25 by recursive feature elimination with a default random forest. The union removed only four candidates, so the elimination step did most of the work. The Top-25 (listed in `models/selected_features.json`) contains seven original variables, twelve stage 2 temporal features, two spatial features and four granulation features. None of the advection columns `upwind_pm25_advection_1h`, `_2h` or `_3h` was selected.
+Their union of 64 columns was reduced to 25 by recursive feature elimination with a default random forest. The union removed only four candidates, so the elimination step did most of the work. A first run kept `hour_sin` without `hour_cos`. A sine alone cannot tell apart hours with the same sine value, such as 03:00 and 09:00, so we treated each sin/cos pair (hour, day of week, month) as one unit. Elimination removes the weakest unit, with a pair scored by the sum of its two importances, and stops at exactly 25 columns. The final Top-25 (listed in `models/selected_features.json`) contains both hour terms, seven original variables, eleven other stage 2 temporal features, two spatial features and three granulation features. Compared with the first run, `hour_cos` replaced `gran_low_12h`. None of the advection columns `upwind_pm25_advection_1h`, `_2h` or `_3h` was selected.
 
 ### Ablation
 
-We trained a default random forest on five nested feature sets with seeds 42, 43 and 44 and evaluated on the validation split (16,656 eligible receptor rows, 4,842 high risk). Metrics come from `src/utils_metrics.py`. High-risk recall is the share of true Level 2 or 3 hours predicted as Level 2 or 3. M0 predicts the current level.
+We trained a default random forest with seeds 42, 43 and 44 and evaluated on the validation split (16,656 eligible receptor rows, 4,842 high risk). Sets 1 to 4 add one feature family at a time. Sets 5 to 8 separate two factors on top of the first-run Top-25: the missing `hour_cos` and a neighbourhood mean. The neighbourhood mean is the simple average of PM2.5 at hour t over the three nearest grid cells, excluding the cell itself, with no upwind weights so that any gain can be attributed to neighbour concentration alone. For the three receptors these neighbours lie 28 to 68 km away. Set 9 is the delivered Top-25. Metrics come from `src/utils_metrics.py`. High-risk recall is the share of true Level 2 or 3 hours predicted as Level 2 or 3. M0 predicts the current level.
 
 **Table 2.** Feature ablation on the validation split (mean ± standard deviation over three seeds).
 
@@ -65,7 +65,11 @@ We trained a default random forest on five nested feature sets with seeds 42, 43
 | 2. + Lag and rolling | 53 | 0.7125 ± 0.0013 | 0.7642 ± 0.0022 | 0.2566 | 0.6419 |
 | 3. + Spatial | 63 | 0.7103 ± 0.0006 | 0.7555 ± 0.0010 | 0.2579 | 0.6545 |
 | 4. + Granulation | 68 | 0.7129 ± 0.0018 | 0.7623 ± 0.0006 | 0.2561 | 0.6419 |
-| 5. Selected Top-25 | 25 | 0.7107 ± 0.0013 | 0.7664 ± 0.0019 | 0.2597 | 0.6497 |
+| 5. First-run Top-25 | 25 | 0.7107 ± 0.0013 | 0.7664 ± 0.0019 | 0.2597 | 0.6497 |
+| 6. Set 5 + `hour_cos` | 26 | 0.7142 ± 0.0021 | 0.7687 ± 0.0013 | 0.2557 | 0.6399 |
+| 7. Set 5 + neighbourhood mean | 26 | 0.7131 ± 0.0011 | 0.7665 ± 0.0019 | 0.2565 | 0.6479 |
+| 8. Set 5 + both | 27 | 0.7129 ± 0.0016 | 0.7669 ± 0.0035 | 0.2563 | 0.6459 |
+| 9. Paired Top-25 (delivered) | 25 | 0.7157 ± 0.0010 | 0.7712 ± 0.0008 | 0.2546 | 0.6369 |
 
 ### Figure 7 Feature ablation on the validation split
 
@@ -79,10 +83,14 @@ Dots are means over three seeds, bars one standard deviation, and the dashed lin
 
 **Spatial features did not help.** Adding them lowers macro-F1 from 0.7125 to 0.7103 and high-risk recall from 0.7642 to 0.7555, drops larger than the seed standard deviations. No advection column was selected. Two facts explain this. The forecast horizon is three hours, and the Sumatran and Bornean source cells lie outside the 150 km near-field radius, so they only describe the regional background. And in about one row in ten the filled advection columns simply repeat the cell's own lags. The value of spatial information is better judged in the cross-cell generalisation study.
 
-**Granulation adds little.** Set 4 is only 0.0004 above set 2 in macro-F1 (0.7129 against 0.7125) with the same average cost. Four granulation columns were still selected, but most of their information is already in the rolling features.
+**Granulation adds little.** Set 4 is only 0.0004 above set 2 in macro-F1 (0.7129 against 0.7125) with the same average cost. Three granulation columns were still selected, but most of their information is already in the rolling features.
 
-**Selection keeps performance with fewer columns.** The Top-25 reaches the highest high-risk recall (0.7664) with 25 of 68 columns, while its macro-F1 and cost are slightly worse than set 4.
+**The half-encoded hour was a real defect.** Adding `hour_cos` to the first-run Top-25 improves all three metrics: macro-F1 from 0.7107 to 0.7142, high-risk recall from 0.7664 to 0.7687 and average cost from 0.6497 to 0.6399.
+
+**Raw neighbour concentration adds little.** The neighbourhood mean raises macro-F1 by 0.0024 but leaves high-risk recall almost unchanged (0.7665 against 0.7664). Adding both factors together (set 8) is no better than adding `hour_cos` alone. So even without upwind weighting or filling, the concentration of nearby cells at hour t tells the model little beyond the cell's own recent history. This supports the reading that the weak spatial result comes from the three-hour horizon and not only from how the advection features were built.
+
+**The paired Top-25 is the best set.** With 25 of 68 columns it gives the highest macro-F1 (0.7157), the highest high-risk recall (0.7712) and the lowest average cost (0.6369) of all nine sets.
 
 **Limitations.** The standard deviations only reflect the forest seed, so differences below about 0.01 should not be read as firm rankings. Because the Top-25 was chosen on the whole training split, later cross-validation inside that split will be slightly optimistic. No test data were used here.
 
-**Sources.** `models/selected_features.json` (selection and filling), `models/metrics_stage3.json` (ablation, per-seed values and M0), `models/metrics_stage2_features.json` (missing rates, 150 km radius); code in `src/03_granulation_features.py` and `src/03_feature_selection.py`.
+**Sources.** `models/selected_features.json` (selection and filling), `models/metrics_stage3.json` (ablation, per-seed values, M0 and the neighbourhood definition), `models/metrics_stage2_features.json` (missing rates, 150 km radius); code in `src/03_granulation_features.py` and `src/03_feature_selection.py`.

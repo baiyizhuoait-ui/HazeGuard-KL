@@ -193,16 +193,18 @@ from different initial states and do not agree exactly, so the joined series con
 that belongs to the production system rather than to the atmosphere.
 
 In local time (UTC+8) these boundaries fall at 08:00 and 20:00. The seam is visible in the
-first difference of PM2.5. Averaged over the whole panel, the mean absolute hour-to-hour
-change at 08:00 and 20:00 is 15.2 µg/m³ against 4.7 µg/m³ at all other hours, a factor of
-3.2. At 20:00 the change is not only large but systematic: the mean signed change is
-+17.9 µg/m³, and the series steps upward at nearly every node at the same instant.
+first difference of PM2.5. Across all 26 nodes, the mean absolute hour-to-hour change at
+08:00 and 20:00 is 5.82 µg/m³ against 1.69 µg/m³ at all other hours, a factor of 3.45.
+At the reference receptor node KL_City the effect is stronger: 15.17 against 4.72, a factor
+of 3.22, and the mean signed change at 20:00 there is +17.93 µg/m³, so the series steps
+upward rather than scattering in both directions.
 
 Three checks separate this from ordinary weather or from the diurnal cycle.
 
 1. **It survives removal of the seasonal and diurnal climatology.** Repeating the same
-   statistic on `pm2_5_anomaly`, which has the (month, hour) climatology subtracted, leaves
-   the ratio at 3.0. A normal diurnal cycle would disappear here.
+   statistic on `pm2_5_anomaly` at KL_City, which has the (month, hour) climatology
+   subtracted, moves the ratio only from 3.22 to 3.02. A normal diurnal cycle would
+   disappear here.
 2. **It happens across the network at once.** At 20:00, 79 % of the 26 nodes change in the
    same direction, against 45 % at other hours. Local weather does not synchronise two
    hundred kilometres of coastline.
@@ -347,18 +349,17 @@ which is what a baseline should show.
 
 ## 2.2.4.2 Results
 
-Test split, receptor nodes, n = 16,728 (of which 6,865 high-risk). This table keeps the
-original M1 run. The main comparison table uses the same 16,647 eligible rows as M2–M7;
-the recomputed M1 values differ by at most 0.014 and are stored as `metrics_test_eligible`.
+Test split, receptor nodes, n = 16,647 (of which 6,848 high-risk). This is the same eligible
+row set used by M2–M7, so the table can be read against the model comparison that follows.
 
 | Metric | M0 Persistence | M1 Decision Tree | Δ (M1 − M0) |
 |---|---|---|---|
-| Macro-F1 | 0.6222 | **0.6620** | +0.0398 |
-| Balanced Accuracy | 0.6222 | **0.6443** | +0.0221 |
-| High-Risk Recall (L2 ∪ L3) | **0.7752** | 0.7693 | **−0.0059** |
-| MAOE | 0.3930 | **0.3220** | −0.0710 |
-| Severe Jumping Error Rate | 0.0375 | **0.0218** | −0.0157 |
-| Average Asymmetric Cost | 0.9986 | **0.8905** | −0.1081 |
+| Macro-F1 | 0.6231 | **0.6658** | +0.0427 |
+| Balanced Accuracy | 0.6232 | **0.6473** | +0.0241 |
+| High-Risk Recall (L2 ∪ L3) | **0.7757** | 0.7675 | **−0.0082** |
+| MAOE | 0.3925 | **0.3199** | −0.0726 |
+| Severe Jumping Error Rate | 0.0374 | **0.0210** | −0.0164 |
+| Average Asymmetric Cost | 0.9978 | **0.9047** | −0.0931 |
 
 **Definition of High-Risk Recall.** We report the *union* recall,
 Pr(ŷ ∈ {2,3} | y ∈ {2,3}), which asks whether a dangerous hour received *any* high-risk
@@ -394,16 +395,16 @@ against persistence, not against an empty model.
 
 **Aggregate metrics improve, but the metric that matters does not.** Macro-F1 rises by
 0.04, MAOE falls by 18 %, and average asymmetric cost falls by 11 %; on every summary
-statistic the tree looks like an improvement. Yet its union recall (0.7693) is *lower* than
-that of pure persistence (0.7752). Training a model and thereby losing ground on "should we
+statistic the tree looks like an improvement. Yet its union recall (0.7675) is *lower* than
+that of pure persistence (0.7757). Training a model and thereby losing ground on "should we
 raise an alarm" is the single most important result of this section: it shows that
 aggregate accuracy is the wrong objective for a warning system, and it is the empirical
 justification for the ordinal decomposition (M6) and the cost-sensitive threshold search
 (M7) that follow.
 
-The confusion matrix explains the mechanism. 1,348 true Level 2 cases are predicted as
-Level 1 and 758 true Level 3 cases as Level 2, while false alarms in the opposite direction
-are rare (9 Level 2 predicted from Level 0). The tree suppresses the boundary to accommodate
+The confusion matrix explains the mechanism. 1,358 true Level 2 cases are predicted as
+Level 1 and 809 true Level 3 cases as Level 2, while false alarms in the opposite direction
+are rare (5 Level 2 predicted from Level 0). The tree suppresses the boundary to accommodate
 Level 1, which holds roughly half the test set. That is hedging toward the majority, not
 random error.
 

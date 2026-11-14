@@ -59,6 +59,16 @@ def analyse(df: pd.DataFrame) -> dict:
     dp = p.diff()
     agree = (dp.gt(0).sum(axis=1) / dp.notna().sum(axis=1)).groupby(dp.index.hour).mean()
 
+    # 全网口径：逐节点算 |Δ| 的钟点曲线，再对节点取平均
+    panel = df.pivot_table(index="timestamp", columns="station_id", values="pm2_5")
+    diffs = panel.diff()
+    hour_key = diffs.index.hour
+    abs_hour = diffs.abs().groupby(hour_key).mean().mean(axis=1)   # 先按钟点、再对节点平均
+    signed_hour = diffs.groupby(hour_key).mean().mean(axis=1)
+
+    def panel_ratio(prof: pd.Series) -> float:
+        return float(prof.loc[list(SEAM_HOURS)].mean() / prof.drop(index=list(SEAM_HOURS)).mean())
+
     # 顺带排除「3 小时插值」这一说：若成立，块内 Δ 应恒定、Δ² 应集中在 3 的倍数上
     v = s["pm2_5"].dropna()
     hh = v.index.hour.to_numpy()
@@ -87,6 +97,23 @@ def analyse(df: pd.DataFrame) -> dict:
         "same_sign_share_background": round(
             float(agree.drop(index=list(SEAM_HOURS)).mean()), 2),
         "other_pollutant_seam_ratio": others,
+        "reference_station": {
+            "name": station,
+            "abs_mean_at_seam": round(float(raw.loc[list(SEAM_HOURS)].mean()), 2),
+            "abs_mean_other_hours": round(float(raw.drop(index=list(SEAM_HOURS)).mean()), 2),
+            "seam_ratio": round(ratio(raw), 2),
+            "anomaly_seam_ratio": round(ratio(anom), 2),
+            "signed_mean_at_20": round(float(s["pm2_5"].diff().groupby(
+                s["pm2_5"].diff().index.hour).mean().loc[20]), 2),
+        },
+        "panel": {
+            "n_nodes": int(panel.shape[1]),
+            "abs_mean_at_seam": round(float(abs_hour.loc[list(SEAM_HOURS)].mean()), 2),
+            "abs_mean_other_hours": round(float(abs_hour.drop(index=list(SEAM_HOURS)).mean()), 2),
+            "seam_ratio": round(panel_ratio(abs_hour), 2),
+            "signed_mean_at_20": round(float(signed_hour.loc[20]), 2),
+            "signed_mean_at_08": round(float(signed_hour.loc[8]), 2),
+        },
         "three_hour_interpolation_test": {
             "block_constant_share_pct": round(100 * float(np.mean(block)), 2),
             "abs_second_diff_by_hour_mod3": {int(k): round(float(x), 2) for k, x in mod3.items()},
@@ -110,6 +137,9 @@ def main() -> None:
     print(f"  原始序列 接缝/其余 = {res['raw_seam_ratio']}×")
     print(f"  去气候态后 接缝/其余 = {res['anomaly_seam_ratio']}×")
     print(f"  同时刻同向站点占比：接缝 {res['same_sign_share_at_seam']}，其余 {res['same_sign_share_background']}")
+    pl = res["panel"]
+    print(f"  全网 {pl['n_nodes']} 节点：接缝 |Δ| {pl['abs_mean_at_seam']} vs 其余 {pl['abs_mean_other_hours']}"
+          f"（{pl['seam_ratio']}×），20 时带符号均值 {pl['signed_mean_at_20']:+}")
     print(f"  其他污染物接缝倍数：{res['other_pollutant_seam_ratio']}")
     t3 = res["three_hour_interpolation_test"]
     print(f"  3 小时插值检验：块内 Δ 恒定 {t3['block_constant_share_pct']}%，"

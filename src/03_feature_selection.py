@@ -8,8 +8,13 @@
   b) 准常量过滤 + Spearman |rho| > 0.92 贪心剪枝（按与 target_pm25_3h 的 |rho| 优先保留）
   c) RF permutation importance：train 末 20% 时间作内部留出，留出前 3h 隔离，取前 N_TOP
   三者并集 → RF-RFE（step=1）→ Top-25。
+周期编码成对：hour / dayofweek / month 的 sin 与 cos 是一个单元，任一个进并集则两个都进，
+  RFE 按单元淘汰（单元重要性 = 两列之和），最后恰好 25 列。不成对的旧版 Top-25 也照算，作消融对照。
 消融：同一默认 RF、3 个种子，在 val 上评估六项指标（src/utils_metrics.py），附 M0 持续性；
-  ① 原始 → ② + 滞后/滚动 → ③ + 空间（近场与远场）→ ④ + 粒化 → ⑤ 选择后的 Top-25。
+  ① 原始 → ② + 滞后/滚动 → ③ + 空间（近场与远场）→ ④ + 粒化 →
+  ⑤ 旧版 Top-25（不成对）→ ⑥ ⑤ + 缺的那半个周期项 → ⑦ ⑤ + 邻域均值 → ⑧ ⑤ + 两者 → ⑨ 成对 Top-25（交付）。
+邻域均值（只用于消融，不进候选）：按大圆距离取最近 3 个格点（不含自身），同一时刻 PM2.5 的简单平均，
+  不用上风向权重；插值/缺失行不算；可用邻居取平均，一个都没有时用本格点当前值。
 
 features_final.parquet 只含 receptor ∧ 合格行，Top-25 全部为有限值（4 号读取时会校验）。
 空间列缺失按下面的规则填，都不拟合任何参数；选择与消融都在填补后的数据上做：
@@ -49,6 +54,8 @@ ELIGIBLE = ("audit_model_eligible",)
 KEYS, ID_COLS = ["station_id", "timestamp"], ["station_id", "timestamp", "region", "role", "split"]
 TARGETS = ["target_pm25_3h", "target_level_3h"]
 FAR_MEAN = re.compile(r"far_source_pm25_mean_(\d+)h")
+PAIRS = [("hour_sin", "hour_cos"), ("dayofweek_sin", "dayofweek_cos"), ("month_sin", "month_cos")]
+NBR_K, NBR = 3, "nbr_pm25_mean_k3"
 
 
 def sha256(path: Path) -> str:
@@ -144,6 +151,57 @@ def strategy_perm(tr, cols, scorer):
     return table.sort_values("mean", ascending=False), info
 
 
+def units_of(cols):
+    """Group columns into selection units: a sin/cos pair is one unit when both are present."""
+    units, seen = [], set()
+    for c in cols:
+        if c in seen:
+            continue
+        mate = next((b if a == c else a for a, b in PAIRS if c in (a, b)), None)
+        unit = (c, mate) if mate in cols else (c,)
+        units.append(unit)
+        seen.update(unit)
+    return units
+
+
+def paired_rfe(X, y, k):
+    """RFE that drops whole units; a pair is skipped if removing it would go below k columns."""
+    cols, steps = list(X.columns), []
+    while len(cols) > k:
+        imp = dict(zip(cols, rf().fit(X[cols], y).feature_importances_))
+        units = sorted(units_of(cols), key=lambda u: sum(imp[c] for c in u))
+        drop = next(u for u in units if len(cols) - len(u) >= k)
+        steps.append(drop)
+        cols = [c for c in cols if c not in drop]
+    final_imp = pd.Series(rf().fit(X[cols], y).feature_importances_, index=cols)
+    ranking = {c: 1 for c in cols}
+    for j, unit in enumerate(steps):
+        ranking.update({c: len(steps) - j + 1 for c in unit})
+    return list(final_imp.sort_values(ascending=False).index), final_imp, ranking
+
+
+def neighbour_mean(df, k=NBR_K):
+    """Simple mean of PM2.5 at the same hour over the k nearest grid cells (great-circle, self excluded)."""
+    st = df.drop_duplicates("station_id").set_index("station_id")[["lat", "lon", "role"]]
+    la, lo = np.radians(st["lat"].to_numpy(float)), np.radians(st["lon"].to_numpy(float))
+    d = 6371.0 * 2 * np.arcsin(np.sqrt(np.sin((la[:, None] - la) / 2) ** 2
+                                       + np.cos(la[:, None]) * np.cos(la) * np.sin((lo[:, None] - lo) / 2) ** 2))
+    clean = df["pm2_5"].where(df["qc_interpolated"].eq(0) & df["is_missing"].eq(0))
+    wide = df.assign(_x=clean).pivot(index="timestamp", columns="station_id", values="_x")
+    mean, n_avail, info = pd.Series(np.nan, index=df.index), pd.Series(0, index=df.index), {}
+    for i, sid in enumerate(st.index):
+        if st["role"].iloc[i] != "receptor":
+            continue
+        order = [j for j in np.argsort(d[i]) if j != i][:k]
+        nb = list(st.index[order])
+        rows = df["station_id"].eq(sid).to_numpy()
+        vals = wide[nb].reindex(df.loc[rows, "timestamp"])
+        mean[rows] = vals.mean(axis=1).to_numpy()
+        n_avail[rows] = vals.notna().sum(axis=1).to_numpy()
+        info[sid] = {"neighbours": nb, "distance_km": [round(float(d[i, j]), 1) for j in order]}
+    return mean, n_avail, info
+
+
 def ablate(tr, va, cols, evaluate):
     runs = []
     for s in SEEDS:
@@ -161,7 +219,7 @@ def plot_ablation(groups, m0, path: Path):
               ("Avg_Asymmetric_Cost", "Average asymmetric cost (lower is better)")]
     labels = list(groups)[::-1]
     y = np.arange(len(labels))
-    fig, axes = plt.subplots(1, 3, figsize=(13, 4.2), sharey=True)
+    fig, axes = plt.subplots(1, 3, figsize=(13, 1.4 + 0.55 * len(labels)), sharey=True)
     for ax, (key, title) in zip(axes, panels):
         mean = np.array([groups[g]["mean"][key] for g in labels])
         std = np.array([groups[g]["std"][key] for g in labels])
@@ -202,8 +260,10 @@ def main():
     audit = json.loads((args.repo / "models" / "metrics_stage2_features.json").read_text(encoding="utf-8"))
     base = audit["model_feature_columns"]
     present = [c for c in ELIGIBLE if c in pq.ParquetDataset(feat).schema.names]
-    df = pd.read_parquet(feat, columns=list(dict.fromkeys(ID_COLS + TARGETS + present + base)))
+    df = pd.read_parquet(feat, columns=list(dict.fromkeys(
+        ID_COLS + TARGETS + present + base + ["qc_interpolated", "is_missing"])))
     elig, ok = eligibility(args.repo, df)
+    df[NBR], nbr_avail, nbr_info = neighbour_mean(df)
     gran = pd.read_parquet(gran_path)
     gran_meta = json.loads(pq.read_schema(gran_path).metadata[b"hazeguard"])
     if not (df[KEYS].to_numpy() == gran[KEYS].to_numpy()).all():
@@ -213,11 +273,18 @@ def main():
     gran_cols = [c for c in gran.columns if c.startswith("gran_")]
     df = pd.concat([df, gran[gran_cols]], axis=1)
 
-    rec = df[df["role"].eq("receptor").to_numpy() & ok].copy()
+    keep = df["role"].eq("receptor").to_numpy() & ok
+    rec, nbr_avail = df[keep].copy(), nbr_avail[keep]
     new = [c for c in base if c in audit["new_columns"]]
     spatial = [c for c in new if c.startswith(SPATIAL)]
     filled = fill_spatial(rec, spatial)
     split = rec["split"].astype(str)
+    no_nbr = rec[NBR].isna()
+    rec.loc[no_nbr, NBR] = rec.loc[no_nbr, "pm2_5"]
+    nbr_counts = {s: {"rows": int(split.eq(s).sum()),
+                      "some_neighbour_missing": int((split.eq(s) & (nbr_avail < NBR_K)).sum()),
+                      "no_neighbour_used_own_value": int((split.eq(s) & no_nbr).sum())}
+                  for s in ("train", "val", "test")}
     tr = rec[split.eq("train")].sort_values(KEYS[::-1], kind="stable")
     va = rec[split.eq("val")].sort_values(KEYS[::-1], kind="stable")
 
@@ -233,20 +300,30 @@ def main():
     top_a, set_b = list(mi.index[:N_TOP]), list(rel.index)
     top_c = list(perm.index[perm["mean"] > 0][:N_TOP])
     union = [c for c in cands if c in set(top_a) | set(set_b) | set(top_c)]
+    # 旧版：不成对的 RFE（与此前交付的 Top-25 相同，作消融对照）
     rfe = RFE(rf(), n_features_to_select=TOP_K, step=1).fit(tr[union], y)
-    final_imp = pd.Series(rfe.estimator_.feature_importances_, index=np.array(union)[rfe.support_])
-    selected = list(final_imp.sort_values(ascending=False).index)
+    imp_v1 = pd.Series(rfe.estimator_.feature_importances_, index=np.array(union)[rfe.support_])
+    selected_v1 = list(imp_v1.sort_values(ascending=False).index)
+    # 交付版：周期编码成对
+    union_p = [c for c in cands if c in union or any(c in p and (set(p) & set(union)) for p in PAIRS)]
+    selected, final_imp, ranking = paired_rfe(tr[union_p], y, TOP_K)
+    halves = [b if a in selected_v1 else a for a, b in PAIRS if (a in selected_v1) != (b in selected_v1)]
 
     raw = [c for c in base if c not in new]
     temporal = [c for c in new if c not in spatial]
+    half = " + ".join(halves) if halves else "missing cyclic half"
     group_cols = {"1 Raw only": raw, "2 + Lag/Rolling": raw + temporal,
                   "3 + Spatial (near & far field)": raw + temporal + spatial,
                   "4 + Granulation": raw + temporal + spatial + gran_unique,
-                  f"5 Selected Top-{TOP_K}": selected}
+                  f"5 Top-{TOP_K} unpaired (previous)": selected_v1,
+                  f"6 Previous + {half}": selected_v1 + halves,
+                  "7 Previous + neighbour mean": selected_v1 + [NBR],
+                  f"8 Previous + {half} + neighbour mean": selected_v1 + halves + [NBR],
+                  f"9 Top-{TOP_K} paired (delivered)": selected}
     groups = {}
     for name, cols in group_cols.items():
         groups[name] = ablate(tr, va, cols, evaluate_predictions)
-        print(f"{name:28s} n={len(cols):3d}  " + "  ".join(
+        print(f"{name:42s} n={len(cols):3d}  " + "  ".join(
             f"{k}={groups[name]['mean'][k]:.4f}±{groups[name]['std'][k]:.4f}"
             for k in ("Macro_F1", "High_Risk_Recall", "Avg_Asymmetric_Cost")))
     m0 = evaluate_predictions(va["target_level_3h"], np.searchsorted(LEVEL_THRESHOLDS, va["pm2_5"], side="right"))
@@ -284,15 +361,31 @@ def main():
                  "strategy_c_permutation": {"top": top_c, "holdout": perm_info,
                                             "importance": perm.round(5).to_dict(orient="index")},
                  "union": union, "n_union": len(union),
-                 "rfe_ranking": dict(zip(union, map(int, rfe.ranking_))),
+                 "pairing": {"pairs": PAIRS,
+                             "rule": "a sin/cos pair is one unit: if either enters the union both do; RFE "
+                                     "drops whole units ranked by summed importance, skipping a pair when "
+                                     "that would leave fewer than top_k columns",
+                             "union_paired": union_p, "n_union_paired": len(union_p),
+                             "added_to_union": [c for c in union_p if c not in union]},
+                 "rfe_ranking": ranking,
                  "final_rf_importance": final_imp.round(5).to_dict(),
+                 "selected_features_unpaired": selected_v1,
+                 "rfe_ranking_unpaired": dict(zip(union, map(int, rfe.ranking_))),
                  "selected_in_strategies": {c: [k for k, s in (("a", top_a), ("b", set_b), ("c", top_c))
                                                 if c in s] for c in selected}}
     metrics = {**stamp, "evaluated_on": "val, role==receptor & eligible, spatial NaN filled "
                                         "(see selected_features.json spatial_fill)", "val_rows": len(va),
                "model": "RandomForestClassifier() defaults, n_jobs=-1",
                "high_risk_recall_definition": "union: P(pred in {2,3} | true in {2,3})",
-               "ablation": groups, "metrics_persistence_M0_val": m0}
+               "ablation": groups, "metrics_persistence_M0_val": m0,
+               "neighbour_feature": {
+                   "column": NBR, "used_in": "ablation rows 7 and 8 only, not a selection candidate",
+                   "definition": f"simple mean of pm2_5 at the same hour t over the {NBR_K} nearest grid cells "
+                                 "by great-circle distance, excluding the cell itself; no upwind weights",
+                   "missing_rule": "hours flagged qc_interpolated or is_missing are excluded; mean of the "
+                                   "available neighbours; if none is available, the cell's own pm2_5 at t",
+                   "neighbours_by_receptor": nbr_info, "row_counts_eligible_receptor": nbr_counts},
+               "factor_rows": {"previous_top25": selected_v1, "missing_cyclic_half": halves}}
     (args.out / "models").mkdir(parents=True, exist_ok=True)
     for name, obj in (("selected_features.json", selection), ("metrics_stage3.json", metrics)):
         (args.out / "models" / name).write_text(json.dumps(obj, indent=2, ensure_ascii=False), encoding="utf-8")
