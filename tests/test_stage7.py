@@ -94,8 +94,22 @@ class SavedInputs(unittest.TestCase):
 
     def test_benchmark_has_the_contract_columns(self):
         with open(MODELS / "all_models_benchmark.csv", encoding="utf-8-sig") as handle:
-            header = next(csv.reader(handle))
-        self.assertEqual(header, BENCHMARK_COLUMNS)
+            rows = list(csv.DictReader(handle))
+        header = list(rows[0].keys())
+        self.assertEqual(header[:len(BENCHMARK_COLUMNS)], BENCHMARK_COLUMNS)
+        self.assertIn(header[len(BENCHMARK_COLUMNS):], ([], ["feature_set"]))
+        if "feature_set" in header:          # M8 is the only v2 row (KD-01)
+            for row in rows:
+                self.assertEqual(row["feature_set"], "v2" if row["model"] == "M8" else "v1")
+
+    def test_m8_script_reads_the_registered_v2_files(self):
+        m8 = load_module("m8_v2_control", "src/07_m8_v2_control.py")
+        manifest = json.loads((ROOT / m8.MANIFEST).read_text(encoding="utf-8"))
+        self.assertIn(m8.V2_TABLE, manifest["tables"])
+        features = json.loads((ROOT / m8.V2_FEATURES).read_text(encoding="utf-8"))
+        names = features["selected_features"]
+        self.assertEqual(len(names), 25)
+        self.assertTrue({"hour_sin", "hour_cos"} <= set(names))
 
 
 @unittest.skipUnless((MODELS / "metrics_stage7.json").exists(), "run src/07_system_analysis.py")

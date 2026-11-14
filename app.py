@@ -865,11 +865,17 @@ def tab_models(benchmark: pd.DataFrame | None, stage7: dict | None) -> None:
     if benchmark is None:
         missing("models/all_models_benchmark.csv")
         return
-    splits = sorted(benchmark["split"].unique())
+    if "feature_set" not in benchmark.columns:
+        benchmark = benchmark.assign(feature_set="v1")
+    benchmark["feature_set"] = benchmark["feature_set"].fillna("v1").astype(str)
+    main_table = benchmark[benchmark["feature_set"] == "v1"]
+    st.caption("Main table: every model here uses feature table v1. The v2 control M8 is "
+               "shown separately below and is never ranked against these models.")
+    splits = sorted(main_table["split"].unique())
     c1, c2 = st.columns(2)
     split = c1.selectbox("Split", splits, index=splits.index("test") if "test" in splits else 0)
     metric = c2.selectbox("Metric", list(METRICS), index=2)
-    table = benchmark[benchmark["split"] == split].reset_index(drop=True)
+    table = main_table[main_table["split"] == split].reset_index(drop=True)
     show(fig_benchmark(table, metric))
 
     sizes = sorted(table["n_samples"].unique())
@@ -884,6 +890,8 @@ def tab_models(benchmark: pd.DataFrame | None, stage7: dict | None) -> None:
     with st.expander("Table view", expanded=True):
         st.dataframe(table.style.format({m: "{:.4f}" for m in METRICS}),
                      use_container_width=True, hide_index=True)
+
+    m8_section()
 
     m7 = load_json_or_none("m7_test_metrics.json")
     if m7:
@@ -912,6 +920,49 @@ def tab_models(benchmark: pd.DataFrame | None, stage7: dict | None) -> None:
                         columns=[f"pred {level_label(k)}" for k in range(4)])
     st.dataframe(cost, use_container_width=True)
     st.caption("Missing a high-risk hour (lower left) costs far more than a false alarm.")
+
+
+def m8_section() -> None:
+    """M8 against its own v1 counterpart only: same recipe, different feature table."""
+    st.subheader("M8 · v2 control for known defect KD-01")
+    defects = ROOT / "docs" / "known_defects.json"
+    kd = None
+    if defects.exists():
+        items = json.loads(defects.read_text(encoding="utf-8")).get("items", [])
+        kd = next((i for i in items if i.get("id") == "KD-01"), None)
+    if kd:
+        st.caption(f"KD-01: {kd['description']}")
+    m8 = load_json_or_none("metrics_m8.json")
+    if not m8:
+        st.info("M8 has not been run yet (`python src/07_m8_v2_control.py`).")
+        return
+    reference = m8["m5_reference"]
+    rows = []
+    for label, block in (("M5_val_tuned · feature table v1 (main table)",
+                          reference["validation_mean_std"]),
+                         ("M8 · feature table v2 (control)", m8["validation_mean_std"])):
+        rows.append({"Validation, mean of 3 seeds": label,
+                     **{k: block[k]["mean"] for k in METRICS}})
+    rows.append({"Validation, mean of 3 seeds": "Change, v2 minus v1",
+                 **m8["validation_delta_vs_M5_val_tuned"]})
+    frame = pd.DataFrame(rows)
+    st.dataframe(frame.style.format({k: "{:.4f}" for k in METRICS}),
+                 use_container_width=True, hide_index=True)
+    if m8.get("test_metrics_seed42"):
+        test_rows = [
+            {"Test, seed 42": "M5_val_tuned · v1", **{k: reference["test_seed42"][k]
+                                                      for k in METRICS}},
+            {"Test, seed 42": "M8 · v2 (control)", **{k: m8["test_metrics_seed42"][k]
+                                                       for k in METRICS}},
+            {"Test, seed 42": "Change, v2 minus v1", **m8["test_delta_vs_M5_val_tuned"]},
+        ]
+        st.dataframe(pd.DataFrame(test_rows).style.format({k: "{:.4f}" for k in METRICS}),
+                     use_container_width=True, hide_index=True)
+    else:
+        st.caption("Test pass not run yet; validation only.")
+    st.caption("M8 repeats the M5 recipe (same hyperparameters, same cut-point search on "
+               "validation) on feature table v2, which pairs hour_sin with hour_cos. The only "
+               "comparison made here is M8 against M5; the other models were trained on v1.")
 
 
 def tab_explain() -> None:
