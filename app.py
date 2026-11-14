@@ -277,7 +277,10 @@ def load_predictions() -> pd.DataFrame:
         frames.append(frame)
     out = pd.concat(frames, ignore_index=True)
     out["valid_time"] = out["timestamp"] + pd.Timedelta(hours=HORIZON_H)
-    calibrated = MODELS / "stage5_intervals_calibrated.npz"
+    # The delivered interval is member 5's adaptive version; the fixed-width file is a control.
+    calibrated = MODELS / "stage5_intervals_adaptive.npz"
+    if not calibrated.exists():
+        calibrated = MODELS / "stage5_intervals_calibrated.npz"
     if calibrated.exists():
         cal = np.load(calibrated)
         rows = []
@@ -294,17 +297,24 @@ def load_predictions() -> pd.DataFrame:
 
 def interval_label() -> tuple[str, str] | None:
     """Short legend label and the coverage note for member 5's calibrated interval."""
-    record = load_json_or_none("metrics_stage5_interval_calibrated.json")
+    record = (load_json_or_none("metrics_stage5_interval_adaptive.json")
+              or load_json_or_none("metrics_stage5_interval_calibrated.json"))
     if not record:
         return None
     nominal = record.get("nominal_coverage", 0.9)
-    test = record["test"]["calibrated"]
-    val = record["val"]["calibrated"]
+    test = record["test"].get("overall") or record["test"]["calibrated"]
+    val = record["val"].get("overall") or record["val"]["calibrated"]
+    nodes = record["test"].get("by_node", {})
+    worst = min(nodes.items(), key=lambda kv: kv[1]["PICP"]) if nodes else None
     label = f"{nominal:.0%} target-coverage interval (calibrated on validation)"
     note = (f"Interval: {nominal:.0%} target coverage, calibrated on the validation split "
             f"({val['PICP']:.1%} there). On the test split it covered {test['PICP']:.1%} of "
-            f"outcomes with a mean width of {test['MPIW']:.1f} µg/m³, so the 90% target is not "
-            "met on unseen data. Method and limits: models/interval_calibration.json.")
+            f"outcomes with a mean width of {test['MPIW']:.1f} µg/m³")
+    if worst:
+        note += (f"; the lowest node is {worst[0].replace('_', ' ')} at "
+                 f"{worst[1]['PICP']:.1%}")
+    note += (". The 90% target is not met on unseen data. Method and limits: "
+             "models/metrics_stage5_interval_adaptive.json.")
     return label, note
 
 
@@ -985,14 +995,15 @@ def tab_method() -> None:
                 "across it cannot be foreseen from the inputs.",
                 f"接缝处的逐小时变化是其他时段的 {seam['raw_seam_ratio']} 倍；跨接缝的跳变无法从输入预知。"),
             tr("Evidence"): "models/seam_report.json"})
-    interval = load_json_or_none("metrics_stage5_interval_calibrated.json")
+    interval = (load_json_or_none("metrics_stage5_interval_adaptive.json")
+                or load_json_or_none("metrics_stage5_interval_calibrated.json"))
     if interval:
-        got = interval["test"]["calibrated"]["PICP"]
+        got = (interval["test"].get("overall") or interval["test"]["calibrated"])["PICP"]
         rows.append({
             tr("Limit"): L("Interval misses its target on test", "区间在测试段未达标"),
             tr("What it affects"): L(f"90% target, {got:.1%} achieved on the test split.",
                                      f"目标覆盖 90%，测试段实际 {got:.1%}。"),
-            tr("Evidence"): "models/metrics_stage5_interval_calibrated.json"})
+            tr("Evidence"): "models/metrics_stage5_interval_adaptive.json"})
     stage7 = load_json_or_none("metrics_stage7.json")
     if stage7:
         level3 = stage7["error_anatomy"]["test"]["by_true_level"].get("3")

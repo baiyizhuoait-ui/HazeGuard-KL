@@ -95,7 +95,7 @@ class SavedInputs(unittest.TestCase):
                              == stage5[f"pred_m6_{split}"]).all())
 
     def test_calibrated_interval_lines_up_with_the_predictions(self):
-        path = MODELS / "stage5_intervals_calibrated.npz"
+        path = MODELS / "stage5_intervals_adaptive.npz"
         if not path.exists():
             self.skipTest("interval calibration not merged")
         cal, probs = np.load(path), np.load(MODELS / "ordinal_probs_val_test.npz")
